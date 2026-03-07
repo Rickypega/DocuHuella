@@ -35,10 +35,12 @@ Despliegue: 000webhost (Hosting gratuito)
 /public: Carpeta de recursos estáticos como hojas de estilo (CSS), scripts (JS) y el logo oficial.
 
 👥 Participantes
+
 Ricardo Peña García (Ricky)
 
 Eddual Rafael Corniel
 
+============================================================================================================
 Notas de Instalación
 Clonar el repositorio en la carpeta htdocs de XAMPP.
 
