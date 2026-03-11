@@ -61,6 +61,8 @@ Ricardo Peña García (Ricky)
 
 Eddual Rafael Corniel
 
+Lerinson Samuel Volquez
+
 ============================================================================
 
 Notas de Instalación
