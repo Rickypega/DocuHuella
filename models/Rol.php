@@ -6,6 +6,7 @@ class Rol {
     // Atributos 
     public $id_rol;
     public $nombre_rol;
+    public $descripcion;
 
     public function __construct($db) {
         $this->conexion = $db;
@@ -27,16 +28,17 @@ class Rol {
      */
     public function crearRolesPredeterminados() {
         $roles = [
-            ['id' => 1, 'nombre' => 'Administrador'],
-            ['id' => 2, 'nombre' => 'Veterinario'],
-            ['id' => 3, 'nombre' => 'Cuidador']
+            ['id' => 1, 'nombre' => 'Administrador', 'descripcion' => 'Acceso total al sistema y gestión de usuarios.'],
+            ['id' => 2, 'nombre' => 'Veterinario', 'descripcion' => 'Atención veterinaria y gestión de expedientes.'],
+            ['id' => 3, 'nombre' => 'Cuidador', 'descripcion' => 'Tutor / dueño de las mascotas.']
         ];
 
         foreach ($roles as $r) {
-            $query = "INSERT IGNORE INTO " . $this->tabla . " (id_rol, nombre_rol) VALUES (:id, :nombre)";
+            $query = "INSERT IGNORE INTO " . $this->tabla . " (id_rol, nombre_rol, descripcion) VALUES (:id, :nombre, :descripcion)";
             $stmt = $this->conexion->prepare($query);
             $stmt->bindParam(':id', $r['id']);
             $stmt->bindParam(':nombre', $r['nombre']);
+            $stmt->bindParam(':descripcion', $r['descripcion']);
             $stmt->execute();
         }
     }
