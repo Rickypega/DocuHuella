@@ -6,7 +6,7 @@ class Usuario {
     // Atributos exactos de tu tabla [cite: 13]
     public $id_usuario;
     public $correo;
-    public $contraseña;
+    public $contrasena;
     public $id_rol;
 
     public function __construct($db) {
@@ -27,7 +27,7 @@ class Usuario {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             
             // Verificamos si la contraseña coincide 
-            if(password_verify($this->contraseña, $row['contraseña'])) {
+            if(password_verify($this->contrasena, $row['contrasena'])) {
                 return $row; // Retorna los datos del usuario para la sesión
             }
         }
