@@ -19,7 +19,7 @@ class Mascota {
     public function __construct($db) {
         $this->conexion = $db;
     }
-// ajaggadloghagihjna
+
     // ACCIONES (MÉTODOS)
 
     // Lógica para registrar una nueva mascota
