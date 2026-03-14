@@ -1,3 +1,15 @@
-/config/db.php
+# Configuración de XAMPP / Servidor
+.htaccess
+php_errors.log
+
+# Archivos de Sistema
 .DS_Store
-node_modules/
+Thumbs.db
+
+# IDEs (VS Code, PHPStorm)
+.vscode/
+.idea/
+
+# Scripts temporales de instalación (Seguridad)
+setup.php
+probar_db.php

@@ -73,3 +73,20 @@ Clonar el repositorio en la carpeta htdocs de XAMPP.
 Importar el archivo SQL (próximamente disponible) en phpMyAdmin.
 
 Configurar las credenciales de acceso en el archivo config/db.php.
+
+## 🛠️ Configuración del Entorno Local
+
+Para que el proyecto funcione en tu computadora, sigue estos pasos:
+
+### 1. Base de Datos
+1. Abre **XAMPP** y activa Apache y MySQL.
+2. Ve a [http://localhost:8080/phpmyadmin/](http://localhost:8080/phpmyadmin/) (o al puerto que tengas configurado).
+3. Crea una base de datos llamada `Docuhuella`.
+4. Importa el archivo `DocuhuellaDB.sql` que está en la raíz del proyecto.
+
+### 2. Inicialización de Datos (Roles y Admin)
+Una vez importada la base de datos, debes ejecutar el script de inicialización para crear los roles (Admin, Veterinario, Cuidador) y el usuario maestro:
+- Entra a: `http://localhost:8080/DocuHuella/setup.php`
+- Si ves los mensajes de éxito, los roles y el primer admin (`admin@docuhuella.com` / `admin123`) ya estarán listos en tu DB.
+
+> **Nota sobre el puerto:** Si tu XAMPP da error en el puerto 80, cámbialo al **8080** en el archivo `httpd.conf` de Apache y usa las URLs mencionadas arriba.
