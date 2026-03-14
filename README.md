@@ -1,8 +1,3 @@
-¡Por supuesto! Aquí tienes el código exacto del `README.md` estructurado y listo para que lo copies y pegues directamente en tu archivo.
-
-He mantenido el diseño profesional con iconos, tablas y bloques de código para que resalte en GitHub.
-
-```markdown
 # 🐾 DocuHuella - Sistema de Gestión Veterinaria
 
 **DocuHuella** es una solución tecnológica integral diseñada para optimizar la gestión de expedientes clínicos veterinarios. El sistema permite centralizar la información médica de las mascotas, facilitando el trabajo de los profesionales y mejorando el seguimiento para los cuidadores.
