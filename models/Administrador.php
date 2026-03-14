@@ -3,52 +3,65 @@ class Administrador {
     private $conexion;
     private $tabla = "Administrador";
 
-    // ATRIBUTOS EXACTOS DE TU DOCUMENTO [cite: 13, 36]
+    // ATRIBUTOS 
     public $id_admin;
     public $nombre;
     public $apellido;
     public $cedula;
     public $telefono;
     public $correo;
-    public $clinica_veterinaria; // Campo: Clinica/Veterinaria [cite: 13]
+    public $clinica_veterinaria; // Nombre: Clinica/Veterinaria 
     public $direccion;
+    public $id_usuario; // Relación sugerida en el documento 
 
     public function __construct($db) {
         $this->conexion = $db;
     }
 
-    // ACCIONES (MÉTODOS) [cite: 37, 38]
+    // ACCIONES (MÉTODOS) 
 
-    // Gestionar Usuarios: Permite al admin ver o suspender cuentas 
+    /**
+     * Gestionar Usuarios: Permite al admin ver todas las cuentas y sus roles 
+     */
     public function gestionarUsuarios() {
-        $query = "SELECT u.id_usuario, u.correo, r.nombre_rol 
+       
+        $query = "SELECT u.ID_Usuario, u.Correo, r.Nombre_Rol 
                   FROM Usuarios u 
-                  INNER JOIN Roles r ON u.id_rol = r.id_rol";
+                  INNER JOIN Roles r ON u.ID_Rol = r.ID_Rol";
         
         $stmt = $this->conexion->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Generar Reportes: Estadísticas mensuales de consultas [cite: 38]
+    /**
+     * Generar Reportes: Estadísticas mensuales de consultas 
+     */
     public function generarReportes() {
+        // Ajustado a la columna Fecha_Hora de tu SQL
         $query = "SELECT COUNT(*) as total_consultas 
                   FROM Expedientes 
-                  WHERE MONTH(fecha_hora) = MONTH(CURRENT_DATE())";
+                  WHERE MONTH(Fecha_Hora) = MONTH(CURRENT_DATE())";
         
         $stmt = $this->conexion->prepare($query);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Configurar Clínica: Actualizar datos de la institución [cite: 38]
+    /**
+     * Configurar Clínica: Actualizar datos de la institución
+     */
     public function configurarClinica() {
+        // Ajustado a las columnas Clinica_Veterinaria e ID_Admin de tu SQL
         $query = "UPDATE " . $this->tabla . " 
-                  SET clinica_veterinaria = :clinica, direccion = :dir, telefono = :tel 
-                  WHERE id_admin = :id";
+                  SET Direccion = :dir, Telefono = :tel 
+                  WHERE ID_Admin = :id";
         
         $stmt = $this->conexion->prepare($query);
-        $stmt->bindParam(':clinica', $this->clinica_veterinaria);
+
+        // Sanitización para seguridad
+        $this->direccion = htmlspecialchars(strip_tags($this->direccion));
+
         $stmt->bindParam(':dir', $this->direccion);
         $stmt->bindParam(':tel', $this->telefono);
         $stmt->bindParam(':id', $this->id_admin);

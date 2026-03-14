@@ -3,7 +3,7 @@ class Mascota {
     private $conexion;
     private $tabla = "Mascotas";
 
-    // ATRIBUTOS
+    // ATRIBUTOS (Coinciden con el documento y SQL)
     public $id_mascota;
     public $nombre;
     public $especie;
@@ -22,13 +22,21 @@ class Mascota {
 
     // ACCIONES (MÉTODOS)
 
-    // Lógica para registrar una nueva mascota
+    /**
+     * Lógica para registrar una nueva mascota
+     */
     public function registrarMascota() {
         $query = "INSERT INTO " . $this->tabla . " 
-                  (nombre, especie, raza, sexo, color, edad, rasgos, peso, estado_esterilizacion, id_cuidador) 
+                  (Nombre, Especie, Raza, Sexo, Color, Edad, Rasgos, Peso, Estado_Esterilizacion, ID_Cuidador) 
                   VALUES (:nombre, :especie, :raza, :sexo, :color, :edad, :rasgos, :peso, :esteril, :id_cuidador)";
         
         $stmt = $this->conexion->prepare($query);
+
+        // Sanitización para evitar scripts maliciosos
+        $this->nombre = htmlspecialchars(strip_tags($this->nombre));
+        $this->especie = htmlspecialchars(strip_tags($this->especie));
+        $this->raza = htmlspecialchars(strip_tags($this->raza));
+        $this->rasgos = htmlspecialchars(strip_tags($this->rasgos));
 
         // Vinculación segura de parámetros
         $stmt->bindParam(':nombre', $this->nombre);
@@ -45,13 +53,18 @@ class Mascota {
         return $stmt->execute();
     }
 
-    // Lógica para actualizar los datos físicos de la mascota
+    /**
+     * Lógica para actualizar los datos físicos de la mascota
+     */
     public function actualizarDatos() {
         $query = "UPDATE " . $this->tabla . " 
-                  SET peso = :peso, edad = :edad, rasgos = :rasgos, estado_esterilizacion = :esteril 
-                  WHERE id_mascota = :id";
+                  SET Peso = :peso, Edad = :edad, Rasgos = :rasgos, Estado_Esterilizacion = :esteril 
+                  WHERE ID_Mascota = :id";
         
         $stmt = $this->conexion->prepare($query);
+
+        $this->rasgos = htmlspecialchars(strip_tags($this->rasgos));
+
         $stmt->bindParam(':peso', $this->peso);
         $stmt->bindParam(':edad', $this->edad);
         $stmt->bindParam(':rasgos', $this->rasgos);
@@ -61,9 +74,13 @@ class Mascota {
         return $stmt->execute();
     }
 
-    // Lógica para ver el historial médico completo
+    /**
+     * Lógica para ver el historial médico completo
+     * Conecta con la tabla Expedientes
+     */
     public function verHistorialMedico() {
-        $query = "SELECT * FROM Expedientes WHERE id_mascota = :id ORDER BY fecha_hora DESC";
+        // En el SQL la tabla es "Expedientes" y la FK es "ID_Mascota"
+        $query = "SELECT * FROM Expedientes WHERE ID_Mascota = :id ORDER BY Fecha_Hora DESC";
         $stmt = $this->conexion->prepare($query);
         $stmt->bindParam(':id', $this->id_mascota);
         $stmt->execute();

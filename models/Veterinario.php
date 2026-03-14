@@ -3,7 +3,7 @@ class Veterinario {
     private $conexion;
     private $tabla = "Veterinarios";
 
-    // ATRIBUTOS
+    // ATRIBUTOS 
     public $id_veterinario;
     public $nombre;
     public $apellido;
@@ -14,8 +14,8 @@ class Veterinario {
     public $telefono;
     public $especialidad;
     public $direccion;
-    public $execuatur;
-    public $colegiatura_colvet; // COLVET 
+    public $exequatur; // Número de registro profesional 
+    public $colegiatura;  //certificado de colegiatura que lo acredite como veterinario
     public $id_usuario; // FK hacia Usuarios 
 
     public function __construct($db) {
@@ -23,31 +23,24 @@ class Veterinario {
     }
 
     // ACCIONES (MÉTODOS) 
-    
-    // Lógica para crear un expediente clínico 
-    public function crearExpediente() {
-        // Aquí irá la lógica para insertar en la tabla de Expedientes
-    }
 
-    // Lógica para consultar el historial de una mascota 
-    public function consultarHistorial() {
-        // Aquí la lógica para buscar registros médicos previos
-    }
-
-    // Lógica para emitir un diagnóstico 
-    public function emitirDiagnostico() {
-        // Aquí la lógica para validar y guardar diagnósticos
-    }
-
-    // Método extra para registrar el perfil del veterinario
+    /**
+     * Lógica para registrar el perfil del veterinario
+     */
     public function registrarPerfil() {
         $query = "INSERT INTO " . $this->tabla . " 
-                  (nombre, apellido, edad, cedula, sexo, correo, telefono, especialidad, direccion, execuatur, colegiatura_colvet, id_usuario) 
-                  VALUES (:nombre, :apellido, :edad, :cedula, :sexo, :correo, :telefono, :especialidad, :direccion, :execuatur, :colvet, :id_usuario)";
+                  (Nombre, Apellido, Edad, Cedula, Sexo, Correo, Telefono, Especialidad, Direccion, Exequatur, Colegiatura, ID_Usuario) 
+                  VALUES (:nombre, :apellido, :edad, :cedula, :sexo, :correo, :telefono, :especialidad, :direccion, :exequatur, :colegiatura, :id_usuario)";
         
         $stmt = $this->conexion->prepare($query);
 
-        // Vinculación de todos los parámetros para seguridad
+        // Sanitización para seguridad
+        $this->nombre = htmlspecialchars(strip_tags($this->nombre));
+        $this->apellido = htmlspecialchars(strip_tags($this->apellido));
+        $this->especialidad = htmlspecialchars(strip_tags($this->especialidad));
+        $this->correo = htmlspecialchars(strip_tags($this->correo));
+
+        // Vinculación de parámetros
         $stmt->bindParam(':nombre', $this->nombre);
         $stmt->bindParam(':apellido', $this->apellido);
         $stmt->bindParam(':edad', $this->edad);
@@ -57,11 +50,39 @@ class Veterinario {
         $stmt->bindParam(':telefono', $this->telefono);
         $stmt->bindParam(':especialidad', $this->especialidad);
         $stmt->bindParam(':direccion', $this->direccion);
-        $stmt->bindParam(':execuatur', $this->execuatur);
-        $stmt->bindParam(':colvet', $this->colegiatura_colvet);
+        $stmt->bindParam(':exequatur', $this->exequatur);
+        $stmt->bindParam(':colegiatura', $this->colegiatura);
         $stmt->bindParam(':id_usuario', $this->id_usuario);
 
         return $stmt->execute();
+    }
+
+    /**
+     * Lógica para crear un expediente clínico 
+     * 
+     */
+    public function crearExpediente($id_mascota, $motivo, $diagnostico, $tratamiento) {
+        // Esta lógica se conectará con el modelo Expediente.php
+    }
+
+    /**
+     * Lógica para consultar el historial de una mascota 
+     * 
+     */
+    public function consultarHistorial($id_mascota) {
+        $query = "SELECT * FROM Expedientes WHERE ID_Mascota = :id";
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bindParam(':id', $id_mascota);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Lógica para emitir un diagnóstico 
+     * 
+     */
+    public function emitirDiagnostico() {
+        // Implementación futura según la interfaz del veterinario
     }
 }
 ?>
