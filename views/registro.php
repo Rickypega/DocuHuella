@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --dh-beige: #EBDCCB;
+            --dh-beige: #EADAC1;
             --dh-navy: #1A2D40;
             --dh-light-gray: #F8F9FA;
         }
@@ -55,7 +55,7 @@
             max-width: 70%;
             position: relative;
             z-index: 10;
-            mix-blend-mode: darken; /* La magia para quitar el fondo blanco del JPG */
+            mix-blend-mode: darken; 
         }
 
         /* Estilos de inputs y botones */

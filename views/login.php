@@ -9,7 +9,7 @@
     <style>
         
         :root {
-            --dh-beige: #eadac1; /* Fondo izquierdo */
+            --dh-beige: #EADAC1; /* Fondo izquierdo */
             --dh-navy: #1A2D40;  /* Fondo derecho, texto botones, etc. */
             --dh-light-gray: #F8F9FA; /* Fondos de input, texto secundario */
             --dh-white: #FFFFFF; /* Botón principal, texto claro */
