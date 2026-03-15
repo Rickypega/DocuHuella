@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - DocuHuella</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Paleta de colores extraída del mockup (image_7.png) */
+        
         :root {
-            --dh-beige: #EBDCCB; /* Fondo izquierdo */
+            --dh-beige: #eadac1; /* Fondo izquierdo */
             --dh-navy: #1A2D40;  /* Fondo derecho, texto botones, etc. */
             --dh-light-gray: #F8F9FA; /* Fondos de input, texto secundario */
             --dh-white: #FFFFFF; /* Botón principal, texto claro */
@@ -27,14 +28,46 @@
         /* Sección Izquierda: Beige con Logo */
         .left-panel {
             background-color: var(--dh-beige);
+            position: relative; 
+            overflow: hidden;   
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
+        /* Estilos de las huellas flotantes */
+        .huella-animada {
+            position: absolute;
+            bottom: -50px; 
+            color: var(--dh-navy); 
+            z-index: 1;
+            animation: flotarHaciaArriba linear forwards;
+        }
+
+        /* La animación CSS */
+        @keyframes flotarHaciaArriba {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.15; 
+            }
+            90% {
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateY(-120vh) rotate(25deg); 
+                opacity: 0;
+            }
+        }
+
         .main-logo {
-            max-width: 80%; /* Ajuste responsivo */
+            max-width: 80%; 
             height: auto;
+            position: relative;
+            z-index: 10;
+            mix-blend-mode: darken;
         }
 
         /* Sección Derecha: Azul Oscuro con Formulario */
@@ -110,8 +143,8 @@
     <div class="container-fluid g-0 login-container">
         <div class="row h-100 g-0">
             
-            <div class="col-md-6 left-panel d-none d-md-flex">
-                <img src="../public/images/DH.jpg" alt="Logo Completo DocuHuella" class="main-logo">
+            <div class="col-md-6 left-panel d-none d-md-flex" id="panel-huellas">
+                <img src="../public/images/DH.jpg" alt="Logo DocuHuella" class="main-logo position-relative" style="z-index: 10;">
             </div>
 
             <div class="col-md-6 right-panel">
@@ -152,5 +185,33 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function crearHuella() {
+            const panel = document.getElementById('panel-huellas');
+            const huella = document.createElement('i');
+            huella.classList.add('fas', 'fa-paw', 'huella-animada');
+
+            // 1. Posición horizontal aleatoria (0% a 90% para que no se pegue al borde derecho)
+            huella.style.left = Math.random() * 90 + '%';
+
+            // 2. Tamaño aleatorio (entre 1rem y 3.5rem)
+            const tamaño = Math.random() * 2.5 + 1;
+            huella.style.fontSize = tamaño + 'rem';
+
+            // 3. Velocidad aleatoria (entre 7 y 15 segundos en subir)
+            const duracion = Math.random() * 8 + 7;
+            huella.style.animationDuration = duracion + 's';
+
+            panel.appendChild(huella);
+
+            // 4. Eliminar la huella cuando termine la animación para no saturar la memoria
+            setTimeout(() => {
+                huella.remove();
+            }, duracion * 1000);
+        }
+
+        // Crear una nueva huella cada 800 milisegundos
+        setInterval(crearHuella, 800);
+    </script>
 </body>
 </html>
