@@ -7,7 +7,7 @@ USE Docuhuella;
 -- 1. ROLES
 CREATE TABLE Roles (
     ID_Rol INT AUTO_INCREMENT PRIMARY KEY,
-    Nombre_Rol VARCHAR(50) NOT NULL,
+    Nombre_Rol VARCHAR(100) NOT NULL,
     Descripcion VARCHAR(255) NOT NULL
 );
 
