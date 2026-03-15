@@ -38,15 +38,18 @@ class UsuariosController {
                     $_SESSION['id_rol'] = $datos_usuario['ID_Rol'];
                     $_SESSION['correo'] = $datos_usuario['Correo'];
 
-                    // Redirigimos dependiendo del rol (1=Admin, 2=Vet, 3=Cuidador)
+                    // Redirigimos dependiendo del rol
                     if ($_SESSION['id_rol'] == 1) {
                         header("Location: ../views/admin/dashboard.php");
                     } else if ($_SESSION['id_rol'] == 2) {
                         header("Location: ../views/veterinario/dashboard.php");
-                    } else {
+                    } else if ($_SESSION['id_rol'] == 3) {
                         header("Location: ../views/cuidador/dashboard.php");
+                    } else if ($_SESSION['id_rol'] == 4) {
+                        header("Location: ../views/superadmin/dashboard.php"); // El Olimpo
                     }
                     exit();
+                    
                 } else {
                     // Contraseña incorrecta
                     header("Location: ../views/login.php?error=credenciales");
