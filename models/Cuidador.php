@@ -7,7 +7,7 @@ class Cuidador {
     public $id_cuidador;
     public $nombre;
     public $apellido;
-    public $edad;
+    public $fecha_nacimiento;
     public $cedula;
     public $sexo;
     public $telefono;
