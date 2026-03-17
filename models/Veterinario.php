@@ -7,7 +7,7 @@ class Veterinario {
     public $id_veterinario;
     public $nombre;
     public $apellido;
-    public $edad;
+    public $fecha_nacimiento;
     public $cedula;
     public $sexo;
     public $correo;
