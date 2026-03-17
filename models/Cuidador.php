@@ -27,8 +27,8 @@ class Cuidador {
      */
     public function registrarse() {
         $query = "INSERT INTO " . $this->tabla . " 
-                  (Nombre, Apellido, Edad, Cedula, Sexo, Telefono, Direccion, Correo, ID_Usuario) 
-                  VALUES (:nombre, :apellido, :edad, :cedula, :sexo, :telefono, :direccion, :correo, :id_usuario)";
+                  (Nombre, Apellido, Fecha_Nacimiento, Cedula, Sexo, Telefono, Direccion, Correo, ID_Usuario) 
+                  VALUES (:nombre, :apellido, :fecha_nacimiento, :cedula, :sexo, :telefono, :direccion, :correo, :id_usuario)";
         
         $stmt = $this->conexion->prepare($query);
 
@@ -41,7 +41,7 @@ class Cuidador {
         // Vinculación de parámetros
         $stmt->bindParam(':nombre', $this->nombre);
         $stmt->bindParam(':apellido', $this->apellido);
-        $stmt->bindParam(':edad', $this->edad);
+        $stmt->bindParam(':fecha_nacimiento', $this->fecha_nacimiento);
         $stmt->bindParam(':cedula', $this->cedula);
         $stmt->bindParam(':sexo', $this->sexo);
         $stmt->bindParam(':telefono', $this->telefono);

@@ -29,8 +29,8 @@ class Veterinario {
      */
     public function registrarPerfil() {
         $query = "INSERT INTO " . $this->tabla . " 
-                  (Nombre, Apellido, Edad, Cedula, Sexo, Correo, Telefono, Especialidad, Direccion, Exequatur, Colegiatura, ID_Usuario) 
-                  VALUES (:nombre, :apellido, :edad, :cedula, :sexo, :correo, :telefono, :especialidad, :direccion, :exequatur, :colegiatura, :id_usuario)";
+                  (Nombre, Apellido, Fecha_Nacimiento, Cedula, Sexo, Correo, Telefono, Especialidad, Direccion, Exequatur, Colegiatura, ID_Usuario) 
+                  VALUES (:nombre, :apellido, :fecha_nacimiento, :cedula, :sexo, :correo, :telefono, :especialidad, :direccion, :exequatur, :colegiatura, :id_usuario)";
         
         $stmt = $this->conexion->prepare($query);
 
@@ -43,7 +43,7 @@ class Veterinario {
         // Vinculación de parámetros
         $stmt->bindParam(':nombre', $this->nombre);
         $stmt->bindParam(':apellido', $this->apellido);
-        $stmt->bindParam(':edad', $this->edad);
+        $stmt->bindParam(':fecha_nacimiento', $this->fecha_nacimiento);
         $stmt->bindParam(':cedula', $this->cedula);
         $stmt->bindParam(':sexo', $this->sexo);
         $stmt->bindParam(':correo', $this->correo);
