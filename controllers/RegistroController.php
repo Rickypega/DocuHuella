@@ -2,7 +2,7 @@
 session_start();
 require_once '../config/db.php';
 require_once '../models/Usuario.php';
-require_once '../models/Cuidador.php'; // Necesitaremos el modelo del Cuidador
+require_once '../models/Cuidador.php'; 
 
 class RegistroController {
     
@@ -15,7 +15,7 @@ class RegistroController {
             $contrasena = $_POST['contrasena'];
             $confirmar_contrasena = $_POST['confirmar_contrasena'];
 
-            // 2. Validaciones de seguridad (Lo que planeaste con tu equipo)
+            // 2. Validaciones de seguridad 
             if ($correo !== $confirmar_correo) {
                 header("Location: ../views/registro.php?error=correo_no_coincide");
                 exit();
@@ -36,10 +36,11 @@ class RegistroController {
             $usuario->contrasena = $contrasena;
             $usuario->id_rol = 3; // Le asignamos el Rol 3 (Cuidador)
 
-            if ($usuario->registrarUsuario()) {
+            $resultado_usuario = $usuario->registrarUsuario();
+
+            if ($resultado_usuario === true) {
                 
                 // 4. Buscar el ID del usuario que acabamos de crear
-                // Reutilizamos tu método login() del modelo para encontrarlo por su correo
                 $usuario->correo = $correo;
                 $stmt = $usuario->login(); 
                 
@@ -55,6 +56,7 @@ class RegistroController {
                     $cuidador->cedula = $_POST['cedula'];
                     $cuidador->telefono = $_POST['telefono'];
                     $cuidador->direccion = $_POST['direccion'];
+                    $cuidador->correo = $correo; // Reutilizamos el correo del usuario
                     $cuidador->fecha_nacimiento = $_POST['fecha_nacimiento'];
                     $cuidador->sexo = $_POST['sexo'];
 
@@ -68,9 +70,13 @@ class RegistroController {
                         exit();
                     }
                 }
+            } elseif ($resultado_usuario === 'correo_duplicado') {
+                // El modelo avisó del error 23000, el controlador redirige
+                header("Location: ../views/registro.php?error=correo_ya_existe");
+                exit();
             } else {
-                // Si falla al crear el usuario (ej: el correo ya está registrado)
-                header("Location: ../views/registro.php?error=usuario_existe");
+                // Cualquier otro fallo en la base de datos
+                header("Location: ../views/registro.php?error=error_desconocido");
                 exit();
             }
         }

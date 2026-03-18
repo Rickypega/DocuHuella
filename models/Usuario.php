@@ -45,11 +45,20 @@ class Usuario {
         $stmt->bindParam(':correo', $this->correo);
         $stmt->bindParam(':pass', $password_hash);
         $stmt->bindParam(':rol', $this->id_rol);
-
-        if($stmt->execute()) {
-            return true;
+        try {
+            if($stmt->execute()) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            
+            if ($e->getCode() == 23000) { // Código de error para violación de clave única
+                return 'correo_duplicado';
+            } else {
+                // Para otros errores
+                return 'error_desconocido';
+            }
         }
-        return false;
     }
 }
 ?>
