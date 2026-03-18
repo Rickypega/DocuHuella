@@ -8,7 +8,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
+       
+       /* Ocultar el ojo nativo de los navegadores */
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none;
+        }
+
+       :root {
             --dh-beige: #EADAC1;
             --dh-navy: #1A2D40;
             --dh-light-gray: #F8F9FA;
@@ -206,18 +213,37 @@
                             </div>
                         </div>
 
-                        <div class="row mb-4">
+                      <div class="row mb-4">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Contraseña</label>
-                                <input type="password" class="form-control" name="contrasena" id="pass-input" required>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" name="contrasena" id="pass-input" required style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                                    <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center" type="button" id="btn-ojo-pass" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: var(--dh-light-gray); border: none; padding: 0 15px;">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M5 13 Q 12 5 19 13" />
+                                            <circle cx="12" cy="14" r="2.5" />
+                                            <line id="linea-pass" x1="4" y1="4" x2="20" y2="20" style="display: none;" />
+                                        </svg>
+                                    </button>
+                                </div>
                                 <div class="progress mt-2" style="height: 5px; background-color: var(--dh-navy);">
                                     <div id="barra-fuerza" class="progress-bar bg-danger" role="progressbar" style="width: 0%;"></div>
                                 </div>
                                 <small id="texto-fuerza" class="text-white opacity-50" style="font-size: 0.8rem;">Mínimo 6 caracteres</small>
                             </div>
+                            
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Confirmar Contraseña</label>
-                                <input type="password" class="form-control" name="confirmar_contrasena" required>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" name="confirmar_contrasena" id="pass-confirm-input" required style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                                    <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center" type="button" id="btn-ojo-confirm" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: var(--dh-light-gray); border: none; padding: 0 15px;">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M5 13 Q 12 5 19 13" />
+                                            <circle cx="12" cy="14" r="2.5" />
+                                            <line id="linea-confirm" x1="4" y1="4" x2="20" y2="20" style="display: none;" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -276,13 +302,13 @@
             } else if (fuerza <= 1) {
                 barra.style.width = '25%';
                 barra.className = 'progress-bar bg-danger';
-                texto.innerText = 'Débil (Usa al menos 6 caracteres)';
+                texto.innerText = 'Débil (Usa al menos 8 caracteres)';
                 texto.className = 'text-danger fw-bold';
                 btnSubmit.disabled = true; 
             } else if (fuerza === 2) {
                 barra.style.width = '50%';
                 barra.className = 'progress-bar bg-warning';
-                texto.innerText = 'Intermedia (Válida)';
+                texto.innerText = 'Intermedia (Válida, pero podría ser más segura con mayúsculas, números o símbolos)';
                 texto.className = 'text-warning fw-bold';
                 btnSubmit.disabled = false; 
             } else {
@@ -292,6 +318,30 @@
                 texto.className = 'text-success fw-bold';
                 btnSubmit.disabled = false;
             }
+
+        });
+
+               // Lógica para mostrar/ocultar contraseña
+        function toggleVisibilidad(inputId, lineId) {
+            const input = document.getElementById(inputId);
+            const linea = document.getElementById(lineId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                linea.style.display = 'block'; // Muestra la raya diagonal cruzando el ojo
+            } else {
+                input.type = 'password';
+                linea.style.display = 'none';  // Oculta la raya
+            }
+        }
+
+        // Asignar los clics a los botones
+        document.getElementById('btn-ojo-pass').addEventListener('click', function() {
+            toggleVisibilidad('pass-input', 'linea-pass');
+        });
+
+        document.getElementById('btn-ojo-confirm').addEventListener('click', function() {
+            toggleVisibilidad('pass-confirm-input', 'linea-confirm');
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

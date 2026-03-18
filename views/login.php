@@ -7,7 +7,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        
+       
+       /* Ocultar el ojo nativo de los navegadores */
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none;
+        }
+
         :root {
             --dh-beige: #EADAC1; /* Fondo izquierdo */
             --dh-navy: #1A2D40;  /* Fondo derecho, texto botones, etc. */
@@ -167,14 +173,34 @@
 
                     <form action="../controllers/UsuariosController.php?action=login" method="POST">
                         
-                        <div class="mb-4">
-                            <label for="correo" class="form-label">Correo Electrónico</label>
-                            <input type="email" class="form-control" id="correo" name="correo" required placeholder="admin@docuhuella.com">
+                       <div class="mb-4">
+                            <label for="correo" class="form-label fw-semibold">Correo Electrónico</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background-color: var(--dh-light-gray); border: none; border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-left: 20px;">
+                                    <i class="fas fa-envelope" style="color: #1a1a1a;"></i>
+                                </span>
+                                
+                                <input type="email" class="form-control" id="correo" name="correo" required placeholder="ejemplo@mail.com" style="background-color: var(--dh-light-gray); border: none; border-top-right-radius: 20px; border-bottom-right-radius: 20px; padding-left: 10px;">
+                            </div>
                         </div>
                         
                         <div class="mb-5">
-                            <label for="contrasena" class="form-label">Contraseña</label>
-                            <input type="password" class="form-control" id="contrasena" name="contrasena" required placeholder="••••••••">
+                            <label for="contrasena" class="form-label fw-semibold">Contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background-color: var(--dh-light-gray); border: none; border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-left: 20px;">
+                                    <i class="fas fa-lock" style="color: #1a1a1a;"></i>
+                                </span>
+                                
+                                <input type="password" class="form-control" id="pass-login" name="contrasena" required placeholder="••••••••" style="background-color: var(--dh-light-gray); border: none; border-radius: 0; padding-left: 10px;">
+                                
+                                <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center" type="button" id="btn-ojo-login" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: var(--dh-light-gray); border: none; padding: 0 20px;">
+                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 13 Q 12 5 19 13" />
+                                        <circle cx="12" cy="14" r="2.5" />
+                                        <line id="linea-login" x1="4" y1="4" x2="20" y2="20" style="display: none;" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         
                         <button type="submit" class="btn-entrar text-uppercase">Entrar</button>
@@ -219,6 +245,20 @@
 
         // Crear una nueva huella cada 800 milisegundos
         setInterval(crearHuella, 800);
+
+        // Lógica para mostrar/ocultar contraseña
+        document.getElementById('btn-ojo-login').addEventListener('click', function() {
+            const input = document.getElementById('pass-login');
+            const linea = document.getElementById('linea-login');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                linea.style.display = 'block'; // Muestra la raya diagonal
+            } else {
+                input.type = 'password';
+                linea.style.display = 'none';  // Oculta la raya
+            }
+        });
     </script>
 </body>
 </html>
