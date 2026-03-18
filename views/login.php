@@ -158,6 +158,13 @@
                         </div>
                     <?php endif; ?>
 
+                    <?php if(isset($_GET['exito']) && $_GET['exito'] == 'registrado'): ?>
+                        <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                            <strong>¡Excelente! 🐾</strong> Tu cuenta ha sido creada. Ya puedes iniciar sesión.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php endif; ?>
+
                     <form action="../controllers/UsuariosController.php?action=login" method="POST">
                         
                         <div class="mb-4">

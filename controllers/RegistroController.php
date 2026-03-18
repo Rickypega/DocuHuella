@@ -17,11 +17,17 @@ class RegistroController {
 
             // 2. Validaciones de seguridad 
             if ($correo !== $confirmar_correo) {
+                
+                $_SESSION['datos_temporales'] = $_POST; // Guardamos lo que escribió
+
                 header("Location: ../views/registro.php?error=correo_no_coincide");
                 exit();
             }
             
             if ($contrasena !== $confirmar_contrasena) {
+                
+                $_SESSION['datos_temporales'] = $_POST; // Guardamos lo que escribió
+                
                 header("Location: ../views/registro.php?error=pass_no_coincide");
                 exit();
             }
@@ -66,16 +72,22 @@ class RegistroController {
                         header("Location: ../views/login.php?exito=registrado");
                         exit();
                     } else {
+                        
+                        $_SESSION['datos_temporales'] = $_POST; // Guardamos lo que escribió
+
                         header("Location: ../views/registro.php?error=perfil_fallo");
                         exit();
                     }
                 }
             } elseif ($resultado_usuario === 'correo_duplicado') {
+                
+                $_SESSION['datos_temporales'] = $_POST; // Guardamos lo que escribió
                 // El modelo avisó del error 23000, el controlador redirige
                 header("Location: ../views/registro.php?error=correo_ya_existe");
                 exit();
             } else {
                 // Cualquier otro fallo en la base de datos
+                $_SESSION['datos_temporales'] = $_POST; // Guardamos lo que escribió
                 header("Location: ../views/registro.php?error=error_desconocido");
                 exit();
             }
