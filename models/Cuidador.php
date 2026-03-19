@@ -5,6 +5,7 @@ class Cuidador {
 
     // ATRIBUTOS 
     public $id_cuidador;
+    public $id_usuario;      
     public $nombre;
     public $apellido;
     public $fecha_nacimiento;
@@ -12,33 +13,32 @@ class Cuidador {
     public $sexo;
     public $telefono;
     public $direccion;
-    public $correo;
-    public $id_usuario; // FK hacia Usuarios 
 
     public function __construct($db) {
         $this->conexion = $db;
     }
 
-    // ACCIONES (MÉTODOS) 
-
     /**
-     * Lógica para registrarse (Crear perfil del cuidador)
-     * Se usa inmediatamente después de crear el Usuario
+     * REGISTRAR PERFIL
+     * Se usa en el proceso de registro para crear los datos personales.
      */
     public function registrarse() {
         $query = "INSERT INTO " . $this->tabla . " 
-                  (Nombre, Apellido, Fecha_Nacimiento, Cedula, Sexo, Telefono, Direccion, Correo, ID_Usuario) 
-                  VALUES (:nombre, :apellido, :fecha_nacimiento, :cedula, :sexo, :telefono, :direccion, :correo, :id_usuario)";
+                  SET ID_Usuario = :id_usuario, Nombre = :nombre, Apellido = :apellido, 
+                      Fecha_Nacimiento = :fecha_nacimiento, Cedula = :cedula, 
+                      Sexo = :sexo, Telefono = :telefono, Direccion = :direccion";
         
         $stmt = $this->conexion->prepare($query);
 
-        // Limpieza de datos (Sanitización)
+        // Sanitización de seguridad
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
         $this->apellido = htmlspecialchars(strip_tags($this->apellido));
+        $this->cedula = htmlspecialchars(strip_tags($this->cedula));
+        $this->telefono = htmlspecialchars(strip_tags($this->telefono));
         $this->direccion = htmlspecialchars(strip_tags($this->direccion));
-        $this->correo = htmlspecialchars(strip_tags($this->correo));
 
         // Vinculación de parámetros
+        $stmt->bindParam(':id_usuario', $this->id_usuario);
         $stmt->bindParam(':nombre', $this->nombre);
         $stmt->bindParam(':apellido', $this->apellido);
         $stmt->bindParam(':fecha_nacimiento', $this->fecha_nacimiento);
@@ -46,24 +46,39 @@ class Cuidador {
         $stmt->bindParam(':sexo', $this->sexo);
         $stmt->bindParam(':telefono', $this->telefono);
         $stmt->bindParam(':direccion', $this->direccion);
-        $stmt->bindParam(':correo', $this->correo);
-        $stmt->bindParam(':id_usuario', $this->id_usuario);
 
-        return $stmt->execute();
+        try {
+            if($stmt->execute()) {
+                // Guardamos el ID recién creado por si el controlador lo necesita
+                $this->id_cuidador = $this->conexion->lastInsertId();
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            // Manejo de error si la cédula ya existe
+            if ($e->getCode() == 23000) { 
+                return 'cedula_duplicada';
+            }
+            return false;
+        }
     }
 
     /**
-     * Lógica para editar perfil 
+     * ACTUALIZAR PERFIL
+     * Permite al cuidador mantener sus datos de contacto al día.
      */
     public function editarPerfil() {
         $query = "UPDATE " . $this->tabla . " 
-                  SET Nombre = :nombre, Apellido = :apellido, Telefono = :telefono, Direccion = :direccion 
+                  SET Nombre = :nombre, Apellido = :apellido, 
+                      Telefono = :telefono, Direccion = :direccion 
                   WHERE ID_Cuidador = :id";
         
         $stmt = $this->conexion->prepare($query);
 
+        // Sanitización
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
         $this->apellido = htmlspecialchars(strip_tags($this->apellido));
+        $this->direccion = htmlspecialchars(strip_tags($this->direccion));
 
         $stmt->bindParam(':nombre', $this->nombre);
         $stmt->bindParam(':apellido', $this->apellido);
@@ -75,10 +90,10 @@ class Cuidador {
     }
 
     /**
-     * Lógica para ver mis mascotas (Relación 1:N) 
+     * VER MIS MASCOTAS
+     * Obtiene la lista de animales vinculados a este cuidador.
      */
     public function verMisMascotas() {
-        // En el SQL la tabla es "Mascotas" y la FK es "ID_Cuidador" 
         $query = "SELECT * FROM Mascotas WHERE ID_Cuidador = :id";
         $stmt = $this->conexion->prepare($query);
         $stmt->bindParam(':id', $this->id_cuidador);

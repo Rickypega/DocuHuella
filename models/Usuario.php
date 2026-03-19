@@ -8,6 +8,8 @@ class Usuario {
     public $correo;
     public $contrasena;
     public $id_rol;
+    public $estado; 
+    public $fecha_registro; 
 
     public function __construct($db) {
         $this->conexion = $db;
@@ -15,7 +17,8 @@ class Usuario {
 
     // Acción: Iniciar Sesión
     public function login() {
-        $query = "SELECT ID_Usuario, Correo, Contrasena, ID_Rol 
+        
+        $query = "SELECT ID_Usuario, Correo, Contrasena, ID_Rol, Estado 
                   FROM " . $this->tabla . " 
                   WHERE Correo = :correo LIMIT 0,1";
 
@@ -36,7 +39,7 @@ class Usuario {
 
         // Si id_rol está vacío o no se ha definido, le asignamos 3 (Cuidador)
         if (empty($this->id_rol)) {
-        $this->id_rol = 3; 
+            $this->id_rol = 3; 
         }
 
         // Encriptar contraseña por seguridad
@@ -45,8 +48,11 @@ class Usuario {
         $stmt->bindParam(':correo', $this->correo);
         $stmt->bindParam(':pass', $password_hash);
         $stmt->bindParam(':rol', $this->id_rol);
+        
         try {
             if($stmt->execute()) {
+                // Atrapamos el ID que se acaba de generar en la tabla Usuarios
+                $this->id_usuario = $this->conexion->lastInsertId();
                 return true;
             }
             return false;
