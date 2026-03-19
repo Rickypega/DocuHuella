@@ -1,9 +1,11 @@
 <?php 
-if (!isset($total_admins)) {
-    die("<h2 style='text-align:center; margin-top:50px; font-family:sans-serif;'>
-            Acceso incorrecto. Por favor, entra desde el Login.
-         </h2>");
+// SEGURIDAD: Evitar acceso directo a la vista. 
+// Si alguien teclea "dashboard.php" en la URL, lo mandamos al controlador.
+if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
+    header("Location: ../../controllers/superadmin/DashboardController.php?action=ver");
+    exit();
 }
+// Si llegamos aquí, es porque el controlador nos cargó correctamente mediante "require"
 ?>
 <!DOCTYPE html>
 <html lang="es">

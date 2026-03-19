@@ -163,12 +163,12 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Cédula</label>
-                                <input type="text" class="form-control" name="cedula" placeholder="000-0000000-0" required
+                                <input type="text" name="cedula" class="form-control mascara-cedula" maxlength="12" placeholder="000-0000000-0"
                                        value="<?php echo isset($_SESSION['datos_temporales']['cedula']) ? htmlspecialchars($_SESSION['datos_temporales']['cedula']) : ''; ?>">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Teléfono</label>
-                                <input type="tel" class="form-control" name="telefono" required
+                                <input type="text" name="telefono" class="form-control mascara-telefono" maxlength="12" placeholder="809-000-0000"
                                        value="<?php echo isset($_SESSION['datos_temporales']['telefono']) ? htmlspecialchars($_SESSION['datos_temporales']['telefono']) : ''; ?>">
                             </div>
                         </div>
@@ -345,7 +345,8 @@
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+    <script src="../public/js/mascaras.js"></script>
+
     <?php unset($_SESSION['datos_temporales']); ?>
 </body>
 </html>

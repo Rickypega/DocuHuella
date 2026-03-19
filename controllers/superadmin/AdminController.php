@@ -4,38 +4,33 @@ require_once '../../config/db.php';
 
 class AdminController {
 
-    public function registrarFranquicia() {
-        // SEGURIDAD: Solo el SuperAdmin (Rol 4)
+    // Método de seguridad global
+    private function verificarSeguridad() {
         if (!isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 4) {
             header("Location: ../../views/login.php?error=acceso_denegado");
             exit();
         }
+    }
+
+    // 1. CREAR
+    public function registrarFranquicia() {
+        $this->verificarSeguridad();
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            
-            $database = new Database();
-            $db = $database->getConnection();
-
-            if ($db === null) {
-                header("Location: ../../views/superadmin/administrador.php?error=error_conexion");
-                exit();
-            }
-
+            $db = (new Database())->getConnection();
             try {
-                // 1. INICIAR TRANSACCIÓN
                 $db->beginTransaction();
 
-                // --- PASO A: CREAR EL USUARIO ---
-                $query_user = "INSERT INTO usuarios (Correo, Contrasena, ID_Rol) VALUES (:correo, :pass, 1)";
+                // Crear Usuario
+                $query_user = "INSERT INTO usuarios (Correo, Contrasena, ID_Rol, Estado) VALUES (:correo, :pass, 1, 'Activo')";
                 $stmt_user = $db->prepare($query_user);
                 $pass_hash = password_hash($_POST['contrasena'], PASSWORD_BCRYPT);
                 $stmt_user->bindParam(':correo', $_POST['correo']);
                 $stmt_user->bindParam(':pass', $pass_hash);
-                
-                if (!$stmt_user->execute()) throw new Exception("No se pudo crear la cuenta de usuario.");
+                $stmt_user->execute();
                 $id_usuario_nuevo = $db->lastInsertId();
 
-                // --- PASO B: CREAR EL ADMINISTRADOR (AHORA CON TELÉFONO) ---
+                // Crear Admin
                 $query_admin = "INSERT INTO administrador (ID_Usuario, Nombre, Apellido, Cedula, Telefono) 
                                 VALUES (:id_u, :nom, :ape, :ced, :tel)";
                 $stmt_admin = $db->prepare($query_admin);
@@ -43,12 +38,11 @@ class AdminController {
                 $stmt_admin->bindParam(':nom', $_POST['nombre']);
                 $stmt_admin->bindParam(':ape', $_POST['apellido']);
                 $stmt_admin->bindParam(':ced', $_POST['cedula']);
-                $stmt_admin->bindParam(':tel', $_POST['telefono']); // Atrapamos el nuevo campo
-                
-                if (!$stmt_admin->execute()) throw new Exception("No se pudo crear el perfil del administrador.");
+                $stmt_admin->bindParam(':tel', $_POST['telefono']);
+                $stmt_admin->execute();
                 $id_admin_nuevo = $db->lastInsertId();
 
-                // --- PASO C: CREAR LA CLÍNICA ---
+                // Crear Clínica
                 $query_clinica = "INSERT INTO clinicas (ID_Admin, Nombre_Sucursal, RNC, Direccion) 
                                   VALUES (:id_a, :nom_c, :rnc, :dir)";
                 $stmt_clinica = $db->prepare($query_clinica);
@@ -56,31 +50,131 @@ class AdminController {
                 $stmt_clinica->bindParam(':nom_c', $_POST['nombre_clinica']);
                 $stmt_clinica->bindParam(':rnc', $_POST['rnc']);
                 $stmt_clinica->bindParam(':dir', $_POST['direccion_clinica']);
+                $stmt_clinica->execute();
 
-                if (!$stmt_clinica->execute()) throw new Exception("No se pudo registrar la clínica.");
-
-                // 2. ÉXITO
                 $db->commit();
                 header("Location: ../../views/superadmin/administrador.php?exito=franquicia_creada");
                 exit();
-
             } catch (Exception $e) {
-                // 3. ERROR: Deshacer
                 if ($db->inTransaction()) $db->rollBack();
-                header("Location: ../../views/superadmin/administrador.php?error=fallo_registro&detalle=" . urlencode($e->getMessage()));
+                header("Location: ../../views/superadmin/administrador.php?error=fallo_registro");
                 exit();
             }
-        } else {
-            header("Location: ../../views/superadmin/administrador.php");
-            exit();
+        }
+    }
+
+    // 2. EDITAR
+    public function editarFranquicia() {
+        $this->verificarSeguridad();
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $db = (new Database())->getConnection();
+            try {
+                $db->beginTransaction();
+
+                // Update Admin
+                $query_admin = "UPDATE administrador SET Nombre = :nom, Apellido = :ape, Telefono = :tel WHERE ID_Admin = :id_a";
+                $stmt_admin = $db->prepare($query_admin);
+                $stmt_admin->bindParam(':nom', $_POST['nombre']);
+                $stmt_admin->bindParam(':ape', $_POST['apellido']);
+                $stmt_admin->bindParam(':tel', $_POST['telefono']);
+                $stmt_admin->bindParam(':id_a', $_POST['id_admin']);
+                $stmt_admin->execute();
+
+                // Update Clínica
+                $query_clinica = "UPDATE clinicas SET Nombre_Sucursal = :nom_c WHERE ID_Admin = :id_a";
+                $stmt_clinica = $db->prepare($query_clinica);
+                $stmt_clinica->bindParam(':nom_c', $_POST['nombre_clinica']);
+                $stmt_clinica->bindParam(':id_a', $_POST['id_admin']);
+                $stmt_clinica->execute();
+
+                $db->commit();
+                header("Location: ../../views/superadmin/administrador.php?exito=franquicia_actualizada");
+                exit();
+            } catch (Exception $e) {
+                if ($db->inTransaction()) $db->rollBack();
+                header("Location: ../../views/superadmin/administrador.php?error=fallo_actualizacion");
+                exit();
+            }
+        }
+    }
+
+    // 3. SUSPENDER / REACTIVAR
+    public function suspenderFranquicia() {
+        $this->verificarSeguridad();
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $db = (new Database())->getConnection();
+            try {
+                // Alternar Estado
+                $query = "UPDATE usuarios SET Estado = CASE WHEN Estado = 'Inactivo' THEN 'Activo' ELSE 'Inactivo' END WHERE ID_Usuario = :id_u";
+                $stmt = $db->prepare($query);
+                $stmt->bindParam(':id_u', $_POST['id_usuario']);
+                $stmt->execute();
+
+                header("Location: ../../views/superadmin/administrador.php?exito=estado_cambiado");
+                exit();
+            } catch (Exception $e) {
+                header("Location: ../../views/superadmin/administrador.php?error=fallo_estado");
+                exit();
+            }
+        }
+    }
+
+    // 4. ELIMINAR (Destrucción total)
+    public function eliminarFranquicia() {
+        $this->verificarSeguridad();
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $db = (new Database())->getConnection();
+            try {
+                $db->beginTransaction();
+
+                $stmt1 = $db->prepare("DELETE FROM clinicas WHERE ID_Admin = :id_a");
+                $stmt1->bindParam(':id_a', $_POST['id_admin']);
+                $stmt1->execute();
+
+                $stmt2 = $db->prepare("DELETE FROM administrador WHERE ID_Admin = :id_a");
+                $stmt2->bindParam(':id_a', $_POST['id_admin']);
+                $stmt2->execute();
+
+                $stmt3 = $db->prepare("DELETE FROM usuarios WHERE ID_Usuario = :id_u");
+                $stmt3->bindParam(':id_u', $_POST['id_usuario']);
+                $stmt3->execute();
+
+                $db->commit();
+                header("Location: ../../views/superadmin/administrador.php?exito=franquicia_eliminada");
+                exit();
+            } catch (Exception $e) {
+                if ($db->inTransaction()) $db->rollBack();
+                header("Location: ../../views/superadmin/administrador.php?error=fallo_eliminacion");
+                exit();
+            }
         }
     }
 }
 
-// Ruteo
-if (isset($_GET['action']) && $_GET['action'] == 'registrar') {
+// LÓGICA DE ENRUTAMIENTO (Switch central)
+if (isset($_GET['action'])) {
     $controlador = new AdminController();
-    $controlador->registrarFranquicia();
+    
+    switch ($_GET['action']) {
+        case 'registrar':
+            $controlador->registrarFranquicia();
+            break;
+        case 'editar':
+            $controlador->editarFranquicia();
+            break;
+        case 'suspender':
+            $controlador->suspenderFranquicia();
+            break;
+        case 'eliminar':
+            $controlador->eliminarFranquicia();
+            break;
+        default:
+            header("Location: ../../views/superadmin/administrador.php");
+            exit();
+    }
 } else {
     header("Location: ../../views/superadmin/administrador.php");
     exit();
