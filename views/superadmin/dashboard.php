@@ -1,8 +1,8 @@
 <?php 
-// Si no hay datos, es porque no pasó por el controlador
-if(!isset($total_admins)) {
-    header("Location: ../../controllers/superadmin/DashboardController.php?action=ver");
-    exit();
+if (!isset($total_admins)) {
+    die("<h2 style='text-align:center; margin-top:50px; font-family:sans-serif;'>
+            Acceso incorrecto. Por favor, entra desde el Login.
+         </h2>");
 }
 ?>
 <!DOCTYPE html>
@@ -20,29 +20,29 @@ if(!isset($total_admins)) {
             --dh-light-gray: #F8F9FA;
         }
 
-        body { background-color: var(--dh-light-gray); overflow-x: hidden; }
+        body { background-color: var(--dh-light-gray); overflow-x: hidden; font-family: 'Segoe UI', Tahoma, sans-serif; }
 
+        /* Diseño del Sidebar Restaurado */
         .sidebar {
             height: 100vh;
             background-color: var(--dh-navy);
             color: white;
             position: fixed;
             width: 260px;
-            top: 0; left: 0;
-            padding-top: 20px;
+            display: flex; /* Flexbox para empujar el botón abajo */
+            flex-direction: column;
         }
 
         .sidebar .logo-container {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            padding: 25px 15px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .sidebar a {
             padding: 15px 25px;
             text-decoration: none;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.7);
             display: block;
             transition: 0.3s;
         }
@@ -53,28 +53,37 @@ if(!isset($total_admins)) {
             border-left: 4px solid var(--dh-beige);
         }
 
-        .sidebar .btn-logout {
+        .sidebar i { width: 25px; text-align: center; margin-right: 10px; }
+
+        /* Botón de Logout Restaurado */
+        .btn-logout {
             background-color: #dc3545; 
             color: white !important; 
-            margin: 0 15px;
+            margin: auto 15px 20px; /* El 'auto' empuja el botón hasta abajo */
             border-radius: 10px;
             text-align: center;
-            padding: 12px 15px;
+            padding: 12px;
             font-weight: bold;
+            transition: 0.3s;
+            border: none;
         }
 
-        .main-content { margin-left: 260px; padding: 30px; }
+        .btn-logout:hover { background-color: #c82333; transform: scale(1.02); }
 
+        /* Contenido Principal */
+        .main-content { margin-left: 260px; padding: 40px; }
+
+        /* Tarjetas de Estadísticas */
         .stat-card {
             background-color: white;
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             border-left: 5px solid var(--dh-navy);
-            transition: 0.2s;
+            transition: 0.3s ease;
         }
 
-        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
         .stat-icon { font-size: 2.2rem; color: var(--dh-beige); opacity: 0.8; }
         .stat-number { font-size: 1.8rem; font-weight: bold; color: var(--dh-navy); }
         .stat-label { color: #6c757d; font-weight: 500; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
@@ -84,33 +93,36 @@ if(!isset($total_admins)) {
 
     <div class="sidebar">
         <div class="logo-container">
-            <h3 class="fw-bold text-white mb-0">
-                <i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella
-            </h3>
+            <h3 class="fw-bold text-white mb-0"><i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella</h3>
             <span class="badge bg-warning text-dark mt-2">Super Admin</span>
         </div>
 
-        <a href="#" class="active"><i class="fas fa-chart-pie"></i> Estadísticas</a>
-        <a href="administradores.php"><i class="fas fa-hospital"></i> Gestión de Clínicas</a>
-        <a href="#"><i class="fas fa-file-export"></i> Gestión de Reportes</a>
+        <nav class="mt-3">
+            <a href="../../controllers/superadmin/DashboardController.php?action=ver" class="active"><i class="fas fa-chart-pie"></i> Estadísticas</a>
+            <a href="../../views/superadmin/administrador.php"><i class="fas fa-hospital"></i> Gestión de Clínicas</a>
+            <a href="../../views/superadmin/reportes.php"><i class="fas fa-file-export"></i> Gestión de Reportes</a>
+        </nav>
         
-        <div style="position: absolute; bottom: 20px; width: 100%;">
-            <a href="../../controllers/UsuariosController.php?action=logout" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
-        </div>
+        <a href="../../controllers/UsuariosController.php?action=logout" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </a>
     </div>
 
     <div class="main-content">
         
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold" style="color: var(--dh-navy);">Visión General del Sistema</h2>
-            <div class="user-profile text-muted">
-                <span>Bienvenido, <strong><?php echo htmlspecialchars($nombre_rol); ?></strong></span>
-                <i class="fas fa-user-circle fs-4 ms-2 align-middle"></i>
+        <div class="d-flex justify-content-end mb-2">
+            <div class="user-profile text-muted d-flex align-items-center">
+                <span>Bienvenido Sr. <strong><?php echo htmlspecialchars($nombre_rol); ?></strong></span>
+                <i class="fas fa-user-circle fs-3 ms-2 text-secondary"></i>
             </div>
         </div>
 
+        <div class="mb-4 pb-2 border-bottom">
+            <h2 class="fw-bold mb-0" style="color: var(--dh-navy);">Visión General</h2>
+            <p class="text-muted mt-1">Estado global de la plataforma DocuHuella</p>
+        </div>
+
         <div class="row g-4">
-            
             <div class="col-md-3">
                 <div class="stat-card" style="border-left-color: #0d6efd;">
                     <div class="d-flex justify-content-between align-items-center">
@@ -163,7 +175,7 @@ if(!isset($total_admins)) {
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <div class="stat-label">Cuidadores (Clientes Finales)</div>
+                            <div class="stat-label">Cuidadores Registrados</div>
                             <div class="stat-number"><?php echo number_format($total_cuidadores); ?></div>
                         </div>
                         <i class="fas fa-users stat-icon"></i>
@@ -175,21 +187,20 @@ if(!isset($total_admins)) {
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <div class="stat-label">Mascotas Registradas</div>
+                            <div class="stat-label">Mascotas en Sistema</div>
                             <div class="stat-number"><?php echo number_format($total_mascotas); ?></div>
                         </div>
                         <i class="fas fa-dog stat-icon"></i>
                     </div>
                 </div>
             </div>
-
         </div>
 
         <div class="row mt-5">
             <div class="col-12">
                 <div class="card border-0 shadow-sm" style="border-radius: 15px;">
                     <div class="card-body p-4">
-                        <h5 class="fw-bold mb-4" style="color: var(--dh-navy);">Crecimiento Global del Sistema</h5>
+                        <h5 class="fw-bold mb-4" style="color: var(--dh-navy);">Distribución del Sistema</h5>
                         <div style="height: 350px;">
                             <canvas id="graficoSistema"></canvas>
                         </div>
@@ -212,7 +223,7 @@ if(!isset($total_admins)) {
                 data: {
                     labels: ['Admins', 'Clínicas', 'Veterinarios', 'Cuidadores', 'Mascotas', 'Expedientes'],
                     datasets: [{
-                        label: 'Total Registrado',
+                        label: 'Registros Totales',
                         data: [
                             <?php echo $total_admins; ?>,
                             <?php echo $total_clinicas; ?>,
@@ -222,13 +233,19 @@ if(!isset($total_admins)) {
                             <?php echo $total_expedientes; ?>
                         ],
                         backgroundColor: ['#0d6efd', '#1A2D40', '#c5aa7f', '#1A2D40', '#c5aa7f', '#1A2D40'],
-                        borderRadius: 10,
+                        borderRadius: 8,
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { stepSize: 1 } 
+                        } 
+                    }
                 }
             });
         });
