@@ -23,27 +23,35 @@ class DashboardController {
         $total_mascotas = 0;
         $total_expedientes = 0;
 
-        // 3. CONSULTAS: Obtener las estadísticas
+       // 3. CONSULTAS: Estadísticas detalladas
         try {
-            // Consultar el nombre del rol dinámicamente
+            // Nombre del Rol (Dinámico)
             $stmt_rol = $db->prepare("SELECT Nombre_Rol FROM Roles WHERE ID_Rol = :id_rol");
             $stmt_rol->bindParam(':id_rol', $_SESSION['id_rol']);
             $stmt_rol->execute();
             $resultado_rol = $stmt_rol->fetchColumn();
-            
-            if ($resultado_rol) {
-                $nombre_rol = $resultado_rol; // Si lo encuentra en la DB, sobrescribe el valor de respaldo
-            }
+            if ($resultado_rol) $nombre_rol = $resultado_rol;
 
-            // Contar estadísticas
-            $total_clinicas = $db->query("SELECT COUNT(*) FROM Usuarios WHERE ID_Rol = 1")->fetchColumn();
-            $total_veterinarios = $db->query("SELECT COUNT(*) FROM Usuarios WHERE ID_Rol = 2")->fetchColumn();
-            $total_cuidadores = $db->query("SELECT COUNT(*) FROM Usuarios WHERE ID_Rol = 3")->fetchColumn();
+            // --- CONTADORES ---
             
+            // 1. Total de Clientes (Administradores registrados)
+            $total_admins = $db->query("SELECT COUNT(*) FROM Administradores")->fetchColumn();
+            
+            // 2. Total de Sedes/Sucursales (Clínicas físicas)
+            $total_clinicas = $db->query("SELECT COUNT(*) FROM Clinicas")->fetchColumn();
+            
+            // 3. Total de Empleados (Veterinarios en el sistema)
+            $total_veterinarios = $db->query("SELECT COUNT(*) FROM Veterinarios")->fetchColumn();
+            
+            // 4. Total de Usuarios Finales (Dueños de mascotas)
+            $total_cuidadores = $db->query("SELECT COUNT(*) FROM Cuidadores")->fetchColumn();
+            
+            // 5. El Corazón del Sistema (Pacientes y sus Historias)
             $total_mascotas = $db->query("SELECT COUNT(*) FROM Mascotas")->fetchColumn();
             $total_expedientes = $db->query("SELECT COUNT(*) FROM Expedientes")->fetchColumn();
+
         } catch (PDOException $e) {
-            // Silencioso por si las tablas no existen aún
+            // Las variables se mantienen en 0 si hay error
         }
 
         // 4. PRESENTACIÓN: Enviar los datos a la Vista
