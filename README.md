@@ -72,8 +72,8 @@ Una vez importada la base de datos, debes ejecutar el script de inicialización 
 `http://localhost:8080/DocuHuella/setup.php`
 2. Si ves los mensajes de confirmación en verde, el sistema ya está configurado.
 3. **Credenciales de acceso iniciales:**
-* **Correo:** `admin@docuhuella.com`
-* **Contraseña:** `admin123`
+* **Correo:** `master@docuhuella.com`
+* **Contraseña:** `master123`
 
 
 
