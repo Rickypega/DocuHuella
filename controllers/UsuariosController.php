@@ -55,7 +55,7 @@ class UsuariosController {
         switch ($rol) {
             case 1: // ADMINISTRADOR
                 $query = "SELECT a.ID_Admin, c.ID_Clinica, a.Nombre 
-                          FROM Administradores a 
+                          FROM Administrador a 
                           LEFT JOIN Clinicas c ON a.ID_Admin = c.ID_Admin 
                           WHERE a.ID_Usuario = :id LIMIT 1";
                 $stmt = $db->prepare($query);
