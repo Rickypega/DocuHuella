@@ -5,9 +5,17 @@ require_once '../../config/db.php';
 class DashboardController {
     
     public function index() {
-        // 1. SEGURIDAD: Validar que sea el SuperAdmin (Rol 4)
-        if (!isset($_SESSION['id_usuario']) || $_SESSION['id_rol'] != 4) {
-            header("Location: ../../views/login.php");
+        // 1. SEGURIDAD: Validar acceso
+        if (!isset($_SESSION['id_rol'])) {
+            // Si no hay sesión, al login
+            header("Location: ../../views/login.php?error=sesion_expirada");
+            exit();
+        }
+
+        if ($_SESSION['id_rol'] != 4) {
+            // Si tienes sesión pero NO es SuperAdmin, le mandamos a SU dashboard real
+            header("Location: ../../views/login.php?error=acceso_denegado"); 
+            session_destroy(); // Rompemos el bucle limpiando la sesión errónea
             exit();
         }
 
@@ -17,6 +25,7 @@ class DashboardController {
 
         // Variables por defecto
         $nombre_rol = 'Super Administrador'; // Valor de respaldo
+        $total_admins = 0;
         $total_clinicas = 0;
         $total_veterinarios = 0;
         $total_cuidadores = 0;
@@ -35,7 +44,7 @@ class DashboardController {
             // --- CONTADORES ---
             
             // 1. Total de Clientes (Administradores registrados)
-            $total_admins = $db->query("SELECT COUNT(*) FROM Administradores")->fetchColumn();
+            $total_admins = $db->query("SELECT COUNT(*) FROM Administrador")->fetchColumn();
             
             // 2. Total de Sedes/Sucursales (Clínicas físicas)
             $total_clinicas = $db->query("SELECT COUNT(*) FROM Clinicas")->fetchColumn();
