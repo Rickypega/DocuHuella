@@ -164,6 +164,14 @@
                         </div>
                     <?php endif; ?>
 
+                    <?php if(isset($_GET['error']) && $_GET['error'] == 'cuenta_suspendida'): ?>
+                        <div class="alert alert-danger alert-dismissible fade show text-center fw-bold shadow-sm" role="alert" style="border-radius: 15px;">
+                            <i class="fas fa-ban fs-4 mb-2 d-block"></i>
+                            Su cuenta ha sido suspendida.<br>Por favor, comuníquese con el administrador.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php endif; ?>
+
                     <?php if(isset($_GET['exito']) && $_GET['exito'] == 'registrado'): ?>
                         <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
                             <strong>¡Excelente! 🐾</strong> Tu cuenta ha sido creada. Ya puedes iniciar sesión.

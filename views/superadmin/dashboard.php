@@ -1,4 +1,5 @@
 <?php 
+require_once '../../config/auth_check.php';
 // SEGURIDAD: Evitar acceso directo a la vista. 
 // Si alguien teclea "dashboard.php" en la URL, lo mandamos al controlador.
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
@@ -150,7 +151,7 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
             </div>
 
             <div class="col-md-3">
-                <div class="stat-card" style="border-left-color: var(--dh-beige);">
+                <div class="stat-card" style="border-left-color: #8a0a2a;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <div class="stat-label">Veterinarios</div>
@@ -186,7 +187,7 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
             </div>
 
             <div class="col-md-6">
-                <div class="stat-card">
+                <div class="stat-card" style="border-left-color: #05ac37;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <div class="stat-label">Mascotas en Sistema</div>
@@ -234,7 +235,7 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
                             <?php echo $total_mascotas; ?>,
                             <?php echo $total_expedientes; ?>
                         ],
-                        backgroundColor: ['#0d6efd', '#1A2D40', '#c5aa7f', '#1A2D40', '#c5aa7f', '#1A2D40'],
+                        backgroundColor: ['#0d6efd', '#1A2D40', '#8a0a2a;', '#1A2D40', '#05ac37', '#1A2D40'],
                         borderRadius: 8,
                     }]
                 },

@@ -24,6 +24,13 @@ class UsuariosController {
 
                 if (password_verify($password_ingresada, $datos_usuario['Contrasena'])) {
                     
+                    // Verificamos si la columna Estado dice 'Inactivo'
+                    if (isset($datos_usuario['Estado']) && $datos_usuario['Estado'] == 'Inactivo') {
+                        header("Location: ../views/login.php?error=cuenta_suspendida");
+                        exit();
+                    }
+                    // Si pasó el filtro, le damos acceso normal...
+
                     // 1. Datos básicos de la cuenta
                     $_SESSION['id_usuario'] = $datos_usuario['ID_Usuario'];
                     $_SESSION['id_rol']     = $datos_usuario['ID_Rol'];
@@ -35,6 +42,8 @@ class UsuariosController {
 
                     // 3. Redirección inteligente
                     $this->redireccionarPorRol($_SESSION['id_rol']);
+
+
                     
                 } else {
                     header("Location: ../views/login.php?error=credenciales");

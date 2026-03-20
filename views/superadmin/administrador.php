@@ -1,4 +1,5 @@
 <?php 
+require_once '../../config/auth_check.php';
 session_start();
 
 // SEGURIDAD: Evitar acceso sin sesión
