@@ -7,15 +7,16 @@
     <title>Registro de Cuidador - DocuHuella</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    
     <style>
-       
-       /* Ocultar el ojo nativo de los navegadores */
+        /* Ocultar el ojo nativo de los navegadores */
         input::-ms-reveal,
         input::-ms-clear {
             display: none;
         }
 
-       :root {
+        :root {
             --dh-beige: #EADAC1;
             --dh-navy: #1A2D40;
             --dh-light-gray: #F8F9FA;
@@ -92,8 +93,8 @@
         }
 
         .btn-registrar:disabled {
-            background-color: #555;
-            color: #999;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.3);
             cursor: not-allowed;
         }
 
@@ -163,12 +164,12 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Cédula</label>
-                                <input type="text" name="cedula" class="form-control mascara-cedula" maxlength="12" placeholder="000-0000000-0"
+                                <input type="text" name="cedula" class="form-control mascara-cedula" maxlength="13" placeholder="000-0000000-0" inputmode="numeric" required
                                        value="<?php echo isset($_SESSION['datos_temporales']['cedula']) ? htmlspecialchars($_SESSION['datos_temporales']['cedula']) : ''; ?>">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Teléfono</label>
-                                <input type="text" name="telefono" class="form-control mascara-telefono" maxlength="12" placeholder="809-000-0000"
+                                <input type="text" name="telefono" class="form-control mascara-telefono" maxlength="12" placeholder="809-000-0000" inputmode="numeric" required
                                        value="<?php echo isset($_SESSION['datos_temporales']['telefono']) ? htmlspecialchars($_SESSION['datos_temporales']['telefono']) : ''; ?>">
                             </div>
                         </div>
@@ -244,12 +245,13 @@
                                         </svg>
                                     </button>
                                 </div>
+                                <small id="texto-coincidencia" class="text-danger fw-bold d-none" style="font-size: 0.8rem;">Las contraseñas no coinciden</small>
                             </div>
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mt-4">
                             <a href="login.php" class="text-white text-decoration-none opacity-75 small"><i class="fas fa-arrow-left me-1"></i> Volver al Login</a>
-                            <button type="submit" class="btn btn-registrar" id="btn-submit" disabled>Registrar</button>
+                            <button type="submit" class="btn btn-registrar" id="btn-submit" disabled>Registrar Cuidador</button>
                         </div>
 
                     </form>
@@ -280,73 +282,135 @@
         }
         setInterval(crearHuella, 800);
 
-        // Lógica del Medidor de Contraseñas
-        document.getElementById('pass-input').addEventListener('input', function() {
-            const pass = this.value;
+        // Lógica MEJORADA del Medidor de Contraseñas y Habilitación del Botón
+        const passInput = document.getElementById('pass-input');
+        const confirmInput = document.getElementById('pass-confirm-input');
+        const btnSubmit = document.getElementById('btn-submit');
+        const textoCoincidencia = document.getElementById('texto-coincidencia');
+
+        function validarFormulario() {
+            const pass = passInput.value;
+            const confirmPass = confirmInput.value;
             const barra = document.getElementById('barra-fuerza');
             const texto = document.getElementById('texto-fuerza');
-            const btnSubmit = document.getElementById('btn-submit');
             
             let fuerza = 0;
+            let esFuerte = false;
 
+            // Calcular fuerza
             if (pass.length >= 6) fuerza += 1; 
             if (pass.length >= 8) fuerza += 1; 
             if (/[A-Z]/.test(pass)) fuerza += 1; 
             if (/[0-9]/.test(pass) && /[a-zA-Z]/.test(pass)) fuerza += 1; 
 
+            // Estilos de la barra de progreso
             if (pass.length === 0) {
                 barra.style.width = '0%';
                 texto.innerText = 'Mínimo 6 caracteres';
                 texto.className = 'text-white opacity-50';
-                btnSubmit.disabled = true;
             } else if (fuerza <= 1) {
                 barra.style.width = '25%';
                 barra.className = 'progress-bar bg-danger';
-                texto.innerText = 'Débil (Usa al menos 8 caracteres)';
+                texto.innerText = 'Débil (Mínimo 6 caracteres)';
                 texto.className = 'text-danger fw-bold';
-                btnSubmit.disabled = true; 
             } else if (fuerza === 2) {
                 barra.style.width = '50%';
                 barra.className = 'progress-bar bg-warning';
-                texto.innerText = 'Intermedia (Válida, pero podría ser más segura con mayúsculas, números o símbolos)';
+                texto.innerText = 'Intermedia (Usa números y letras)';
                 texto.className = 'text-warning fw-bold';
-                btnSubmit.disabled = false; 
+                esFuerte = true;
             } else {
                 barra.style.width = '100%';
                 barra.className = 'progress-bar bg-success';
                 texto.innerText = 'Fuerte (Excelente)';
                 texto.className = 'text-success fw-bold';
-                btnSubmit.disabled = false;
+                esFuerte = true;
             }
 
-        });
-
-               // Lógica para mostrar/ocultar contraseña
-        function toggleVisibilidad(inputId, lineId) {
-            const input = document.getElementById(inputId);
-            const linea = document.getElementById(lineId);
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                linea.style.display = 'block'; // Muestra la raya diagonal cruzando el ojo
+            // Validar coincidencia SOLO si el usuario ya escribió algo en confirmación
+            let coinciden = false;
+            if (confirmPass.length > 0) {
+                if (pass === confirmPass) {
+                    textoCoincidencia.classList.add('d-none');
+                    coinciden = true;
+                } else {
+                    textoCoincidencia.classList.remove('d-none');
+                    coinciden = false;
+                }
             } else {
-                input.type = 'password';
-                linea.style.display = 'none';  // Oculta la raya
+                textoCoincidencia.classList.add('d-none');
+            }
+
+            // El botón solo se activa si la contraseña es fuerte y ambas coinciden
+            if (esFuerte && coinciden) {
+                btnSubmit.disabled = false;
+            } else {
+                btnSubmit.disabled = true;
             }
         }
 
-        // Asignar los clics a los botones
+        // Escuchamos ambos campos para validar en tiempo real
+        passInput.addEventListener('input', validarFormulario);
+        confirmInput.addEventListener('input', validarFormulario);
+
+        // Lógica para mostrar/ocultar contraseña
+        function toggleVisibilidad(inputId, lineId) {
+            const input = document.getElementById(inputId);
+            const linea = document.getElementById(lineId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                linea.style.display = 'block'; 
+            } else {
+                input.type = 'password';
+                linea.style.display = 'none';  
+            }
+        }
+
         document.getElementById('btn-ojo-pass').addEventListener('click', function() {
             toggleVisibilidad('pass-input', 'linea-pass');
         });
-
         document.getElementById('btn-ojo-confirm').addEventListener('click', function() {
             toggleVisibilidad('pass-confirm-input', 'linea-confirm');
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../public/js/mascaras.js"></script>
 
+    <script>
+    // ... tu código de las huellas y contraseñas ...
+
+    // 🛡️ MÁSCARAS DIRECTAS EN LA VISTA (Infalibles)
+    function soloNumerosYFormato(e) {
+        // Permitir teclas de borrado y flechas
+        if (['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'].includes(e.key)) return;
+        
+        // Bloquear si intentan escribir una letra (si no es un número del 0 al 9)
+        if (!/^[0-9]$/.test(e.key)) {
+            e.preventDefault();
+        }
+    }
+
+    // Aplicar a Cédula
+    const inputCedula = document.querySelector('.mascara-cedula');
+    if(inputCedula) {
+        inputCedula.addEventListener('keydown', soloNumerosYFormato);
+        inputCedula.addEventListener('input', function(e) {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,7})(\d{0,1})/);
+            e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+    }
+
+    // Aplicar a Teléfono
+    const inputTelefono = document.querySelector('.mascara-telefono');
+    if(inputTelefono) {
+        inputTelefono.addEventListener('keydown', soloNumerosYFormato);
+        inputTelefono.addEventListener('input', function(e) {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+    }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <?php unset($_SESSION['datos_temporales']); ?>
 </body>
 </html>

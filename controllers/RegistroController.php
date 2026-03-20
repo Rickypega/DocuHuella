@@ -6,7 +6,7 @@ require_once '../models/Cuidador.php';
 
 class RegistroController {
     
-    public function registrarCuidador() {
+   public function registrarCuidador() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             // 1. Captura de datos
@@ -39,21 +39,36 @@ class RegistroController {
             if ($resultado_usuario === true) {
                 
                 // 4. Obtener el ID recién creado 
-                // Usamos el ID que el modelo Usuario ya debe haber capturado
                 $id_usuario_nuevo = $db->lastInsertId(); 
+                
+                // Cédula: Quitamos todo lo que no sea número
+                $cedula_limpia = preg_replace('/[^0-9]/', '', $_POST['cedula']);
+                // Si tiene los 11 dígitos, la formateamos. Si no, la guardamos como llegó para no romper el string.
+                $cedula_final = (strlen($cedula_limpia) == 11) 
+                                ? substr($cedula_limpia, 0, 3) . '-' . substr($cedula_limpia, 3, 7) . '-' . substr($cedula_limpia, 10, 1) 
+                                : $_POST['cedula'];
+
+                // Teléfono: Quitamos todo lo que no sea número
+                $telefono_limpio = preg_replace('/[^0-9]/', '', $_POST['telefono']);
+                // Si tiene 10 o más dígitos, lo formateamos.
+                $telefono_final = (strlen($telefono_limpio) >= 10) 
+                                  ? substr($telefono_limpio, 0, 3) . '-' . substr($telefono_limpio, 3, 3) . '-' . substr($telefono_limpio, 6, 4) 
+                                  : $_POST['telefono'];
+
 
                 // 5. Crear el Perfil del Cuidador
                 $cuidador = new Cuidador($db);
                 $cuidador->id_usuario = $id_usuario_nuevo;
                 $cuidador->nombre = $_POST['nombre'];
                 $cuidador->apellido = $_POST['apellido'];
-                $cuidador->cedula = $_POST['cedula'];
-                $cuidador->telefono = $_POST['telefono'];
+                
+                // Usamos nuestras variables ya limpias y formateadas
+                $cuidador->cedula = $cedula_final; 
+                $cuidador->telefono = $telefono_final; 
+                
                 $cuidador->direccion = $_POST['direccion'];
                 $cuidador->fecha_nacimiento = $_POST['fecha_nacimiento'];
                 $cuidador->sexo = $_POST['sexo'];
-
-               
 
                 if ($cuidador->registrarse()) {
                     header("Location: ../views/login.php?exito=registrado");

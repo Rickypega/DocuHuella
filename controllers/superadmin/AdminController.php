@@ -17,6 +17,23 @@ class AdminController {
         $this->verificarSeguridad();
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            
+          
+            // Cédula
+            $cedula_limpia = preg_replace('/[^0-9]/', '', $_POST['cedula']);
+            $cedula_final = (strlen($cedula_limpia) == 11) 
+                            ? substr($cedula_limpia, 0, 3) . '-' . substr($cedula_limpia, 3, 7) . '-' . substr($cedula_limpia, 10, 1) 
+                            : $_POST['cedula'];
+
+            // Teléfono
+            $telefono_limpio = preg_replace('/[^0-9]/', '', $_POST['telefono']);
+            $telefono_final = (strlen($telefono_limpio) >= 10) 
+                              ? substr($telefono_limpio, 0, 3) . '-' . substr($telefono_limpio, 3, 3) . '-' . substr($telefono_limpio, 6, 4) 
+                              : $_POST['telefono'];
+           
+            // RNC (Solo números)
+            $rnc_limpio = preg_replace('/[^0-9]/', '', $_POST['rnc']);
+
             $db = (new Database())->getConnection();
             try {
                 $db->beginTransaction();
@@ -30,15 +47,15 @@ class AdminController {
                 $stmt_user->execute();
                 $id_usuario_nuevo = $db->lastInsertId();
 
-                // Crear Admin
+                // Crear Admin (Usando variables limpias)
                 $query_admin = "INSERT INTO administrador (ID_Usuario, Nombre, Apellido, Cedula, Telefono) 
                                 VALUES (:id_u, :nom, :ape, :ced, :tel)";
                 $stmt_admin = $db->prepare($query_admin);
                 $stmt_admin->bindParam(':id_u', $id_usuario_nuevo);
                 $stmt_admin->bindParam(':nom', $_POST['nombre']);
                 $stmt_admin->bindParam(':ape', $_POST['apellido']);
-                $stmt_admin->bindParam(':ced', $_POST['cedula']);
-                $stmt_admin->bindParam(':tel', $_POST['telefono']);
+                $stmt_admin->bindParam(':ced', $cedula_final); 
+                $stmt_admin->bindParam(':tel', $telefono_final); 
                 $stmt_admin->execute();
                 $id_admin_nuevo = $db->lastInsertId();
 
@@ -63,21 +80,28 @@ class AdminController {
         }
     }
 
-    // 2. EDITAR
+    // 2. EDITAR 
     public function editarFranquicia() {
         $this->verificarSeguridad();
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            
+            // 
+            $telefono_limpio = preg_replace('/[^0-9]/', '', $_POST['telefono']);
+            $telefono_final = (strlen($telefono_limpio) >= 10) 
+                              ? substr($telefono_limpio, 0, 3) . '-' . substr($telefono_limpio, 3, 3) . '-' . substr($telefono_limpio, 6, 4) 
+                              : $_POST['telefono'];
+
             $db = (new Database())->getConnection();
             try {
                 $db->beginTransaction();
 
-                // Update Admin
+                // Update Admin 
                 $query_admin = "UPDATE administrador SET Nombre = :nom, Apellido = :ape, Telefono = :tel WHERE ID_Admin = :id_a";
                 $stmt_admin = $db->prepare($query_admin);
                 $stmt_admin->bindParam(':nom', $_POST['nombre']);
                 $stmt_admin->bindParam(':ape', $_POST['apellido']);
-                $stmt_admin->bindParam(':tel', $_POST['telefono']);
+                $stmt_admin->bindParam(':tel', $telefono_final); 
                 $stmt_admin->bindParam(':id_a', $_POST['id_admin']);
                 $stmt_admin->execute();
 

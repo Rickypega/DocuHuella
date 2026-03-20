@@ -228,12 +228,12 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="col-md-6"><label class="form-label">Contraseña Temporal</label><input type="password" name="contrasena" class="form-control" required></div>
                             <div class="col-md-4"><label class="form-label">Nombre</label><input type="text" name="nombre" class="form-control" required></div>
                             <div class="col-md-4"><label class="form-label">Apellido</label><input type="text" name="apellido" class="form-control" required></div>
-                            <div class="col-md-4"><label class="form-label">Teléfono</label><input type="text" name="telefono" class="form-control mascara-telefono" maxlength="12" placeholder="809-000-0000"></div>
-                            <div class="col-md-12"><label class="form-label">Cédula</label><input type="text" name="cedula" class="form-control mascara-cedula" maxlength="12" placeholder="000-0000000-0" required></div>
+                            <div class="col-md-4"><label class="form-label">Teléfono</label><input type="text" name="telefono" class="form-control mascara-telefono" maxlength="12" placeholder="809-000-0000" inputmode="numeric" required></div>
+                            <div class="col-md-12"><label class="form-label">Cédula</label><input type="text" name="cedula" class="form-control mascara-cedula" maxlength="12" placeholder="000-0000000-0" inputmode="numeric" required></div>
 
                             <h6 class="text-uppercase fw-bold text-muted border-bottom pb-2 mt-4">2. Información de la Clínica</h6>
                             <div class="col-md-6"><label class="form-label">Nombre Veterinaria</label><input type="text" name="nombre_clinica" class="form-control" required></div>
-                            <div class="col-md-6"><label class="form-label">RNC</label><input type="text" name="rnc" class="form-control mascara-rnc" maxlength="11" placeholder="Solo números"></div>
+                            <div class="col-md-6"><label class="form-label">RNC</label><input type="text" name="rnc" class="form-control mascara-rnc" maxlength="11" placeholder="Solo números" inputmode="numeric" required></div>
                             <div class="col-md-12"><label class="form-label">Dirección Física</label><input type="text" name="direccion_clinica" class="form-control" required></div>
                         </div>
                     </div>
@@ -262,7 +262,7 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="row g-3">
                             <div class="col-md-6"><label class="form-label">Nombre</label><input type="text" name="nombre" id="edit_nombre" class="form-control" required></div>
                             <div class="col-md-6"><label class="form-label">Apellido</label><input type="text" name="apellido" id="edit_apellido" class="form-control" required></div>
-                            <div class="col-md-6"><label class="form-label">Teléfono</label><input type="text" name="telefono" class="form-control mascara-telefono" maxlength="12" placeholder="809-000-0000"></div>
+                            <div class="col-md-6"><label class="form-label">Teléfono</label><input type="text" name="telefono" class="form-control mascara-telefono" maxlength="12" placeholder="809-000-0000" inputmode="numeric" required></div>
                             <div class="col-md-6"><label class="form-label">Clínica</label><input type="text" name="nombre_clinica" id="edit_clinica" class="form-control" required></div>
                         </div>
 
@@ -390,6 +390,51 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
             });
         }
     </script>
-    <script src="../../public/js/mascaras.js"></script>
+
+    <script>
+
+        function soloNumerosYFormato(e) {
+            const teclasPermitidas = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'];
+            // Bloquear si intentan escribir algo que no sea número ni tecla de control
+            if (!/^[0-9]$/.test(e.key) && !teclasPermitidas.includes(e.key) && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+            }
+        }
+
+        // Aplicar a TODOS los inputs de Teléfono 
+        document.querySelectorAll('.mascara-telefono').forEach(function(input) {
+            input.addEventListener('keydown', soloNumerosYFormato);
+            input.addEventListener('input', function(e) {
+                let numero = e.target.value.replace(/\D/g, '');
+                let formateado = '';
+                if (numero.length > 0) formateado += numero.substring(0, 3);
+                if (numero.length >= 4) formateado += '-' + numero.substring(3, 6);
+                if (numero.length >= 7) formateado += '-' + numero.substring(6, 10);
+                e.target.value = formateado;
+            });
+        });
+
+        // Aplicar a TODOS los inputs de Cédula
+        document.querySelectorAll('.mascara-cedula').forEach(function(input) {
+            input.addEventListener('keydown', soloNumerosYFormato);
+            input.addEventListener('input', function(e) {
+                let numero = e.target.value.replace(/\D/g, '');
+                let formateado = '';
+                if (numero.length > 0) formateado += numero.substring(0, 3);
+                if (numero.length >= 4) formateado += '-' + numero.substring(3, 10);
+                if (numero.length >= 11) formateado += '-' + numero.substring(10, 11);
+                e.target.value = formateado;
+            });
+        });
+
+        // Aplicar a TODOS los inputs de RNC (Solo números, máx 11)
+        document.querySelectorAll('.mascara-rnc').forEach(function(input) {
+            input.addEventListener('keydown', soloNumerosYFormato);
+            input.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/\D/g, '').substring(0, 11);
+            });
+        });
+    </script>
+    
 </body>
 </html>
