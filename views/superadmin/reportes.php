@@ -1,6 +1,6 @@
 <?php 
 require_once '../../config/auth_check.php';
-session_start();
+
 if (!isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 4) { header("Location: ../login.php"); exit(); }
 ?>
 <div class="main-content">

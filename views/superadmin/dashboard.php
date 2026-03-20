@@ -235,7 +235,7 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
                             <?php echo $total_mascotas; ?>,
                             <?php echo $total_expedientes; ?>
                         ],
-                        backgroundColor: ['#0d6efd', '#1A2D40', '#8a0a2a;', '#1A2D40', '#05ac37', '#1A2D40'],
+                        backgroundColor: ['#0d6efd', '#1A2D40', '#8a0a2a', '#1A2D40', '#05ac37', '#1A2D40'],
                         borderRadius: 8,
                     }]
                 },
