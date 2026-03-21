@@ -193,7 +193,7 @@ try {
             <div class="col-md-4">
                 <div class="report-card text-center">
                     <i class="fas fa-hospital-user report-icon"></i>
-                    <h5 class="fw-bold" style="color: var(--dh-navy);">Clínicas y Franquicias</h5>
+                    <h5 class="fw-bold" style="color: var(--dh-navy);">Clínicas</h5>
                     <p class="text-muted small mb-4">Listado completo de administradores registrados, RNC y estado de sus veterinarias.</p>
                     <div class="d-flex justify-content-center gap-2">
                         <button class="btn btn-sm btn-pdf w-50 fw-bold" onclick="generarReporte('clinicas', 'pdf')"><i class="fas fa-file-pdf"></i> PDF</button>
@@ -217,8 +217,8 @@ try {
             <div class="col-md-4">
                 <div class="report-card text-center" style="border-top-color: #ffc107;">
                     <i class="fas fa-users report-icon" style="color: #ffc107;"></i>
-                    <h5 class="fw-bold" style="color: var(--dh-navy);">Cuidadores y Clientes</h5>
-                    <p class="text-muted small mb-4">Base de datos de dueños de mascotas registrados en la plataforma a nivel nacional.</p>
+                    <h5 class="fw-bold" style="color: var(--dh-navy);">Cuidadores</h5>
+                    <p class="text-muted small mb-4">Listado de dueños de mascotas registrados en la plataforma.</p>
                     <div class="d-flex justify-content-center gap-2">
                         <button class="btn btn-sm btn-pdf w-50 fw-bold" onclick="generarReporte('cuidadores', 'pdf')"><i class="fas fa-file-pdf"></i> PDF</button>
                         <button class="btn btn-sm btn-excel w-50 fw-bold" onclick="generarReporte('cuidadores', 'excel')"><i class="fas fa-file-excel"></i> Excel</button>
@@ -261,7 +261,7 @@ try {
             let f_fin = document.getElementById('fecha_fin').value;
             let estado = document.getElementById('estado').value;
 
-            // Armar la URL para el futuro ReportesController (Esto lo programaremos en el siguiente paso)
+            // Armar la URL para el futuro ReportesController 
             let url = `../../controllers/superadmin/ReportesController.php?action=generar&tipo=${tipo}&formato=${formato}&inicio=${f_inicio}&fin=${f_fin}&estado=${estado}`;
 
             Swal.fire({
