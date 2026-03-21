@@ -3,16 +3,16 @@ class Expediente {
     private $conexion;
     private $tabla = "Expedientes";
 
-    // ATRIBUTOS ACTUALIZADOS
+    // ATRIBUTOS 
     public $id_expediente;
     public $id_mascota; 
     public $id_veterinario; 
-    public $id_clinica; // NUEVO: Para el sistema multi-sucursal
-    public $fecha_creacion; // Ajustado al SQL
+    public $id_clinica; // Para el sistema multi-sucursal
+    public $fecha_creacion; 
     public $motivo;
     public $diagnostico_presuntivo;
     public $tratamiento_recomendado;
-    public $estado_edicion; // NUEVO: Abierto, Cerrado
+    public $estado_edicion; //  Abierto, Cerrado
 
     public function __construct($db) {
         $this->conexion = $db;

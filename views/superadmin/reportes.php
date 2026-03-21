@@ -193,7 +193,7 @@ try {
             <div class="col-md-4">
                 <div class="report-card text-center">
                     <i class="fas fa-hospital-user report-icon"></i>
-                    <h5 class="fw-bold" style="color: var(--dh-navy);">Clínicas</h5>
+                    <h5 class="fw-bold" style="color: var(--dh-navy);">Administradores de Clínicas</h5>
                     <p class="text-muted small mb-4">Listado completo de administradores registrados, RNC y estado de sus veterinarias.</p>
                     <div class="d-flex justify-content-center gap-2">
                         <button class="btn btn-sm btn-pdf w-50 fw-bold" onclick="generarReporte('clinicas', 'pdf')"><i class="fas fa-file-pdf"></i> PDF</button>
@@ -256,12 +256,10 @@ try {
         }
 
         function generarReporte(tipo, formato) {
-            // Capturar los valores de los filtros
             let f_inicio = document.getElementById('fecha_inicio').value;
             let f_fin = document.getElementById('fecha_fin').value;
             let estado = document.getElementById('estado').value;
 
-            // Armar la URL para el futuro ReportesController 
             let url = `../../controllers/superadmin/ReportesController.php?action=generar&tipo=${tipo}&formato=${formato}&inicio=${f_inicio}&fin=${f_fin}&estado=${estado}`;
 
             Swal.fire({
@@ -273,11 +271,8 @@ try {
                     Swal.showLoading()
                 }
             }).then((result) => {
-                // Aquí es donde el navegador abrirá el archivo o lo descargará
-                // window.open(url, '_blank');
-                
-                // Mensaje temporal hasta que hagamos el backend:
-                Swal.fire('¡En Construcción!', 'La vista está lista. Falta programar la librería PDF/Excel en el backend.', 'info');
+           
+                window.open(url, '_blank');
             });
         }
     </script>
