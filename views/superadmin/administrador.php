@@ -239,7 +239,7 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="modal-footer bg-light" style="border-radius: 0 0 20px 20px;">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-dh-navy px-4" onclick="confirmarAccion('formRegistro', 'crear')">Guardar Franquicia</button>
+                        <button type="button" class="btn btn-dh-navy px-4" onclick="confirmarAccion('formRegistro', 'registrar')">Guardar Franquicia</button>
                     </div>
                 </form>
             </div>
@@ -346,7 +346,7 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
             document.getElementById(formId).action = "../../controllers/superadmin/AdminController.php?action=" + accion;
 
             switch(accion) {
-                case 'crear':
+                case 'registrar':
                     titulo = "¿Crear nueva franquicia?";
                     texto = "Se generarán accesos y perfiles en el sistema.";
                     icono = "question";
