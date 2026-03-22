@@ -1,6 +1,5 @@
 <?php
 require_once '../../config/auth_check.php';
-session_start();
 
 $rol_permitido = 3; // Rol permitido para acceder a esta página (Cuidador)
 
