@@ -18,7 +18,6 @@ class AdminController {
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
-          
             // Cédula
             $cedula_limpia = preg_replace('/[^0-9]/', '', $_POST['cedula']);
             $cedula_final = (strlen($cedula_limpia) == 11) 
@@ -35,6 +34,33 @@ class AdminController {
             $rnc_limpio = preg_replace('/[^0-9]/', '', $_POST['rnc']);
 
             $db = (new Database())->getConnection();
+
+            // 🛡️ --- VALIDACIÓN PREVIA DE DUPLICADOS --- 🛡️
+            // 1. Revisar si el Correo ya existe
+            $stmt = $db->prepare("SELECT ID_Usuario FROM usuarios WHERE Correo = :correo");
+            $stmt->execute([':correo' => $_POST['correo']]);
+            if ($stmt->rowCount() > 0) {
+                header("Location: ../../views/superadmin/administrador.php?error=correo_duplicado");
+                exit();
+            }
+
+            // 2. Revisar si la Cédula ya existe
+            $stmt = $db->prepare("SELECT ID_Admin FROM administrador WHERE Cedula = :cedula");
+            $stmt->execute([':cedula' => $cedula_final]);
+            if ($stmt->rowCount() > 0) {
+                header("Location: ../../views/superadmin/administrador.php?error=cedula_duplicada");
+                exit();
+            }
+
+            // 3. Revisar si el RNC ya existe
+            $stmt = $db->prepare("SELECT ID_Clinica FROM clinicas WHERE RNC = :rnc");
+            $stmt->execute([':rnc' => $rnc_limpio]);
+            if ($stmt->rowCount() > 0) {
+                header("Location: ../../views/superadmin/administrador.php?error=rnc_duplicado");
+                exit();
+            }
+            // 🛡️ --- FIN VALIDACIÓN PREVIA --- 🛡️
+
             try {
                 $db->beginTransaction();
 
@@ -65,7 +91,7 @@ class AdminController {
                 $stmt_clinica = $db->prepare($query_clinica);
                 $stmt_clinica->bindParam(':id_a', $id_admin_nuevo);
                 $stmt_clinica->bindParam(':nom_c', $_POST['nombre_clinica']);
-                $stmt_clinica->bindParam(':rnc', $_POST['rnc']);
+                $stmt_clinica->bindParam(':rnc', $rnc_limpio); 
                 $stmt_clinica->bindParam(':dir', $_POST['direccion_clinica']);
                 $stmt_clinica->execute();
 
@@ -74,6 +100,7 @@ class AdminController {
                 exit();
             } catch (Exception $e) {
                 if ($db->inTransaction()) $db->rollBack();
+                // Si ocurre otro tipo de error, lo mandamos como fallo genérico
                 header("Location: ../../views/superadmin/administrador.php?error=fallo_registro");
                 exit();
             }

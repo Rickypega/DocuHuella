@@ -162,7 +162,7 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <tr>
                             <th>ID</th>
                             <th>Administrador</th>
-                            <th>Teléfono</th>
+                            <th>Cédula</th> <th>Teléfono</th>
                             <th>Clínica</th>
                             <th>Correo</th>
                             <th>Estado</th>
@@ -174,6 +174,7 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <tr>
                             <td><strong>#<?php echo $admin['ID_Admin']; ?></strong></td>
                             <td><?php echo htmlspecialchars($admin['Nombre'] . " " . $admin['Apellido']); ?></td>
+                            <td class="text-muted"><?php echo htmlspecialchars($admin['Cedula']); ?></td>
                             <td><?php echo htmlspecialchars($admin['Telefono'] ?? '---'); ?></td>
                             <td>
                                 <span class="badge <?php echo isset($admin['Nombre_Sucursal']) ? 'bg-info text-dark' : 'bg-secondary'; ?>">
@@ -228,18 +229,34 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="col-md-6"><label class="form-label">Contraseña Temporal</label><input type="password" name="contrasena" class="form-control" required></div>
                             <div class="col-md-4"><label class="form-label">Nombre</label><input type="text" name="nombre" class="form-control" required></div>
                             <div class="col-md-4"><label class="form-label">Apellido</label><input type="text" name="apellido" class="form-control" required></div>
-                            <div class="col-md-4"><label class="form-label">Teléfono</label><input type="text" name="telefono" class="form-control mascara-telefono" maxlength="12" placeholder="809-000-0000" inputmode="numeric" required></div>
-                            <div class="col-md-12"><label class="form-label">Cédula</label><input type="text" name="cedula" class="form-control mascara-cedula" maxlength="12" placeholder="000-0000000-0" inputmode="numeric" required></div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label">Teléfono</label>
+                                <input type="text" name="telefono" id="reg_telefono" class="form-control mascara-telefono" maxlength="12" placeholder="809-000-0000" inputmode="numeric" required>
+                                <small id="msg_telefono" class="text-danger d-none fw-bold" style="font-size: 0.75rem;">Faltan números</small>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <label class="form-label">Cédula</label>
+                                <input type="text" name="cedula" id="reg_cedula" class="form-control mascara-cedula" maxlength="13" placeholder="000-0000000-0" inputmode="numeric" required>
+                                <small id="msg_cedula" class="text-danger d-none fw-bold" style="font-size: 0.75rem;">Debe tener 11 dígitos</small>
+                            </div>
 
                             <h6 class="text-uppercase fw-bold text-muted border-bottom pb-2 mt-4">2. Información de la Clínica</h6>
-                            <div class="col-md-6"><label class="form-label">Nombre Veterinaria</label><input type="text" name="nombre_clinica" class="form-control" required></div>
-                            <div class="col-md-6"><label class="form-label">RNC</label><input type="text" name="rnc" class="form-control mascara-rnc" maxlength="11" placeholder="Solo números" inputmode="numeric" required></div>
-                            <div class="col-md-12"><label class="form-label">Dirección Física</label><input type="text" name="direccion_clinica" class="form-control" required></div>
+                            <div class="col-md-6"><label class="form-label">Nombre Veterinaria</label><input type="text" name="nombre_clinica" id="reg_clinica" class="form-control" required></div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">RNC</label>
+                                <input type="text" name="rnc" id="reg_rnc" class="form-control mascara-rnc" maxlength="11" placeholder="Solo números" inputmode="numeric" required>
+                                <small id="msg_rnc" class="text-danger d-none fw-bold" style="font-size: 0.75rem;">Debe tener 11 dígitos exactos</small>
+                            </div>
+                            
+                            <div class="col-md-12"><label class="form-label">Dirección Física</label><input type="text" name="direccion_clinica" id="reg_direccion" class="form-control" required></div>
                         </div>
                     </div>
                     <div class="modal-footer bg-light" style="border-radius: 0 0 20px 20px;">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-dh-navy px-4" onclick="confirmarAccion('formRegistro', 'registrar')">Guardar Franquicia</button>
+                        <button type="button" id="btnGuardarRegistro" class="btn btn-dh-navy px-4" onclick="confirmarAccion('formRegistro', 'registrar')" disabled>Guardar Franquicia</button>
                     </div>
                 </form>
             </div>
@@ -432,6 +449,126 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
             input.addEventListener('keydown', soloNumerosYFormato);
             input.addEventListener('input', function(e) {
                 e.target.value = e.target.value.replace(/\D/g, '').substring(0, 11);
+            });
+        });
+    </script>
+
+    <script>
+        // 🛡️ --- NOTIFICACIONES Y ERRORES --- 🛡️
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            const exito = urlParams.get('exito');
+
+            // Manejo de Errores
+            if (error) {
+                let mensaje = "Ocurrió un error inesperado al procesar la solicitud.";
+                if (error === 'correo_duplicado') mensaje = "Ese correo electrónico ya está registrado en DocuHuella.";
+                if (error === 'cedula_duplicada') mensaje = "La cédula ingresada ya pertenece a un administrador existente.";
+                if (error === 'rnc_duplicado') mensaje = "El RNC ingresado ya pertenece a otra clínica registrada.";
+                if (error === 'fallo_registro') mensaje = "Hubo un problema de conexión al guardar los datos.";
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No se pudo guardar',
+                    text: mensaje,
+                    confirmButtonColor: '#1A2D40'
+                });
+                
+                // Limpiar URL sin recargar la página
+                window.history.replaceState(null, null, window.location.pathname);
+            }
+
+            // Manejo de Éxitos
+            if (exito) {
+                let mensajeExito = "Operación realizada con éxito.";
+                if (exito === 'franquicia_creada') mensajeExito = "La nueva franquicia y sus accesos fueron creados.";
+                if (exito === 'franquicia_actualizada') mensajeExito = "Los datos se actualizaron correctamente.";
+                if (exito === 'estado_cambiado') mensajeExito = "El estado de acceso fue modificado.";
+                if (exito === 'franquicia_eliminada') mensajeExito = "La franquicia fue eliminada definitivamente del sistema.";
+
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Excelente!',
+                    text: mensajeExito,
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+
+                // Limpiar URL sin recargar la página
+                window.history.replaceState(null, null, window.location.pathname);
+            }
+        });
+    </script>
+
+    <script>
+        // 🛡️ --- VALIDACIÓN EN TIEMPO REAL DEL MODAL DE REGISTRO --- 🛡️
+        document.addEventListener('DOMContentLoaded', function() {
+            const formRegistro = document.getElementById('formRegistro');
+            const btnGuardar = document.getElementById('btnGuardarRegistro');
+            const inputsRequeridos = formRegistro.querySelectorAll('input[required]');
+
+            // Elementos específicos
+            const inputTelefono = document.getElementById('reg_telefono');
+            const inputCedula = document.getElementById('reg_cedula');
+            const inputRNC = document.getElementById('reg_rnc');
+            
+            const msgTelefono = document.getElementById('msg_telefono');
+            const msgCedula = document.getElementById('msg_cedula');
+            const msgRNC = document.getElementById('msg_rnc');
+
+            function validarFormulario() {
+                let todoLleno = true;
+                let formatosCorrectos = true;
+
+                // 1. Verificar que NINGÚN campo requerido esté vacío
+                inputsRequeridos.forEach(input => {
+                    if (input.value.trim() === '') {
+                        todoLleno = false;
+                    }
+                });
+
+                // 2. Validar longitud del Teléfono (Debe ser 12: XXX-XXX-XXXX)
+                if (inputTelefono.value.length > 0 && inputTelefono.value.length < 12) {
+                    msgTelefono.classList.remove('d-none');
+                    formatosCorrectos = false;
+                } else {
+                    msgTelefono.classList.add('d-none');
+                }
+
+                // 3. Validar longitud de la Cédula (Debe ser 13: XXX-XXXXXXX-X)
+                if (inputCedula.value.length > 0 && inputCedula.value.length < 13) {
+                    msgCedula.classList.remove('d-none');
+                    formatosCorrectos = false;
+                } else {
+                    msgCedula.classList.add('d-none');
+                }
+
+                // 4. Validar longitud del RNC (Debe ser 11 dígitos)
+                if (inputRNC.value.length > 0 && inputRNC.value.length < 11) {
+                    msgRNC.classList.remove('d-none');
+                    formatosCorrectos = false;
+                } else {
+                    msgRNC.classList.add('d-none');
+                }
+
+                // 5. Encender o apagar el botón maestro
+                if (todoLleno && formatosCorrectos) {
+                    btnGuardar.disabled = false;
+                } else {
+                    btnGuardar.disabled = true;
+                }
+            }
+
+            // Poner a escuchar a todos los inputs
+            inputsRequeridos.forEach(input => {
+                input.addEventListener('input', validarFormulario);
+            });
+            
+            // 🧹 Limpiar validaciones al cerrar el modal
+            document.getElementById('modalRegistro').addEventListener('hidden.bs.modal', function () {
+                formRegistro.reset();
+                validarFormulario(); // Volver a apagar el botón
             });
         });
     </script>
