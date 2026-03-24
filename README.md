@@ -3,6 +3,7 @@
 **DocuHuella** es una solución tecnológica integral diseñada para optimizar la gestión de expedientes clínicos veterinarios. El sistema permite centralizar la información médica de las mascotas, facilitando el trabajo de los profesionales y mejorando el seguimiento para los cuidadores.
 
 LINK: http://localhost:8080/DocuHuella/views/login.php
+LINK: http://localhost/DocuHuella/views/login.php
 
 ---
 
@@ -60,7 +61,7 @@ Para que el proyecto funcione en tu computadora local, sigue estos pasos al pie 
 ### 1. Base de Datos
 
 1. Abre **XAMPP** y activa los módulos de **Apache** y **MySQL**.
-2. Ve a tu navegador e ingresa a [http://localhost:8080/phpmyadmin/](https://www.google.com/search?q=http://localhost:8080/phpmyadmin/) *(Ajusta el puerto si usas uno diferente al 8080)*.
+2. Presiona admin en xampp o ve a tu navegador e ingresa a [http://localhost:8080/phpmyadmin/](https://www.google.com/search?q=http://localhost:8080/phpmyadmin/) *(Ajusta el puerto si usas uno diferente al 8080)*.
 3. Crea una base de datos nueva con el nombre exacto: `Docuhuella`.
 4. Ve a la pestaña "Importar" y sube el archivo `DocuhuellaDB.sql` que se encuentra en la raíz de este proyecto.
 
@@ -70,8 +71,9 @@ Una vez importada la base de datos, debes ejecutar el script de inicialización 
 
 1. Entra a la siguiente ruta en tu navegador:
 `http://localhost:8080/DocuHuella/setup.php`
-2. Si ves los mensajes de confirmación en verde, el sistema ya está configurado.
-3. **Credenciales de acceso iniciales:**
+`http://localhost/DocuHuella/setup.php`
+3. Si ves los mensajes de confirmación en verde, el sistema ya está configurado.
+4. **Credenciales de acceso iniciales:**
 * **Correo:** `master@docuhuella.com`
 * **Contraseña:** `master123`
 
