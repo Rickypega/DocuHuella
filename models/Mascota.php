@@ -54,28 +54,28 @@ class Mascota {
      * Ver historial médico CON JOINS (Para que el cuidador entienda qué lee)
      */
     public function verHistorialMedico() {
-       
-        $query = "SELECT 
-                    e.ID_Expediente, 
-                    e.Fecha_Creacion, 
-                    e.Motivo, 
-                    e.Diagnostico_Presuntivo, 
-                    e.Tratamiento_Recomendado,
-                    v.Nombre AS Nombre_Vet, 
-                    v.Apellido AS Apellido_Vet,
-                    c.Nombre_Sucursal AS Clinica
-                  FROM Expedientes e
-                  INNER JOIN Veterinarios v ON e.ID_Veterinario = v.ID_Veterinario
-                  INNER JOIN Clinicas c ON e.ID_Clinica = c.ID_Clinica
-                  WHERE e.ID_Mascota = :id 
-                  ORDER BY e.Fecha_Creacion DESC";
-        
-        $stmt = $this->conexion->prepare($query);
-        $stmt->bindParam(':id', $this->id_mascota);
-        $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    $query = "SELECT 
+                e.ID_Expediente, 
+                e.Fecha_Hora AS Fecha_Creacion,
+                e.Motivo, 
+                e.Diagnostico_Presuntivo, 
+                e.Tratamiento_Recomendado,
+                v.Nombre AS Nombre_Vet, 
+                v.Apellido AS Apellido_Vet,
+                c.Nombre_Sucursal AS Clinica
+              FROM Expedientes e
+              INNER JOIN Veterinarios v ON e.ID_Veterinario = v.ID_Veterinario
+              INNER JOIN Clinicas c ON v.ID_Clinica = c.ID_Clinica
+              WHERE e.ID_Mascota = :id 
+              ORDER BY e.Fecha_Hora DESC";
+
+    $stmt = $this->conexion->prepare($query);
+    $stmt->bindParam(':id', $this->id_mascota);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
     public function actualizarDatos() {
         $query = "UPDATE " . $this->tabla . " 
