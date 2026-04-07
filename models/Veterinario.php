@@ -27,13 +27,14 @@ class Veterinario {
      */
     public function registrarPerfil() {
         $query = "INSERT INTO " . $this->tabla . " 
-                  SET ID_Usuario = :id_usuario, ID_Clinica = :id_clinica, Nombre = :nombre, 
-                      Apellido = :apellido, Fecha_Nacimiento = :fecha_nacimiento, Cedula = :cedula, 
-                      Sexo = :sexo, Telefono = :telefono, Especialidad = :especialidad, 
-                      Direccion = :direccion, Exequatur = :exequatur, Colegiatura = :colegiatura";
+                  (ID_Usuario, ID_Clinica, Nombre, Apellido, Fecha_Nacimiento, Cedula, 
+                   Sexo, Telefono, Especialidad, Direccion, Exequatur, Colegiatura) 
+                  VALUES (:id_usuario, :id_clinica, :nombre, :apellido, :fecha_nacimiento, :cedula, 
+                          :sexo, :telefono, :especialidad, :direccion, :exequatur, :colegiatura)";
         
         $stmt = $this->conexion->prepare($query);
 
+        // Limpieza de datos
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
         $this->apellido = htmlspecialchars(strip_tags($this->apellido));
         $this->cedula = htmlspecialchars(strip_tags($this->cedula));
@@ -60,30 +61,32 @@ class Veterinario {
     }
 
     /**
-     * Consulta el historial clínico completo
-     * Relaciona: Expediente -> Mascota -> Cuidador -> Veterinario -> Clínica
+     * Consulta el historial clínico completo 
+     * Relaciona: Consulta -> Expediente -> Mascota -> Cuidador -> Veterinario -> Clínica
      */
     public function consultarHistorial($id_mascota) {
         $query = "SELECT 
-                    e.ID_Expediente, 
-                    e.Fecha_Creacion, 
-                    e.Motivo, 
-                    e.Diagnostico_Presuntivo, 
-                    e.Tratamiento_Recomendado,
+                    cons.ID_Consulta, 
+                    cons.Fecha_Consulta, 
+                    cons.Motivo_Consulta AS Motivo, 
+                    cons.Diagnostico, 
+                    cons.Tratamiento_Sugerido,
                     m.Nombre AS Nombre_Mascota,
-                    m.Especie,
-                    cui.Nombre AS Nombre_Dueño,
-                    cui.Apellido AS Apellido_Dueño,
+                    esp.Nombre_Especie AS Especie,
+                    cui.Nombre AS Nombre_Dueno,
+                    cui.Apellido AS Apellido_Dueno,
                     v.Nombre AS Nombre_Vet, 
                     v.Apellido AS Apellido_Vet,
                     c.Nombre_Sucursal AS Clinica
-                  FROM Expedientes e
+                  FROM Consultas cons
+                  INNER JOIN Expedientes e ON cons.ID_Expediente = e.ID_Expediente
                   INNER JOIN Mascotas m ON e.ID_Mascota = m.ID_Mascota
+                  INNER JOIN Especies esp ON m.ID_Especie = esp.ID_Especie
                   INNER JOIN Cuidadores cui ON m.ID_Cuidador = cui.ID_Cuidador
-                  INNER JOIN Veterinarios v ON e.ID_Veterinario = v.ID_Veterinario
+                  INNER JOIN Veterinarios v ON cons.ID_Veterinario = v.ID_Veterinario
                   INNER JOIN Clinicas c ON e.ID_Clinica = c.ID_Clinica
                   WHERE e.ID_Mascota = :id 
-                  ORDER BY e.Fecha_Creacion DESC";
+                  ORDER BY cons.Fecha_Consulta DESC";
         
         $stmt = $this->conexion->prepare($query);
         $stmt->bindParam(':id', $id_mascota);
@@ -93,25 +96,26 @@ class Veterinario {
     }
 
     /**
-     * BUSCAR POR CÉDULA
-     * Trae todos los expedientes de todas las mascotas de un mismo dueño
+     * BUSCAR POR CÉDULA DEL DUEÑO 
+     * Trae todas las visitas médicas de todas las mascotas de un mismo dueño
      */
     public function buscarHistorialPorCedula($cedula_cliente) {
         $query = "SELECT 
-                    e.ID_Expediente, 
-                    e.Fecha_Creacion, 
-                    e.Motivo, 
+                    cons.ID_Consulta, 
+                    cons.Fecha_Consulta, 
+                    cons.Motivo_Consulta AS Motivo, 
                     m.Nombre AS Nombre_Mascota,
-                    cui.Nombre AS Nombre_Dueño,
+                    cui.Nombre AS Nombre_Dueno,
                     v.Nombre AS Nombre_Vet,
                     c.Nombre_Sucursal AS Clinica
-                  FROM Expedientes e
+                  FROM Consultas cons
+                  INNER JOIN Expedientes e ON cons.ID_Expediente = e.ID_Expediente
                   INNER JOIN Mascotas m ON e.ID_Mascota = m.ID_Mascota
                   INNER JOIN Cuidadores cui ON m.ID_Cuidador = cui.ID_Cuidador
-                  INNER JOIN Veterinarios v ON e.ID_Veterinario = v.ID_Veterinario
+                  INNER JOIN Veterinarios v ON cons.ID_Veterinario = v.ID_Veterinario
                   INNER JOIN Clinicas c ON e.ID_Clinica = c.ID_Clinica
                   WHERE cui.Cedula = :cedula
-                  ORDER BY e.Fecha_Creacion DESC";
+                  ORDER BY cons.Fecha_Consulta DESC";
         
         $stmt = $this->conexion->prepare($query);
         $stmt->bindParam(':cedula', $cedula_cliente);

@@ -5,78 +5,108 @@ class Mascota {
 
     // ATRIBUTOS
     public $id_mascota;
+    public $id_cuidador; 
+    public $id_especie; 
+    public $id_raza;    
     public $nombre;
-    public $especie;
-    public $raza;
     public $sexo;
     public $color;
     public $edad;
     public $rasgos;
     public $peso;
     public $estado_esterilizacion;
-    public $id_cuidador; 
 
     public function __construct($db) {
         $this->conexion = $db;
     }
 
     /**
-     * Registro de nueva mascota
+     * REGISTRO DE NUEVA MASCOTA
      */
     public function registrarMascota() {
         $query = "INSERT INTO " . $this->tabla . " 
-                  SET Nombre = :nombre, Especie = :especie, Raza = :raza, Sexo = :sexo, 
-                      Color = :color, Edad = :edad, Rasgos = :rasgos, Peso = :peso, 
-                      Estado_Esterilizacion = :esteril, ID_Cuidador = :id_cuidador";
+                  (ID_Cuidador, ID_Especie, ID_Raza, Nombre, Sexo, Color, Edad, Rasgos, Peso, Estado_Esterilizacion) 
+                  VALUES (:id_cuidador, :id_especie, :id_raza, :nombre, :sexo, :color, :edad, :rasgos, :peso, :esteril)";
         
         $stmt = $this->conexion->prepare($query);
 
+        // Limpieza de datos de texto
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
-        $this->especie = htmlspecialchars(strip_tags($this->especie));
-        $this->raza = htmlspecialchars(strip_tags($this->raza));
+        $this->color = htmlspecialchars(strip_tags($this->color));
         $this->rasgos = htmlspecialchars(strip_tags($this->rasgos));
 
+        $stmt->bindParam(':id_cuidador', $this->id_cuidador);
+        $stmt->bindParam(':id_especie', $this->id_especie);
+        $stmt->bindParam(':id_raza', $this->id_raza);
         $stmt->bindParam(':nombre', $this->nombre);
-        $stmt->bindParam(':especie', $this->especie);
-        $stmt->bindParam(':raza', $this->raza);
         $stmt->bindParam(':sexo', $this->sexo);
         $stmt->bindParam(':color', $this->color);
         $stmt->bindParam(':edad', $this->edad);
         $stmt->bindParam(':rasgos', $this->rasgos);
         $stmt->bindParam(':peso', $this->peso);
         $stmt->bindParam(':esteril', $this->estado_esterilizacion);
-        $stmt->bindParam(':id_cuidador', $this->id_cuidador);
 
-        return $stmt->execute();
+        try {
+            if($stmt->execute()) {
+                $this->id_mascota = $this->conexion->lastInsertId();
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
     /**
-     * Ver historial médico CON JOINS (Para que el cuidador entienda qué lee)
+     * OBTENER PERFIL COMPLETO 
+     * Trae los datos de la mascota incluyendo el texto real de su Especie y Raza.
+     */
+    public function obtenerPerfilCompleto() {
+        $query = "SELECT m.*, e.Nombre_Especie, r.Nombre_Raza 
+                  FROM " . $this->tabla . " m
+                  INNER JOIN Especies e ON m.ID_Especie = e.ID_Especie
+                  LEFT JOIN Razas r ON m.ID_Raza = r.ID_Raza
+                  WHERE m.ID_Mascota = :id LIMIT 1";
+                  
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bindParam(':id', $this->id_mascota);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * VER HISTORIAL MÉDICO 
+     * Navega: Mascota -> Expediente -> Consultas
      */
     public function verHistorialMedico() {
+        $query = "SELECT 
+                    cons.ID_Consulta, 
+                    cons.Fecha_Consulta,
+                    cons.Motivo_Consulta AS Motivo, 
+                    cons.Diagnostico, 
+                    cons.Tratamiento_Sugerido,
+                    v.Nombre AS Nombre_Vet, 
+                    v.Apellido AS Apellido_Vet,
+                    c.Nombre_Sucursal AS Clinica
+                  FROM Consultas cons
+                  INNER JOIN Expedientes e ON cons.ID_Expediente = e.ID_Expediente
+                  INNER JOIN Veterinarios v ON cons.ID_Veterinario = v.ID_Veterinario
+                  INNER JOIN Clinicas c ON e.ID_Clinica = c.ID_Clinica
+                  WHERE e.ID_Mascota = :id 
+                  ORDER BY cons.Fecha_Consulta DESC";
 
-    $query = "SELECT 
-                e.ID_Expediente, 
-                e.Fecha_Hora AS Fecha_Creacion,
-                e.Motivo, 
-                e.Diagnostico_Presuntivo, 
-                e.Tratamiento_Recomendado,
-                v.Nombre AS Nombre_Vet, 
-                v.Apellido AS Apellido_Vet,
-                c.Nombre_Sucursal AS Clinica
-              FROM Expedientes e
-              INNER JOIN Veterinarios v ON e.ID_Veterinario = v.ID_Veterinario
-              INNER JOIN Clinicas c ON v.ID_Clinica = c.ID_Clinica
-              WHERE e.ID_Mascota = :id 
-              ORDER BY e.Fecha_Hora DESC";
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bindParam(':id', $this->id_mascota);
+        $stmt->execute();
 
-    $stmt = $this->conexion->prepare($query);
-    $stmt->bindParam(':id', $this->id_mascota);
-    $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
+    /**
+     * ACTUALIZAR DATOS MÉTRICOS
+     * Para cuando la mascota crece, sube de peso o es esterilizada.
+     */
     public function actualizarDatos() {
         $query = "UPDATE " . $this->tabla . " 
                   SET Peso = :peso, Edad = :edad, Rasgos = :rasgos, Estado_Esterilizacion = :esteril 
@@ -94,6 +124,5 @@ class Mascota {
 
         return $stmt->execute();
     }
-
 }
 ?>

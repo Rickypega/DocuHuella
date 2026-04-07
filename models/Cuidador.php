@@ -19,14 +19,25 @@ class Cuidador {
     }
 
     /**
+     * OBTENER PERFIL POR USUARIO
+     */
+    public function obtenerCuidadorPorUsuario() {
+        $query = "SELECT * FROM " . $this->tabla . " WHERE ID_Usuario = :id_usuario LIMIT 1";
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bindParam(':id_usuario', $this->id_usuario);
+        $stmt->execute();
+        
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * REGISTRAR PERFIL
      * Se usa en el proceso de registro para crear los datos personales.
      */
     public function registrarse() {
         $query = "INSERT INTO " . $this->tabla . " 
-                  SET ID_Usuario = :id_usuario, Nombre = :nombre, Apellido = :apellido, 
-                      Fecha_Nacimiento = :fecha_nacimiento, Cedula = :cedula, 
-                      Sexo = :sexo, Telefono = :telefono, Direccion = :direccion";
+                  (ID_Usuario, Nombre, Apellido, Fecha_Nacimiento, Cedula, Sexo, Telefono, Direccion) 
+                  VALUES (:id_usuario, :nombre, :apellido, :fecha_nacimiento, :cedula, :sexo, :telefono, :direccion)";
         
         $stmt = $this->conexion->prepare($query);
 
@@ -78,6 +89,7 @@ class Cuidador {
         // Sanitización
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
         $this->apellido = htmlspecialchars(strip_tags($this->apellido));
+        $this->telefono = htmlspecialchars(strip_tags($this->telefono));
         $this->direccion = htmlspecialchars(strip_tags($this->direccion));
 
         $stmt->bindParam(':nombre', $this->nombre);
@@ -91,10 +103,15 @@ class Cuidador {
 
     /**
      * VER MIS MASCOTAS
-     * Obtiene la lista de animales vinculados a este cuidador.
      */
     public function verMisMascotas() {
-        $query = "SELECT * FROM Mascotas WHERE ID_Cuidador = :id";
+        $query = "SELECT m.*, e.Nombre_Especie, r.Nombre_Raza 
+                  FROM Mascotas m
+                  INNER JOIN Especies e ON m.ID_Especie = e.ID_Especie
+                  LEFT JOIN Razas r ON m.ID_Raza = r.ID_Raza
+                  WHERE m.ID_Cuidador = :id
+                  ORDER BY m.Fecha_Registro DESC";
+                  
         $stmt = $this->conexion->prepare($query);
         $stmt->bindParam(':id', $this->id_cuidador);
         $stmt->execute();

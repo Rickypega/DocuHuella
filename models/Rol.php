@@ -13,13 +13,15 @@ class Rol {
     }
 
     /**
-     * Obtener todos los roles para un formulario
+     * Obtener todos los roles de la base de datos
      */
     public function leerTodos() {
-        $query = "SELECT * FROM " . $this->tabla;
+        $query = "SELECT * FROM " . $this->tabla . " ORDER BY ID_Rol ASC";
         $stmt = $this->conexion->prepare($query);
         $stmt->execute();
-        return $stmt;
+        
+        // Estandarizado para devolver un array asociativo directo
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 ?>
