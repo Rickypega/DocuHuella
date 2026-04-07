@@ -5,7 +5,7 @@ class Administrador {
 
     // ATRIBUTOS 
     public $id_admin;
-    public $id_usuario; // La llave que lo une con Usuarios
+    public $id_usuario; 
     public $nombre;
     public $apellido;
     public $cedula;
@@ -15,7 +15,6 @@ class Administrador {
         $this->conexion = $db;
     }
 
-    
     public function registrarAdministrador() {
         $query = "INSERT INTO " . $this->tabla . " 
                   (ID_Usuario, Nombre, Apellido, Cedula, Telefono) 
@@ -37,7 +36,6 @@ class Administrador {
 
         try {
             if($stmt->execute()) {
-                // Atrapamos el ID generado para pasárselo al modelo Clinica
                 $this->id_admin = $this->conexion->lastInsertId();
                 return true;
             }
@@ -58,8 +56,8 @@ class Administrador {
      * Gestionar Veterinarios: Permite al admin ver a los empleados de SUS clínicas
      */
     public function gestionarUsuarios() {
-        // Hacemos JOIN con Clinicas para asegurarnos que solo vea a sus veterinarios
-        $query = "SELECT u.Correo, v.Nombre, v.Apellido, c.Nombre_Sucursal 
+        $query = "SELECT v.ID_Veterinario, u.ID_Usuario, u.Correo, u.Estado, 
+                         v.Nombre, v.Apellido, v.Especialidad, c.Nombre_Sucursal 
                   FROM Veterinarios v
                   INNER JOIN Usuarios u ON v.ID_Usuario = u.ID_Usuario
                   INNER JOIN Clinicas c ON v.ID_Clinica = c.ID_Clinica
@@ -73,15 +71,17 @@ class Administrador {
     }
 
     /**
-     * Generar Reportes: Estadísticas mensuales de consultas en SUS clínicas
+     * Generar Reportes: Estadísticas mensuales de CONSULTAS en SUS clínicas
      */
     public function generarReportes() {
-        // Contamos expedientes, pero solo los que ocurrieron en las clínicas de este Admin
-        $query = "SELECT COUNT(*) as total_consultas 
-                  FROM Expedientes e
+        // Recorrido de la nueva arquitectura: Admin -> Clinica -> Expediente -> Consulta
+        $query = "SELECT COUNT(cons.ID_Consulta) as total_consultas 
+                  FROM Consultas cons
+                  INNER JOIN Expedientes e ON cons.ID_Expediente = e.ID_Expediente
                   INNER JOIN Clinicas c ON e.ID_Clinica = c.ID_Clinica
                   WHERE c.ID_Admin = :id_admin 
-                  AND MONTH(e.Fecha_Creacion) = MONTH(CURRENT_DATE())";
+                  AND MONTH(cons.Fecha_Consulta) = MONTH(CURRENT_DATE())
+                  AND YEAR(cons.Fecha_Consulta) = YEAR(CURRENT_DATE())";
         
         $stmt = $this->conexion->prepare($query);
         $stmt->bindParam(":id_admin", $this->id_admin);

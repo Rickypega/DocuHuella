@@ -6,64 +6,79 @@ class Expediente {
     // ATRIBUTOS 
     public $id_expediente;
     public $id_mascota; 
-    public $id_veterinario; 
-    public $id_clinica; // Para el sistema multi-sucursal
-    public $fecha_creacion; 
-    public $motivo;
-    public $diagnostico_presuntivo;
-    public $tratamiento_recomendado;
-    public $estado_edicion; //  Abierto, Cerrado
+    public $id_clinica; 
+    public $fecha_apertura; 
+    public $estado_expediente; // Activo, Archivado, Fallecido
 
     public function __construct($db) {
         $this->conexion = $db;
     }
 
     /**
-     * Registrar el expediente (Punto crítico del sistema)
+     * CREAR LA CARPETA MAESTRA
+     * Esto solo debe ejecutarse UNA vez en toda la vida de la mascota.
      */
-    public function guardarConsulta() {
+    public function crearExpediente() {
         $query = "INSERT INTO " . $this->tabla . " 
-                  SET ID_Mascota = :id_mas, ID_Veterinario = :id_vet, ID_Clinica = :id_cli, 
-                      Motivo = :motivo, Diagnostico_Presuntivo = :diag, 
-                      Tratamiento_Recomendado = :trata, Estado_Edicion = 'Abierto'";
+                  (ID_Mascota, ID_Clinica) 
+                  VALUES (:id_mascota, :id_clinica)";
         
         $stmt = $this->conexion->prepare($query);
 
-        // Sanitización profunda
-        $this->motivo = htmlspecialchars(strip_tags($this->motivo));
-        $this->diagnostico_presuntivo = htmlspecialchars(strip_tags($this->diagnostico_presuntivo));
-        $this->tratamiento_recomendado = htmlspecialchars(strip_tags($this->tratamiento_recomendado));
+        $stmt->bindParam(':id_mascota', $this->id_mascota);
+        $stmt->bindParam(':id_clinica', $this->id_clinica);
 
-        $stmt->bindParam(':id_mas', $this->id_mascota);
-        $stmt->bindParam(':id_vet', $this->id_veterinario);
-        $stmt->bindParam(':id_cli', $this->id_clinica);
-        $stmt->bindParam(':motivo', $this->motivo);
-        $stmt->bindParam(':diag', $this->diagnostico_presuntivo);
-        $stmt->bindParam(':trata', $this->tratamiento_recomendado);
-
-        return $stmt->execute();
+        try {
+            if($stmt->execute()) {
+                $this->id_expediente = $this->conexion->lastInsertId();
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            // Error 23000 es duplicidad. Significa que la mascota ya tiene expediente.
+            if ($e->getCode() == 23000) { 
+                return 'expediente_existente';
+            }
+            return false;
+        }
     }
 
     /**
-     * Obtener datos para la Receta (Con nombres reales)
+     * OBTENER EL EXPEDIENTE DE UNA MASCOTA
+     * Busca la carpeta para poder mostrarla en el perfil del animal.
      */
-    public function obtenerDatosReceta($id) {
-        $query = "SELECT 
-                    e.Fecha_Creacion, e.Diagnostico_Presuntivo, e.Tratamiento_Recomendado,
-                    m.Nombre AS Mascota,
-                    v.Nombre AS Veterinario, v.Apellido AS Apellido_Vet,
-                    c.Nombre_Sucursal AS Clinica, c.Direccion AS Direccion_Clinica
+    public function obtenerPorMascota($id_mascota) {
+        $query = "SELECT e.*, c.Nombre_Sucursal AS Clinica_Origen 
                   FROM " . $this->tabla . " e
-                  INNER JOIN Mascotas m ON e.ID_Mascota = m.ID_Mascota
-                  INNER JOIN Veterinarios v ON e.ID_Veterinario = v.ID_Veterinario
                   INNER JOIN Clinicas c ON e.ID_Clinica = c.ID_Clinica
-                  WHERE e.ID_Expediente = :id";
+                  WHERE e.ID_Mascota = :id_mascota LIMIT 1";
         
         $stmt = $this->conexion->prepare($query);
-        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':id_mascota', $id_mascota);
         $stmt->execute();
         
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * SOFT DELETE / ACTUALIZACIÓN DE ESTADO
+     * Permite archivar el expediente o marcar al paciente como fallecido 
+     * sin borrar su historial médico legal.
+     */
+    public function cambiarEstado() {
+        $query = "UPDATE " . $this->tabla . " 
+                  SET Estado_Expediente = :estado 
+                  WHERE ID_Expediente = :id";
+        
+        $stmt = $this->conexion->prepare($query);
+        
+        // Sanitizamos el estado por si acaso (ENUM en DB)
+        $this->estado_expediente = htmlspecialchars(strip_tags($this->estado_expediente));
+
+        $stmt->bindParam(':estado', $this->estado_expediente);
+        $stmt->bindParam(':id', $this->id_expediente);
+
+        return $stmt->execute();
     }
 }
 ?>

@@ -17,18 +17,20 @@ class UsuariosController {
             $password_ingresada = $_POST['contrasena'];
 
             $usuario->correo = $correo_ingresado;
-            $stmt = $usuario->login(); 
+            
+            
+            $datos_usuario = $usuario->login(); 
 
-            if ($stmt->rowCount() > 0) {
-                $datos_usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($datos_usuario) { // Si encontró el correo (no devolvió false)
 
                 if (password_verify($password_ingresada, $datos_usuario['Contrasena'])) {
                     
-                    // Verificamos si la columna Estado dice 'Inactivo'
-                    if (isset($datos_usuario['Estado']) && $datos_usuario['Estado'] == 'Inactivo') {
+                    // Verificamos si la columna Estado es distinta de 'Activo'
+                    if (isset($datos_usuario['Estado']) && $datos_usuario['Estado'] !== 'Activo') {
                         header("Location: ../views/login.php?error=cuenta_suspendida");
                         exit();
                     }
+                    
                     // Si pasó el filtro, le damos acceso normal...
 
                     // 1. Datos básicos de la cuenta
@@ -36,14 +38,12 @@ class UsuariosController {
                     $_SESSION['id_rol']     = $datos_usuario['ID_Rol'];
                     $_SESSION['correo']     = $datos_usuario['Correo'];
 
-                    // 2. BUSCAR IDENTIDAD Y CLÍNICA (Lo nuevo y vital)
+                    // 2. BUSCAR IDENTIDAD Y CLÍNICA 
                     // Dependiendo del rol, necesitamos saber su ID de tabla y su Clínica
                     $this->cargarContextoUsuario($db, $_SESSION['id_usuario'], $_SESSION['id_rol']);
 
                     // 3. Redirección inteligente
                     $this->redireccionarPorRol($_SESSION['id_rol']);
-
-
                     
                 } else {
                     header("Location: ../views/login.php?error=credenciales");
@@ -71,9 +71,12 @@ class UsuariosController {
                 $stmt->bindParam(':id', $id_usuario);
                 $stmt->execute();
                 $res = $stmt->fetch(PDO::FETCH_ASSOC);
-                $_SESSION['id_perfil']  = $res['ID_Admin'];
-                $_SESSION['id_clinica'] = $res['ID_Clinica'];
-                $_SESSION['nombre']     = $res['Nombre'];
+                
+                if($res) {
+                    $_SESSION['id_perfil']  = $res['ID_Admin'];
+                    $_SESSION['id_clinica'] = $res['ID_Clinica'];
+                    $_SESSION['nombre']     = $res['Nombre'];
+                }
                 break;
 
             case 2: // VETERINARIO
@@ -82,9 +85,12 @@ class UsuariosController {
                 $stmt->bindParam(':id', $id_usuario);
                 $stmt->execute();
                 $res = $stmt->fetch(PDO::FETCH_ASSOC);
-                $_SESSION['id_perfil']  = $res['ID_Veterinario'];
-                $_SESSION['id_clinica'] = $res['ID_Clinica'];
-                $_SESSION['nombre']     = $res['Nombre'];
+                
+                if($res) {
+                    $_SESSION['id_perfil']  = $res['ID_Veterinario'];
+                    $_SESSION['id_clinica'] = $res['ID_Clinica'];
+                    $_SESSION['nombre']     = $res['Nombre'];
+                }
                 break;
 
             case 3: // CUIDADOR
@@ -93,9 +99,12 @@ class UsuariosController {
                 $stmt->bindParam(':id', $id_usuario);
                 $stmt->execute();
                 $res = $stmt->fetch(PDO::FETCH_ASSOC);
-                $_SESSION['id_perfil'] = $res['ID_Cuidador'];
-                $_SESSION['nombre']    = $res['Nombre'];
-                // El cuidador no tiene ID_Clinica fijo, él puede ir a varias.
+                
+                if($res) {
+                    $_SESSION['id_perfil'] = $res['ID_Cuidador'];
+                    $_SESSION['nombre']    = $res['Nombre'];
+                    // El cuidador no tiene ID_Clinica fijo, él puede ir a varias.
+                }
                 break;
 
             case 4: // SUPERADMIN
@@ -130,3 +139,4 @@ if (isset($_GET['action'])) {
     if ($_GET['action'] == 'login') $controlador->login();
     else if ($_GET['action'] == 'logout') $controlador->logout();
 }
+?>
