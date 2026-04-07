@@ -230,7 +230,7 @@
                                 <div class="progress mt-2" style="height: 5px; background-color: var(--dh-navy);">
                                     <div id="barra-fuerza" class="progress-bar bg-danger" role="progressbar" style="width: 0%;"></div>
                                 </div>
-                                <small id="texto-fuerza" class="text-white opacity-50" style="font-size: 0.8rem;">Mínimo 6 caracteres</small>
+                                <small id="texto-fuerza" class="text-white opacity-50" style="font-size: 0.8rem;">Recomendado 8 caracteres mínimos</small>
                             </div>
                             
                             <div class="col-md-6">
@@ -282,7 +282,7 @@
         }
         setInterval(crearHuella, 800);
 
-        // Lógica MEJORADA del Medidor de Contraseñas y Habilitación del Botón
+       // Lógica del Medidor de Contraseñas y Habilitación del Botón
         const passInput = document.getElementById('pass-input');
         const confirmInput = document.getElementById('pass-confirm-input');
         const btnSubmit = document.getElementById('btn-submit');
@@ -297,34 +297,35 @@
             let fuerza = 0;
             let esFuerte = false;
 
-            // Calcular fuerza
-            if (pass.length >= 6) fuerza += 1; 
-            if (pass.length >= 8) fuerza += 1; 
-            if (/[A-Z]/.test(pass)) fuerza += 1; 
-            if (/[0-9]/.test(pass) && /[a-zA-Z]/.test(pass)) fuerza += 1; 
+            // Calcular fuerza evaluando 5 criterios distintos (Máximo 5 puntos)
+            if (pass.length >= 8) fuerza += 1;                  // 1. Longitud segura
+            if (/[a-z]/.test(pass)) fuerza += 1;                // 2. Tiene letras minúsculas
+            if (/[A-Z]/.test(pass)) fuerza += 1;                // 3. Tiene letras mayúsculas
+            if (/[0-9]/.test(pass)) fuerza += 1;                // 4. Tiene números
+            if (/[^A-Za-z0-9]/.test(pass)) fuerza += 1;         // 5. Tiene símbolos especiales (!@#$%^&*...)
 
             // Estilos de la barra de progreso
             if (pass.length === 0) {
                 barra.style.width = '0%';
-                texto.innerText = 'Mínimo 6 caracteres';
+                texto.innerText = 'Recomendado 8 caracteres mínimos';
                 texto.className = 'text-white opacity-50';
-            } else if (fuerza <= 1) {
-                barra.style.width = '25%';
+            } else if (fuerza <= 2) {
+                barra.style.width = '33%';
                 barra.className = 'progress-bar bg-danger';
-                texto.innerText = 'Débil (Mínimo 6 caracteres)';
+                texto.innerText = 'Débil (Usa mayúsculas, números y símbolos)';
                 texto.className = 'text-danger fw-bold';
-            } else if (fuerza === 2) {
-                barra.style.width = '50%';
-                barra.className = 'progress-bar bg-warning';
-                texto.innerText = 'Intermedia (Usa números y letras)';
+            } else if (fuerza === 3 || fuerza === 4) {
+                barra.style.width = '66%';
+                barra.className = 'progress-bar bg-warning text-dark';
+                texto.innerText = 'Intermedia (Agrega un símbolo especial, mayúsculas o números)';
                 texto.className = 'text-warning fw-bold';
-                esFuerte = true;
-            } else {
+                esFuerte = true; // Ya es decente, permitimos el registro
+            } else if (fuerza === 5) {
                 barra.style.width = '100%';
                 barra.className = 'progress-bar bg-success';
                 texto.innerText = 'Fuerte (Excelente)';
                 texto.className = 'text-success fw-bold';
-                esFuerte = true;
+                esFuerte = true; // Cumple con todos los estándares
             }
 
             // Validar coincidencia SOLO si el usuario ya escribió algo en confirmación
@@ -377,7 +378,7 @@
     <script>
     // ... tu código de las huellas y contraseñas ...
 
-    // 🛡️ MÁSCARAS DIRECTAS EN LA VISTA (Infalibles)
+    //  MÁSCARAS DIRECTAS EN LA VISTA
     function soloNumerosYFormato(e) {
         // Permitir teclas de borrado y flechas
         if (['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'].includes(e.key)) return;
