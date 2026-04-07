@@ -105,7 +105,7 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
             <a href="../../controllers/admin/DashboardController.php?action=ver" class="active"><i class="fas fa-chart-pie"></i> Mi Resumen</a>
             <a href="../../views/admin/clinicas.php"><i class="fas fa-hospital"></i> Mis Sucursales</a>
             <a href="../../views/admin/registrar_vet.php"><i class="fas fa-user-md"></i> Veterinarios</a>
-            <a href="../../views/admin/reportes.php"><i class="fas fa-file-export"></i> Reportes Clinicos</a>
+            <a href="../../views/admin/reportes.php"><i class="fas fa-file-medical-alt"></i> Reportes Clinicos</a>
         </nav>
         
         <a href="../../controllers/UsuariosController.php?action=logout" class="btn-logout">
