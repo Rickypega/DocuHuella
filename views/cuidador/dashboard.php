@@ -5,40 +5,64 @@ require_once '../../models/Cuidador.php';
 require_once '../../models/Mascota.php';
 require_once '../../config/auth_check.php';
 
-$rol_permitido = 3;
-
-if (!isset($_SESSION['id_usuario']) || $_SESSION['id_rol'] != $rol_permitido) {
+if (!isset($_SESSION['id_usuario']) || $_SESSION['id_rol'] != 3) {
     header("Location: ../login.php");
     exit();
 }
 
-// 🔥 CONEXIÓN
 $database = new Database();
 $db = $database->getConnection();
 
-// 🔥 CUIDADOR
 $cuidador = new Cuidador($db);
 $cuidador->id_cuidador = $_SESSION['id_perfil'];
 
-// 🔥 MASCOTAS
+// CREAR MASCOTA
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+    $imagenRuta = null;
+
+    if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] == 0) {
+        $nombreArchivo = time() . "_" . $_FILES['imagen']['name'];
+        $rutaDestino = "../../uploads/" . $nombreArchivo;
+
+        if (move_uploaded_file($_FILES['imagen']['tmp_name'], $rutaDestino)) {
+            $imagenRuta = "uploads/" . $nombreArchivo;
+        }
+    }
+
+    $query = "INSERT INTO Mascotas 
+    (Nombre, Especie, Raza, Sexo, Color, Edad, Rasgos, Peso, Estado_Esterilizacion, ID_Cuidador, Imagen)
+    VALUES (:nombre, :especie, 'No especificada', :sexo, :color, :edad, '', :peso, 'No', :id_cuidador, :imagen)";
+
+    $stmt = $db->prepare($query);
+
+    $stmt->execute([
+        ':nombre' => $_POST['nombre'],
+        ':especie' => $_POST['especie'],
+        ':sexo' => $_POST['sexo'],
+        ':color' => $_POST['color'],
+        ':edad' => $_POST['edad'],
+        ':peso' => $_POST['peso'],
+        ':id_cuidador' => $_SESSION['id_perfil'],
+        ':imagen' => $imagenRuta
+    ]);
+}
+
 $mascotas = $cuidador->verMisMascotas();
 
-// 🔥 MASCOTA SELECCIONADA
 $mascotaSeleccionada = null;
 $historial = [];
 
 if (isset($_GET['mascota'])) {
     $id = $_GET['mascota'];
 
-    $query = "SELECT * FROM Mascotas WHERE ID_Mascota = :id";
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':id', $id);
-    $stmt->execute();
+    $stmt = $db->prepare("SELECT * FROM Mascotas WHERE ID_Mascota = :id");
+    $stmt->execute([':id' => $id]);
     $mascotaSeleccionada = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $mascotaObj = new Mascota($db);
-    $mascotaObj->id_mascota = $id;
-    $historial = $mascotaObj->verHistorialMedico();
+    $m = new Mascota($db);
+    $m->id_mascota = $id;
+    $historial = $m->verHistorialMedico();
 }
 ?>
 
@@ -46,191 +70,188 @@ if (isset($_GET['mascota'])) {
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panel - DocuHuella</title>
+<title>Panel Cuidador</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
+
 body {
-    overflow-x: hidden;
-    background-color: #1A2D40;
+    background-color: #1F3446;
+    color: white;
 }
 
+/* SIDEBAR */
 .sidebar {
+    width: 250px;
     height: 100vh;
-    background-color: #1A2D40;
-    color: white;
+    background: #1A2D40;
+    padding: 20px;
 }
 
-.sidebar a {
-    color: white;
-    text-decoration: none;
+.sidebar h4 {
+    font-weight: bold;
+}
+
+.sidebar a, .sidebar button {
     display: block;
+    color: white;
     padding: 10px;
-    border-radius: 8px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    text-decoration: none;
 }
 
 .sidebar a:hover {
-    background-color: #2c3e50;
+    background: #2c3e50;
 }
 
-.mascota-link {
-    padding-left: 25px;
-    font-size: 14px;
+/* BOTÓN ROJO */
+.logout-btn {
+    background: #dc3545;
+    border: none;
+    width: 100%;
+    margin-top: 20px;
 }
 
-.contenido-box {
-    background-color: #D9C9B0;
+/* CONTENIDO */
+.main {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+/* TARJETA */
+.card-main {
+    background: #D9C9B0;
+    color: black;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+/* INFO BOX */
+.info-box {
+    background: #1A2D40;
+    color: white;
     border-radius: 15px;
+    padding: 20px;
 }
+
+/* BADGE USER */
+.user-badge {
+    background: #f1c40f;
+    color: black;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
 </style>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-dark" style="background-color: #1A2D40;">
-    <div class="container-fluid">
-        <a class="navbar-brand fw-bold">
-            <i class="fas fa-paw me-2"></i>DocuHuella
-        </a>
-
-        <div class="d-flex text-white align-items-center">
-            <span class="me-3">
-                Bienvenido: <b><?php echo $_SESSION['nombre']; ?></b>
-            </span>
-            <a href="../../controllers/UsuariosController.php?action=logout" class="btn btn-outline-light btn-sm">
-                Cerrar Sesión
-            </a>
-        </div>
-    </div>
-</nav>
-
 <div class="d-flex">
 
-    <!-- SIDEBAR -->
-    <div class="sidebar p-3" style="width:250px;">
+<!-- SIDEBAR -->
+<div class="sidebar">
 
-        <h5 class="mb-4 text-center">Menú</h5>
+    <h4>🐾 DocuHuella</h4>
 
-        <a href="#"><i class="fas fa-home"></i> Inicio</a>
+    <span class="user-badge">
+        <?php echo $_SESSION['nombre']; ?>
+    </span>
 
-        <!-- DESPLEGABLE -->
-        <button class="btn btn-dark w-100 text-start mt-2" data-bs-toggle="collapse" data-bs-target="#menuMascotas">
-            <i class="fas fa-dog"></i> Mascotas
-        </button>
+    <hr>
 
-        <div id="menuMascotas" class="collapse mt-2">
+    <a href="#">🏠 Inicio</a>
 
-            <?php if (!empty($mascotas)): ?>
-                <?php foreach ($mascotas as $m): ?>
-                    <a href="?mascota=<?php echo $m['ID_Mascota']; ?>" class="mascota-link">
-                        🐾 <?php echo $m['Nombre']; ?>
-                    </a>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <span class="mascota-link">Sin mascotas</span>
-            <?php endif; ?>
+    <button data-bs-toggle="collapse" data-bs-target="#menuMascotas">
+        🐶 Mascotas
+    </button>
 
+    <div id="menuMascotas" class="collapse">
+        <?php foreach ($mascotas as $m): ?>
+            <a href="?mascota=<?php echo $m['ID_Mascota']; ?>">
+                • <?php echo $m['Nombre']; ?>
+            </a>
+        <?php endforeach; ?>
+    </div>
+
+    <a href="?nueva=1">➕ Nueva Mascota</a>
+
+    <form action="../../controllers/UsuariosController.php?action=logout" method="POST">
+        <button class="logout-btn btn btn-danger">Cerrar Sesión</button>
+    </form>
+
+</div>
+
+<!-- CONTENIDO -->
+<div class="main">
+
+<?php if (isset($_GET['nueva'])): ?>
+
+<div class="card-main">
+    <h3>Nueva Mascota</h3>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <input class="form-control mb-2" name="nombre" placeholder="Nombre" required>
+        <input class="form-control mb-2" name="especie" placeholder="Especie" required>
+        <input class="form-control mb-2" name="edad" placeholder="Edad" required>
+        <input class="form-control mb-2" name="peso" placeholder="Peso" required>
+        <input class="form-control mb-2" name="color" placeholder="Color" required>
+
+        <select class="form-control mb-2" name="sexo">
+            <option>Macho</option>
+            <option>Hembra</option>
+        </select>
+
+        <input type="file" name="imagen" class="form-control mb-3">
+
+        <button class="btn btn-dark">Guardar</button>
+
+    </form>
+</div>
+
+<?php elseif ($mascotaSeleccionada): ?>
+
+<div class="card-main">
+
+    <h3><?php echo $mascotaSeleccionada['Nombre']; ?></h3>
+
+    <div class="row">
+
+        <div class="col-md-6">
+            <div class="info-box">
+                <p><b>Edad:</b> <?php echo $mascotaSeleccionada['Edad']; ?></p>
+                <p><b>Sexo:</b> <?php echo $mascotaSeleccionada['Sexo']; ?></p>
+                <p><b>Color:</b> <?php echo $mascotaSeleccionada['Color']; ?></p>
+            </div>
         </div>
 
-        <a href="#" class="mt-2"><i class="fas fa-notes-medical"></i> Actividades</a>
+        <div class="col-md-6 text-center">
+            <img 
+            src="<?php echo (!empty($mascotaSeleccionada['Imagen'])) 
+                ? '../../' . $mascotaSeleccionada['Imagen'] 
+                : 'https://placedog.net/400/300'; ?>"
+            class="img-fluid rounded"
+            style="max-height:250px;">
+        </div>
 
     </div>
 
-    <!-- CONTENIDO -->
-    <div class="flex-grow-1 p-4">
+</div>
 
-        <?php if ($mascotaSeleccionada): ?>
+<?php else: ?>
 
-        <div class="contenido-box p-4">
+<div class="card-main text-center">
+    <h3>Bienvenido</h3>
+    <p>Selecciona una mascota</p>
+</div>
 
-            <h4 class="mb-4">
-                Bienvenido <?php echo $_SESSION['nombre']; ?>
-            </h4>
+<?php endif; ?>
 
-            <div class="row">
-
-                <!-- INFO -->
-                <div class="col-md-6">
-                    <div class="p-4 rounded" style="background-color:#1A2D40; color:white;">
-
-                        <p><b>Nombre:</b> <?php echo $mascotaSeleccionada['Nombre']; ?></p>
-                        <p><b>Raza:</b> <?php echo $mascotaSeleccionada['Raza']; ?></p>
-                        <p><b>Edad:</b> <?php echo $mascotaSeleccionada['Edad']; ?></p>
-                        <p><b>Sexo:</b> <?php echo $mascotaSeleccionada['Sexo']; ?></p>
-                        <p><b>Color:</b> <?php echo $mascotaSeleccionada['Color']; ?></p>
-
-                    </div>
-                </div>
-
-                <!-- IMAGEN -->
-                <div class="col-md-6 text-center">
-
-                    <div class="p-3 rounded" style="background-color:#1A2D40; display:inline-block;">
-                        
-                        <img src="https://placedog.net/400/300"
-                             class="img-fluid rounded"
-                             style="max-height:250px;">
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- HISTORIAL -->
-            <div class="mt-4">
-
-                <div class="card p-3 shadow-sm">
-                    <h5>📋 Historial Médico</h5>
-
-                    <table class="table table-striped mt-3">
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Motivo</th>
-                                <th>Diagnóstico</th>
-                                <th>Veterinario</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                        <?php if (!empty($historial)): ?>
-                            <?php foreach ($historial as $h): ?>
-                                <tr>
-                                    <td><?php echo $h['Fecha_Creacion']; ?></td>
-                                    <td><?php echo $h['Motivo']; ?></td>
-                                    <td><?php echo $h['Diagnostico_Presuntivo']; ?></td>
-                                    <td><?php echo $h['Nombre_Vet']; ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center">Sin historial</td>
-                            </tr>
-                        <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>
-
-        </div>
-
-        <?php else: ?>
-
-        <!-- PANTALLA INICIAL -->
-        <div class="contenido-box p-4 text-center">
-            <h3>👋 Bienvenido</h3>
-            <p>Selecciona una mascota en el menú para ver su información</p>
-        </div>
-
-        <?php endif; ?>
-
-    </div>
+</div>
 
 </div>
 
