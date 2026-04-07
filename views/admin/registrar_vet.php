@@ -23,6 +23,7 @@ $stmt->bindParam(':id_admin', $_SESSION['id_perfil']);
 $stmt->execute();
 $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -33,6 +34,13 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <style>
+        
+        /* Ocultar el ojo nativo de los navegadores */
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none;
+        }
+
         :root { 
             --dh-beige: #c5aa7f;
             --dh-navy: #1A2D40; 
@@ -159,6 +167,24 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             margin-top: 15px;
         }
 
+        .btn-vibrante {
+        background-color: #28a745; /* Un verde éxito vibrante */
+        color: white;
+        border-radius: 20px;
+        font-weight: bold;
+        transition: 0.3s;
+        border: none;
+    }
+    .btn-vibrante:hover {
+        background-color: #218838;
+        transform: scale(1.05);
+        color: white;
+    }
+    .btn-vibrante:disabled {
+        background-color: #6c757d;
+        transform: scale(1);
+    }
+
     </style>
 </head>
 <body>
@@ -203,10 +229,11 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <table id="tablaVets" class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th>Nombre del Profesional</th>
+                        <th>Nombre del Veterinario</th>
                         <th>Cédula</th>
+                        <th>Teléfono</th> 
                         <th>Especialidad</th>
-                        <th>Sucursal</th>
+                        <th>Clinica</th>
                         <th>Estado</th>
                         <th class="text-center">Acción</th>
                     </tr>
@@ -216,10 +243,19 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <tr>
                         <td class="fw-bold"><?= htmlspecialchars($vet['Nombre'] . " " . $vet['Apellido']) ?></td>
                         <td><?= $vet['Cedula'] ?></td>
-                        <td><?= htmlspecialchars($vet['Especialidad']) ?></td>
+                        <td><?= $vet['Telefono'] ?></td> <td><?= htmlspecialchars($vet['Especialidad']) ?></td>
                         <td><span class="badge bg-info text-dark"><?= htmlspecialchars($vet['Nombre_Sucursal']) ?></span></td>
                         <td><span class="badge <?= $vet['Estado'] == 'Activo' ? 'bg-success' : 'bg-danger' ?>"><?= $vet['Estado'] ?></span></td>
-                        <td class="text-center"><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-cog"></i></button></td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-secondary btn-editar" 
+                                data-idusu="<?= $vet['ID_Usuario'] ?>"
+                                data-nombre="<?= htmlspecialchars($vet['Nombre']) ?>"
+                                data-apellido="<?= htmlspecialchars($vet['Apellido']) ?>"
+                                data-estado="<?= $vet['Estado'] ?>"
+                                data-bs-toggle="modal" data-bs-target="#modalEditar">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -230,7 +266,7 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="modal fade" id="modalRegistroVet" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                <form id="formRegistroVet" action="../../controllers/VeterinarioController.php?action=registrar" method="POST">
+                <form id="formRegistroVet" action="../../controllers/admin/VeterinarioController.php?action=registrar" method="POST">
                     <div class="modal-header text-white" style="background-color: var(--dh-navy); border-radius: 20px 20px 0 0;">
                         <h5 class="modal-title"><i class="fas fa-id-card-alt me-2"></i> Registro Profesional de Salud</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -247,7 +283,7 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Confirmar Correo</label>
-                                    <input type="email" id="email_conf" class="form-control" placeholder="Repite el correo" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
+                                    <input type="email" id="email_conf" name="confirmar_correo" class="form-control" placeholder="Repite el correo" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
                                     <small id="err_email_conf" class="error-msg text-danger d-none">Los correos no coinciden</small>
                                 </div>
                                 
@@ -349,7 +385,8 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="row align-items-center">
                                 <div class="col-md-7">
                                     <h6 class="mb-1 fw-bold text-dark"><i class="fas fa-user-shield text-warning me-2"></i> Verificación del Administrador</h6>
-                                    <p class="small text-muted mb-0">Confirma este registro profesional ingresando <strong>tu propia contraseña</strong>.</p>
+                                    <p class="small text-muted mb-0">Confirma que eres el <strong>ADMIN</strong>.</p>
+                                    <p class="small text-muted mb-1"> (Recuerda que todos los campos deben estar llenos).</p>
                                 </div>
                                 <div class="col-md-5">
                                     <div class="input-group">
@@ -372,7 +409,9 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     <div class="modal-footer border-0 p-4 pt-0">
                         <button type="button" class="btn btn-secondary px-4 fw-semibold" data-bs-dismiss="modal" style="border-radius: 20px;">Cancelar</button>
-                        <button type="submit" id="btnSubmitVet" class="btn btn-dark px-5 shadow fw-bold" disabled style="border-radius: 20px;">Autorizar y Registrar</button>
+                        <button type="submit" id="btnSubmitVet" class="btn btn-vibrante px-5 shadow fw-bold" disabled>
+                            Autorizar y Registrar
+                        </button>
                     </div>
                 </form>
             </div>
@@ -383,66 +422,35 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
 
     <script>
-       $(document).ready(function() {
-            // 1. Inicializar DataTables con la traducción completa al español
-           $('#tablaVets').DataTable({
-        "language": {
-            "processing": "Procesando...",
-            "lengthMenu": "Mostrar _MENU_ registros",
-            "zeroRecords": "No se encontraron resultados",
-            "emptyTable": "Ningún dato disponible en esta tabla",
-            "info": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-            "infoEmpty": "Mostrando página 0 de 0 con un total de 0 registros",
-            "infoFiltered": "(filtrado de un total de _MAX_ registros)",
-            "search": "Buscar Profesional:",
-            "infoThousands": ",",
-            "loadingRecords": "Cargando...",
-            "paginate": {
-                "first": "Primero",
-                "last": "Último",
-                "next": "Siguiente",
-                "previous": "Anterior"
-            },
-            "aria": {
-                "sortAscending": ": Activar para ordenar la columna de manera ascendente",
-                "sortDescending": ": Activar para ordenar la columna de manera descendente"
-            }
-        },
-        "pageLength": 10,
-        "dom": '<"d-flex justify-content-between align-items-center mb-3"lf>rt<"d-flex justify-content-between align-items-center"ip>' 
-    });
-
-            // 2. Lógica del botón de Gestión (Engranaje) para llenar el Modal de Edición/Suspensión
-            $('.btn-editar').on('click', function() {
-                const btn = $(this);
-                const estado = btn.data('estado');
-
-                // Asignar valores a los campos ocultos del modal
-                $('#edit_id_usuario').val(btn.data('idusu'));
-                $('#edit_nombre_completo').text(btn.data('nombre') + " " + btn.data('apellido'));
-
-                // Control visual dinámico del botón de Suspender/Reactivar
-                if(estado === 'Activo') {
-                    $('#btn_suspender')
-                        .html('<i class="fas fa-ban me-2"></i> Suspender Acceso')
-                        .removeClass('btn-success')
-                        .addClass('btn-warning');
-                } else {
-                    $('#btn_suspender')
-                        .html('<i class="fas fa-check-circle me-2"></i> Reactivar Acceso')
-                        .removeClass('btn-warning')
-                        .addClass('btn-success');
-                }
+        // 1. INICIALIZACIÓN DE TABLA
+        $(document).ready(function() {
+            $('#tablaVets').DataTable({
+                "language": {
+                    "processing": "Procesando...",
+                    "lengthMenu": "Mostrar _MENU_ registros",
+                    "zeroRecords": "No se encontraron resultados",
+                    "emptyTable": "Ningún dato disponible en esta tabla",
+                    "info": "Mostrando página _PAGE_ de _PAGES_ con un total de _TOTAL_ registros",
+                    "infoEmpty": "Mostrando página 0 de 0 con un total de 0 registros",
+                    "infoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "search": "Buscar Dr.Veterinario:",
+                    "paginate": {
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                },
+                "pageLength": 10,
+                "dom": '<"d-flex justify-content-between align-items-center mb-3"lf>rt<"d-flex justify-content-between align-items-center"ip>' 
             });
         });
 
-        // Lógica mejorada para el Ojo SVG
+        // 2. UTILIDADES VISUALES (OJO PASSWORD)
         function togglePassword(inputId, lineId) {
             const input = document.getElementById(inputId);
             const line = document.getElementById(lineId);
-            
             if (input.type === "password") {
                 input.type = "text";
                 line.style.display = "block";
@@ -452,60 +460,7 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
         }
 
-        // --- VALIDACIONES MAESTRAS ---
-        const form = document.getElementById('formRegistroVet');
-        const btn = document.getElementById('btnSubmitVet');
-
-        form.addEventListener('input', function() {
-            let ok = true;
-
-            // 1. Campos vacíos
-            form.querySelectorAll('[required]').forEach(i => { if(!i.value.trim()) ok = false; });
-
-            // 2. Correo y Formato
-            const email = document.getElementById('email_v').value;
-            const emailC = document.getElementById('email_conf').value;
-            const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-            document.getElementById('err_email').classList.toggle('d-none', isEmail || !email);
-            document.getElementById('err_email_conf').classList.toggle('d-none', (email === emailC && email !== "") || !emailC);
-            if(!isEmail || email !== emailC) ok = false;
-
-            // 3. Contraseñas
-            const pass = document.getElementById('pass_v').value;
-            const passC = document.getElementById('pass_conf').value;
-            document.getElementById('err_pass_conf').classList.toggle('d-none', (pass === passC && pass !== "") || !passC);
-            if(pass !== passC) ok = false;
-
-            // 4. Longitudes Máscaras
-            const ced = document.getElementById('cedula_v').value;
-            const tel = document.getElementById('tel_v').value;
-            document.getElementById('err_cedula').classList.toggle('d-none', ced.length === 13 || !ced);
-            document.getElementById('err_tel').classList.toggle('d-none', tel.length === 12 || !tel);
-            if(ced.length !== 13 || tel.length !== 12) ok = false;
-
-            // 5. Exequatur (5) y Colvet (4)
-            const ex = document.getElementById('ex_v').value;
-            const col = document.getElementById('col_v').value;
-            document.getElementById('err_ex').classList.toggle('d-none', ex.length === 5 || !ex);
-            document.getElementById('err_col').classList.toggle('d-none', col.length === 4 || !col);
-            if(ex.length !== 5 || col.length !== 4) ok = false;
-
-            // 6. +18 Años
-            const fecha = document.getElementById('fecha_n').value;
-            if(fecha){
-                const hoy = new Date();
-                const cumple = new Date(fecha);
-                let edad = hoy.getFullYear() - cumple.getFullYear();
-                const m = hoy.getMonth() - cumple.getMonth();
-                if (m < 0 || (m === 0 && hoy.getDate() < cumple.getDate())) { edad--; }
-                document.getElementById('err_edad').classList.toggle('d-none', edad >= 18);
-                if(edad < 18) ok = false;
-            } else { ok = false; }
-
-            btn.disabled = !ok;
-        });
-
-        // --- MÁSCARAS ---
+        // 3. MÁSCARAS DE ENTRADA
         $('.mascara-cedula').on('input', function() {
             let v = $(this).val().replace(/\D/g, '').substring(0,11);
             if (v.length > 10) v = v.replace(/^(\d{3})(\d{7})(\d{1})$/, "$1-$2-$3");
@@ -521,6 +476,98 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         });
 
         $('.solo-num').on('input', function() { $(this).val($(this).val().replace(/\D/g, '')); });
+
+        // 4. VALIDACIÓN MAESTRA Y ENVÍO AJAX
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('formRegistroVet');
+            const btn = document.getElementById('btnSubmitVet');
+
+            // --- Validación en tiempo real para habilitar botón ---
+            form.addEventListener('input', function() {
+                let ok = true;
+                form.querySelectorAll('[required]').forEach(i => { if(!i.value.trim()) ok = false; });
+
+                const email = document.getElementById('email_v').value;
+                const emailC = document.getElementById('email_conf').value;
+                const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+                document.getElementById('err_email').classList.toggle('d-none', isEmail || !email);
+                document.getElementById('err_email_conf').classList.toggle('d-none', (email === emailC && email !== "") || !emailC);
+                if(!isEmail || email !== emailC) ok = false;
+
+                const pass = document.getElementById('pass_v').value;
+                const passC = document.getElementById('pass_conf').value;
+                document.getElementById('err_pass_conf').classList.toggle('d-none', (pass === passC && pass !== "") || !passC);
+                if(pass !== passC) ok = false;
+
+                const ced = document.getElementById('cedula_v').value;
+                const tel = document.getElementById('tel_v').value;
+                if(ced.length !== 13 || tel.length !== 12) ok = false;
+
+                const ex = document.getElementById('ex_v').value;
+                const col = document.getElementById('col_v').value;
+                if(ex.length !== 5 || col.length !== 4) ok = false;
+
+                const fecha = document.getElementById('fecha_n').value;
+                if(fecha){
+                    const hoy = new Date();
+                    const cumple = new Date(fecha);
+                    let edad = hoy.getFullYear() - cumple.getFullYear();
+                    if (hoy.getMonth() < cumple.getMonth() || (hoy.getMonth() === cumple.getMonth() && hoy.getDate() < cumple.getDate())) edad--;
+                    document.getElementById('err_edad').classList.toggle('d-none', edad >= 18);
+                    if(edad < 18) ok = false;
+                } else { ok = false; }
+
+                btn.disabled = !ok;
+            });
+
+            // --- Envío del Formulario vía AJAX ---
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Autorizando...';
+
+                fetch('../../controllers/admin/VeterinarioController.php?action=registrar', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    // Si el servidor manda un error de PHP, esto lo atrapará
+                    return response.text().then(text => {
+                        try {
+                            return JSON.parse(text);
+                        } catch (err) {
+                            console.log("Respuesta cruda del servidor:", text);
+                            throw new Error("El servidor no envió un JSON válido. Revisa la consola.");
+                        }
+                    });
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        $('#modalRegistroVet').modal('hide');
+                        Swal.fire({ icon: 'success', title: '¡Éxito!', text: 'Veterinario registrado.', showConfirmButton: false, timer: 1500 })
+                        .then(() => { location.reload(); });
+                    } else {
+                        let msg = "Error en el registro.";
+                        if(data.type === 'auth_admin_fallida') msg = "Contraseña de administrador incorrecta.";
+                        if(data.type === 'correo_ya_existe') msg = "Este correo ya está registrado.";
+                        
+                        Swal.fire({ icon: 'error', title: 'Fallo', text: msg, confirmButtonColor: '#1A2D40' });
+                        btn.disabled = false;
+                        btn.innerHTML = 'Autorizar y Registrar';
+                        document.getElementById('admin_auth').value = ""; 
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({ icon: 'error', title: 'Error Crítico', text: error.message });
+                    btn.disabled = false;
+                    btn.innerHTML = 'Autorizar y Registrar';
+                });
+            });
+        });
     </script>
+
 </body>
 </html>
