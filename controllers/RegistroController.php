@@ -24,6 +24,16 @@ class RegistroController {
                 $this->regresarConError("pass_no_coincide", $_POST);
             }
 
+            // 2.1 Verificar mayoría de edad (18+ años)
+            $fecha_nacimiento = $_POST['fecha_nacimiento'];
+            $fecha_nac_obj = new DateTime($fecha_nacimiento);
+            $hoy = new DateTime();
+            $edad = $hoy->diff($fecha_nac_obj)->y;
+
+            if ($edad < 18) {
+                $this->regresarConError("menor_de_edad", $_POST);
+            }
+
             // Conexión
             $database = new Database();
             $db = $database->getConnection();

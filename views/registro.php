@@ -127,23 +127,46 @@
                         <p class="text-white opacity-75 small">Crea tu cuenta para gestionar el expediente de tu mascota.</p>
                     </div>
 
-                    <?php if(isset($_GET['error'])): ?>
-                        <?php if($_GET['error'] == 'correo_ya_existe'): ?>
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <strong>¡Ups!</strong> Este correo ya está registrado en DocuHuella.
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        <?php elseif($_GET['error'] == 'pass_no_coincide'): ?>
-                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                <strong>¡Cuidado!</strong> Las contraseñas no coinciden.
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        <?php elseif($_GET['error'] == 'correo_no_coincide'): ?>
-                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                <strong>¡Cuidado!</strong> Los correos no coinciden.
+                    <?php 
+                        if(isset($_GET['error'])): 
+                            // Configuraciones por defecto
+                            $clase_alerta = 'alert-danger'; 
+                            $titulo = '¡Atención!';
+                            $mensaje = 'Ha ocurrido un error inesperado.';
+
+                            // Evaluamos qué error llegó
+                            switch ($_GET['error']) {
+                                case 'correo_ya_existe':
+                                    $titulo = '¡Ups!';
+                                    $mensaje = 'Este correo ya está registrado en DocuHuella.';
+                                    break;
+                                case 'pass_no_coincide':
+                                    $clase_alerta = 'alert-warning'; 
+                                    $titulo = '¡Cuidado!';
+                                    $mensaje = 'Las contraseñas no coinciden.';
+                                    break;
+                                case 'correo_no_coincide':
+                                    $clase_alerta = 'alert-warning'; 
+                                    $titulo = '¡Cuidado!';
+                                    $mensaje = 'Los correos no coinciden.';
+                                    break;
+                                case 'menor_de_edad':
+                                    $titulo = '¡Acceso denegado!';
+                                    $mensaje = 'Debes ser mayor de 18 años para registrarte como responsable legal de una mascota.';
+                                    break;
+                            }
+                        ?>
+                            <div class="alert <?= $clase_alerta ?> alert-dismissible fade show" role="alert">
+                                <strong><?= $titulo ?></strong> <?= $mensaje ?>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         <?php endif; ?>
+
+                    <?php if (isset($_GET['exito']) && $_GET['exito'] == 'registrado'): ?>
+                        <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                            <strong>¡Registro Exitoso!</strong> Tu cuenta ha sido creada. Ya puedes iniciar sesión.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                     <?php endif; ?>
 
                     <form action="../controllers/RegistroController.php?action=registrar_cuidador" method="POST">
