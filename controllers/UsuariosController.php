@@ -18,38 +18,60 @@ class UsuariosController {
 
             $usuario->correo = $correo_ingresado;
             
-            
+            // Buscamos al usuario por correo
             $datos_usuario = $usuario->login(); 
 
-            if ($datos_usuario) { // Si encontró el correo (no devolvió false)
+            if ($datos_usuario) { 
 
+                // 1. VERIFICAR BLOQUEO PREVIO (Fail-Fast)
+                if (isset($datos_usuario['Estado']) && $datos_usuario['Estado'] !== 'Activo') {
+                    header("Location: ../views/login.php?error=cuenta_suspendida");
+                    exit();
+                }
+
+                // 2. VALIDAR CONTRASEÑA
                 if (password_verify($password_ingresada, $datos_usuario['Contrasena'])) {
                     
-                    // Verificamos si la columna Estado es distinta de 'Activo'
-                    if (isset($datos_usuario['Estado']) && $datos_usuario['Estado'] !== 'Activo') {
-                        header("Location: ../views/login.php?error=cuenta_suspendida");
-                        exit();
-                    }
-                    
-                    // Si pasó el filtro, le damos acceso normal...
+                    // LOGIN EXITOSO: Limpiamos los intentos fallidos
+                    $usuario->resetearIntentos($datos_usuario['ID_Usuario']);
 
-                    // 1. Datos básicos de la cuenta
+                    // Datos básicos de la cuenta en sesión
                     $_SESSION['id_usuario'] = $datos_usuario['ID_Usuario'];
                     $_SESSION['id_rol']     = $datos_usuario['ID_Rol'];
                     $_SESSION['correo']     = $datos_usuario['Correo'];
 
-                    // 2. BUSCAR IDENTIDAD Y CLÍNICA 
-                    // Dependiendo del rol, necesitamos saber su ID de tabla y su Clínica
+                    // Cargar contexto (clínica e identidad)
                     $this->cargarContextoUsuario($db, $_SESSION['id_usuario'], $_SESSION['id_rol']);
 
-                    // 3. Redirección inteligente
+                    // Redirección por rol
                     $this->redireccionarPorRol($_SESSION['id_rol']);
                     
                 } else {
-                    header("Location: ../views/login.php?error=credenciales");
+                    // CONTRASEÑA INCORRECTA: Lógica de bloqueo
+                    $usuario->registrarFallo($datos_usuario['ID_Usuario']);
+                    
+                    // Calculamos los intentos (sumamos 1 al valor que ya traíamos de la DB)
+                    $intentos_actuales = $datos_usuario['Intentos_Fallidos'] + 1;
+
+                    if ($intentos_actuales >= 5) {
+                        // BLOQUEO DEFINITIVO
+                        $usuario->id_usuario = $datos_usuario['ID_Usuario'];
+                        $usuario->estado = 'Suspendido';
+                        $usuario->cambiarEstado();
+                        
+                        header("Location: ../views/login.php?error=cuenta_suspendida");
+                    } elseif ($intentos_actuales >= 3) {
+                        // ADVERTENCIA (Intentos 3 y 4)
+                        $restantes = 5 - $intentos_actuales;
+                        header("Location: ../views/login.php?error=advertencia&restantes=" . $restantes);
+                    } else {
+                        // ERROR NORMAL (Intentos 1 y 2)
+                        header("Location: ../views/login.php?error=credenciales");
+                    }
                     exit();
                 }
             } else {
+                // El correo ni siquiera existe
                 header("Location: ../views/login.php?error=credenciales");
                 exit();
             }
@@ -58,7 +80,6 @@ class UsuariosController {
 
     /**
      * Esta función es el "GPS" del sistema. 
-     * Ubica al usuario en su clínica y perfil correspondiente.
      */
     private function cargarContextoUsuario($db, $id_usuario, $rol) {
         switch ($rol) {
@@ -103,13 +124,11 @@ class UsuariosController {
                 if($res) {
                     $_SESSION['id_perfil'] = $res['ID_Cuidador'];
                     $_SESSION['nombre']    = $res['Nombre'];
-                    // El cuidador no tiene ID_Clinica fijo, él puede ir a varias.
                 }
                 break;
 
             case 4: // SUPERADMIN
                 $_SESSION['nombre'] = "Super Administrador";
-                // El SuperAdmin no tiene clínica porque él es el dueño de TODO el software.
                 break;
         }
     }

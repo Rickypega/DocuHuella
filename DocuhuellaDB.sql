@@ -52,6 +52,7 @@ CREATE TABLE Usuarios (
     Contrasena VARCHAR(255) NOT NULL,
     ID_Rol INT NOT NULL,
     Estado VARCHAR(20) DEFAULT 'Activo',
+    Intentos_Fallidos INT DEFAULT 0 AFTER ID_Rol,
     Fecha_Registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (ID_Rol) REFERENCES Roles(ID_Rol)
 );
@@ -93,8 +94,8 @@ CREATE TABLE Veterinarios (
     Sexo VARCHAR(10),
     Telefono VARCHAR(20),
     Direccion VARCHAR(150),
-    Exequatur VARCHAR(50),
-    Colegiatura VARCHAR(50),
+    Exequatur VARCHAR(50) UNIQUE,
+    Colegiatura VARCHAR(50) UNIQUE,
     FOREIGN KEY (ID_Usuario) REFERENCES Usuarios(ID_Usuario) ON DELETE CASCADE,
     FOREIGN KEY (ID_Clinica) REFERENCES Clinicas(ID_Clinica) ON DELETE CASCADE,
     FOREIGN KEY (ID_Especialidad) REFERENCES Especialidades(ID_Especialidad) ON DELETE SET NULL

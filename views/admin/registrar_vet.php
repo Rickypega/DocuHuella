@@ -579,11 +579,25 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         Swal.fire({ icon: 'success', title: '¡Éxito!', text: 'Veterinario registrado.', showConfirmButton: false, timer: 1500 })
                         .then(() => { location.reload(); });
                     } else {
-                        let msg = "Error en el registro.";
-                        if(data.type === 'auth_admin_fallida') msg = "Contraseña de administrador incorrecta.";
-                        if(data.type === 'correo_ya_existe') msg = "Este correo ya está registrado.";
                         
-                        Swal.fire({ icon: 'error', title: 'Fallo', text: msg, confirmButtonColor: '#1A2D40' });
+                    let msg = "Error en el registro.";
+                        if (data.type === 'auth_admin_fallida') {
+                            msg = "Contraseña de administrador incorrecta.";
+                        } else if (data.type === 'correo_ya_existe') {
+                            msg = "Este correo electrónico ya está registrado por otro usuario.";
+                        } else if (data.type === 'cedula_duplicada') {
+                            msg = "Error: Esta cédula ya pertenece a otro veterinario en el sistema.";
+                        } else if (data.type === 'exequatur_duplicado') {
+                            msg = "Error: Este número de Exequátur ya está registrado.";
+                        } else if (data.type === 'colegiatura_duplicada') {
+                            msg = "Error: El número de colegiatura ya está registrado.";
+                        } else if (data.type === 'campos_incompletos') {
+                            msg = "Por favor, completa todos los campos requeridos correctamente.";
+                        } else if (data.type === 'error_perfil') {
+                            msg = "No se pudo crear el perfil médico. Intenta de nuevo.";
+                        }
+                        
+                        Swal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonColor: '#1A2D40' });
                         btn.disabled = false;
                         btn.innerHTML = 'Autorizar y Registrar';
                         document.getElementById('admin_auth').value = ""; 

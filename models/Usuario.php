@@ -9,6 +9,7 @@ class Usuario {
     public $contrasena;
     public $id_rol;
     public $estado; 
+    public $intentos_fallidos;
     public $fecha_registro; 
 
     public function __construct($db) {
@@ -19,7 +20,8 @@ class Usuario {
     // Acción: Iniciar Sesión
     // ==========================================
     public function login() {
-        $query = "SELECT ID_Usuario, Correo, Contrasena, ID_Rol, Estado 
+        // CORRECCIÓN: Agregamos Intentos_Fallidos al SELECT
+        $query = "SELECT ID_Usuario, Correo, Contrasena, ID_Rol, Estado, Intentos_Fallidos 
                   FROM " . $this->tabla . " 
                   WHERE Correo = :correo LIMIT 1";
 
@@ -29,7 +31,6 @@ class Usuario {
         $stmt->bindParam(':correo', $this->correo);
         $stmt->execute();
 
-        // Devolvemos directamente los datos del usuario (o false si no existe)
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
@@ -43,15 +44,11 @@ class Usuario {
 
         $stmt = $this->conexion->prepare($query);
 
-        // Si id_rol está vacío o no se ha definido, le asignamos 3 (Cuidador)
         if (empty($this->id_rol)) {
             $this->id_rol = 3; 
         }
 
-        // Limpieza de correo
         $this->correo = htmlspecialchars(strip_tags($this->correo));
-        
-        // Encriptar contraseña por seguridad
         $password_hash = password_hash($this->contrasena, PASSWORD_BCRYPT);
 
         $stmt->bindParam(':correo', $this->correo);
@@ -60,13 +57,12 @@ class Usuario {
         
         try {
             if($stmt->execute()) {
-                // Atrapamos el ID que se acaba de generar en la tabla Usuarios
                 $this->id_usuario = $this->conexion->lastInsertId();
                 return true;
             }
             return false;
         } catch (PDOException $e) {
-            if ($e->getCode() == 23000) { // Violación de clave única
+            if ($e->getCode() == 23000) { 
                 return 'correo_duplicado';
             } else {
                 return 'error_desconocido';
@@ -75,11 +71,11 @@ class Usuario {
     }
 
     // ==========================================
-    // MÉTODOS DE CONTROL
+    // MÉTODOS DE CONTROL DE SEGURIDAD
     // ==========================================
 
     /**
-     * ACTUALIZAR ESTADO DE USUARIO (ACTIVO/INACTIVO)
+     * ACTUALIZAR ESTADO DE USUARIO (Manual o Automático)
      */
     public function cambiarEstado() {
         $query = "UPDATE " . $this->tabla . " 
@@ -93,6 +89,30 @@ class Usuario {
         $stmt->bindParam(':estado', $this->estado);
         $stmt->bindParam(':id', $this->id_usuario);
         
+        return $stmt->execute();
+    }
+
+    /**
+     * Incrementa el contador de fallos
+     */
+    public function registrarFallo($id) {
+        $sql = "UPDATE " . $this->tabla . " 
+                SET Intentos_Fallidos = Intentos_Fallidos + 1 
+                WHERE ID_Usuario = :id";
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
+    }
+
+    /**
+     * Limpia el contador tras un login exitoso
+     */
+    public function resetearIntentos($id) {
+        $sql = "UPDATE " . $this->tabla . " 
+                SET Intentos_Fallidos = 0 
+                WHERE ID_Usuario = :id";
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->bindParam(':id', $id);
         return $stmt->execute();
     }
 }
