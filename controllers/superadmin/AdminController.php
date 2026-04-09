@@ -1,25 +1,8 @@
 <?php
 session_start();
 require_once '../../config/db.php';
-require_once '../../models/Sucursal.php';
 
 class AdminController {
-
-public function guardarSucursal() {
-    $this->verificarSeguridad();
-
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-        $db = (new Database())->getConnection();
-
-        $sucursal = new Sucursal($db);
-
-        $sucursal->crearSucursal($_POST['nombre'], $_POST['direccion']);
-
-        header("Location: ../../controllers/AdminController.php?action=listar_sucursales");
-        exit();
-    }
-}
 
     // Método de seguridad global
     private function verificarSeguridad() {
@@ -28,19 +11,6 @@ public function guardarSucursal() {
             exit();
         }
     }
-    // LISTAR SUCURSALES
-public function listarSucursales() {
-    $this->verificarSeguridad();
-
-    $db = (new Database())->getConnection();
-
-    $stmt = $db->prepare("SELECT * FROM clinicas");
-    $stmt->execute();
-    $sucursales = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    require_once '../../views/admin/sucursales.php';
-}
-
 
     // 1. CREAR
     public function registrarFranquicia() {
@@ -252,12 +222,6 @@ if (isset($_GET['action'])) {
         case 'eliminar':
             $controlador->eliminarFranquicia();
             break;
-        case 'guardar_sucursal':
-            $controlador->guardarSucursal();
-            break;
-        case 'listar_sucursales':
-            $controlador->listarSucursales();
-            break;
         default:
             header("Location: ../../views/superadmin/administrador.php");
             exit();
@@ -266,7 +230,3 @@ if (isset($_GET['action'])) {
     header("Location: ../../views/superadmin/administrador.php");
     exit();
 }
-
-
-
-
