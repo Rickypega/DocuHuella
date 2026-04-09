@@ -2,6 +2,7 @@
 require_once '../../config/auth_check.php';
 require_once '../../config/db.php';
 require_once '../../models/Clinica.php';
+require_once '../../models/Especialidad.php';
 
 if (!isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 1) {
     header("Location: ../login.php?error=acceso_denegado"); exit();
@@ -9,9 +10,12 @@ if (!isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 1) {
 
 $database = new Database();
 $db = $database->getConnection();
+// Instanciar el modelo y obtener la lista
 $clinicaModel = new Clinica($db);
 $clinicaModel->id_admin = $_SESSION['id_perfil'];
 $mis_sucursales = $clinicaModel->obtenerClinicasPorAdmin();
+$especialidadModel = new Especialidad($db);
+$lista_especialidades = $especialidadModel->obtenerTodas();
 
 $query = "SELECT v.*, u.Correo, u.Estado, u.ID_Usuario, c.Nombre_Sucursal 
           FROM Veterinarios v
@@ -354,11 +358,31 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <small id="err_edad" class="error-msg text-danger d-none">Debe ser mayor de 18 años</small>
                                     </div>
                                 </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Dirección Residencial </label>
+                                    <textarea name="direccion" id="direccion_v" class="form-control" rows="2" 
+                                        placeholder="Calle, No. de casa, Sector y Ciudad..." required
+                                        style="background-color: var(--dh-light-gray); border-radius: 15px; padding: 10px 20px; resize: none;"></textarea>
+                                    <div class="invalid-feedback">Este campo es obligatorio para el registro.</div>
+                                </div>
                             </div>
 
                             <div class="col-lg-4 px-4">
                                 <div class="section-header">3. Datos Clínicos</div>
-                                <div class="mb-3"><label class="form-label fw-semibold">Especialidad Médica</label><input type="text" name="especialidad" class="form-control" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;"></div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Especialidad Médica</label>
+                                    <select name="id_especialidad" id="especialidad_v" class="form-select" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
+                                        <option value="">Seleccionar especialidad...</option>
+                                        <?php foreach($lista_especialidades as $esp): ?>
+                                            <option value="<?= $esp['ID_Especialidad'] ?>">
+                                                <?= htmlspecialchars($esp['Nombre_Especialidad']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <small class="text-muted" style="font-size: 0.7rem; padding-left: 10px;">
+                                        Si no aparece la especialidad, contacta a soporte.
+                                    </small>
+                                </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Sucursal de Asignación</label>
                                     <select name="id_clinica" class="form-select" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
@@ -502,7 +526,11 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 const ced = document.getElementById('cedula_v').value;
                 const tel = document.getElementById('tel_v').value;
                 if(ced.length !== 13 || tel.length !== 12) ok = false;
+                const direccion = document.getElementById('direccion_v').value.trim();
+                if(direccion.length < 3) ok = false;
 
+                const esp = document.getElementById('especialidad_v').value;
+                if(!esp) ok = false;
                 const ex = document.getElementById('ex_v').value;
                 const col = document.getElementById('col_v').value;
                 if(ex.length !== 5 || col.length !== 4) ok = false;
