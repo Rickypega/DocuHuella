@@ -49,23 +49,21 @@ class UsuariosController {
                 } else {
                     // CONTRASEÑA INCORRECTA: Lógica de bloqueo
                     $usuario->registrarFallo($datos_usuario['ID_Usuario']);
-                    
-                    // Calculamos los intentos (sumamos 1 al valor que ya traíamos de la DB)
                     $intentos_actuales = $datos_usuario['Intentos_Fallidos'] + 1;
 
                     if ($intentos_actuales >= 5) {
-                        // BLOQUEO DEFINITIVO
                         $usuario->id_usuario = $datos_usuario['ID_Usuario'];
                         $usuario->estado = 'Suspendido';
                         $usuario->cambiarEstado();
                         
+                        // Enviamos error de cuenta suspendida
                         header("Location: ../views/login.php?error=cuenta_suspendida");
                     } elseif ($intentos_actuales >= 3) {
-                        // ADVERTENCIA (Intentos 3 y 4)
                         $restantes = 5 - $intentos_actuales;
+                        // Enviamos el error de advertencia y pasamos cuántos quedan
                         header("Location: ../views/login.php?error=advertencia&restantes=" . $restantes);
                     } else {
-                        // ERROR NORMAL (Intentos 1 y 2)
+                        // El error de siempre para 1 y 2 intentos fallidos
                         header("Location: ../views/login.php?error=credenciales");
                     }
                     exit();
