@@ -14,7 +14,7 @@ class Raza {
     /**
      * Trae las razas vinculadas a una especie específica
      */
-    public function leerPorEspecie($id_especie) {
+    public function obtenerPorEspecie($id_especie) {
         $query = "SELECT * FROM " . $this->tabla . " 
                   WHERE ID_Especie = :id_especie 
                   ORDER BY Nombre_Raza ASC";
