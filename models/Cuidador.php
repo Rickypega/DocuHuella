@@ -31,8 +31,19 @@ class Cuidador {
     }
 
     /**
+     * OBTENER POR CÉDULA (Útil para el flujo de Veterinaria)
+     */
+    public function obtenerPorCedula($cedula) {
+        $query = "SELECT * FROM " . $this->tabla . " WHERE Cedula = :cedula LIMIT 1";
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bindParam(':cedula', $cedula);
+        $stmt->execute();
+        
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * REGISTRAR PERFIL
-     * Se usa en el proceso de registro para crear los datos personales.
      */
     public function registrarse() {
         $query = "INSERT INTO " . $this->tabla . " 
@@ -41,14 +52,12 @@ class Cuidador {
         
         $stmt = $this->conexion->prepare($query);
 
-        // Sanitización de seguridad
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
         $this->apellido = htmlspecialchars(strip_tags($this->apellido));
         $this->cedula = htmlspecialchars(strip_tags($this->cedula));
         $this->telefono = htmlspecialchars(strip_tags($this->telefono));
         $this->direccion = htmlspecialchars(strip_tags($this->direccion));
 
-        // Vinculación de parámetros
         $stmt->bindParam(':id_usuario', $this->id_usuario);
         $stmt->bindParam(':nombre', $this->nombre);
         $stmt->bindParam(':apellido', $this->apellido);
@@ -60,13 +69,11 @@ class Cuidador {
 
         try {
             if($stmt->execute()) {
-                // Guardamos el ID recién creado por si el controlador lo necesita
                 $this->id_cuidador = $this->conexion->lastInsertId();
                 return true;
             }
             return false;
         } catch (PDOException $e) {
-            // Manejo de error si la cédula ya existe
             if ($e->getCode() == 23000) { 
                 return 'cedula_duplicada';
             }
@@ -76,7 +83,6 @@ class Cuidador {
 
     /**
      * ACTUALIZAR PERFIL
-     * Permite al cuidador mantener sus datos de contacto al día.
      */
     public function editarPerfil() {
         $query = "UPDATE " . $this->tabla . " 
@@ -86,7 +92,6 @@ class Cuidador {
         
         $stmt = $this->conexion->prepare($query);
 
-        // Sanitización
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
         $this->apellido = htmlspecialchars(strip_tags($this->apellido));
         $this->telefono = htmlspecialchars(strip_tags($this->telefono));
@@ -102,13 +107,14 @@ class Cuidador {
     }
 
     /**
-     * VER MIS MASCOTAS
+     * OBTENER MIS MASCOTAS (Incluyendo Especie, Raza y Color)
      */
-    public function verMisMascotas() {
-        $query = "SELECT m.*, e.Nombre_Especie, r.Nombre_Raza 
+    public function obtenerMisMascotas() {
+        $query = "SELECT m.*, e.Nombre_Especie, r.Nombre_Raza, col.Nombre_Color 
                   FROM Mascotas m
                   INNER JOIN Especies e ON m.ID_Especie = e.ID_Especie
                   LEFT JOIN Razas r ON m.ID_Raza = r.ID_Raza
+                  LEFT JOIN Colores col ON m.ID_Color = col.ID_Color
                   WHERE m.ID_Cuidador = :id
                   ORDER BY m.Fecha_Registro DESC";
                   
@@ -119,4 +125,3 @@ class Cuidador {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
-?>

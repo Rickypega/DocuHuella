@@ -13,7 +13,7 @@ class Especie {
     /**
      * Trae todas las especies para el <select>
      */
-    public function leerTodas() {
+    public function obtenerTodas() {
         $query = "SELECT * FROM " . $this->tabla . " ORDER BY Nombre_Especie ASC";
         $stmt = $this->conexion->prepare($query);
         $stmt->execute();

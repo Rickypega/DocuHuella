@@ -10,7 +10,7 @@ class Mascota {
     public $id_raza;    
     public $nombre;
     public $sexo;
-    public $color;
+    public $id_color;
     public $edad;
     public $rasgos;
     public $peso;
@@ -25,22 +25,26 @@ class Mascota {
      */
     public function registrarMascota() {
         $query = "INSERT INTO " . $this->tabla . " 
-                  (ID_Cuidador, ID_Especie, ID_Raza, Nombre, Sexo, Color, Edad, Rasgos, Peso, Estado_Esterilizacion) 
-                  VALUES (:id_cuidador, :id_especie, :id_raza, :nombre, :sexo, :color, :edad, :rasgos, :peso, :esteril)";
+                  (ID_Cuidador, ID_Especie, ID_Raza, Nombre, Sexo, ID_Color, Edad, Rasgos, Peso, Estado_Esterilizacion) 
+                  VALUES (:id_cuidador, :id_especie, :id_raza, :nombre, :sexo, :id_color, :edad, :rasgos, :peso, :esteril)";
         
         $stmt = $this->conexion->prepare($query);
 
-        // Limpieza de datos de texto
+        // Limpieza de datos
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
-        $this->color = htmlspecialchars(strip_tags($this->color));
         $this->rasgos = htmlspecialchars(strip_tags($this->rasgos));
+        $this->id_cuidador = (int)$this->id_cuidador;
+        $this->id_especie = (int)$this->id_especie;
+        $this->id_raza = (int)$this->id_raza;
+        $this->id_color = (int)$this->id_color;
 
+        // Vinculación de parámetros
         $stmt->bindParam(':id_cuidador', $this->id_cuidador);
         $stmt->bindParam(':id_especie', $this->id_especie);
         $stmt->bindParam(':id_raza', $this->id_raza);
         $stmt->bindParam(':nombre', $this->nombre);
         $stmt->bindParam(':sexo', $this->sexo);
-        $stmt->bindParam(':color', $this->color);
+        $stmt->bindParam(':id_color', $this->id_color); 
         $stmt->bindParam(':edad', $this->edad);
         $stmt->bindParam(':rasgos', $this->rasgos);
         $stmt->bindParam(':peso', $this->peso);
@@ -53,19 +57,21 @@ class Mascota {
             }
             return false;
         } catch (PDOException $e) {
+            
             return false;
         }
     }
 
     /**
      * OBTENER PERFIL COMPLETO 
-     * Trae los datos de la mascota incluyendo el texto real de su Especie y Raza.
+     * Incluye los nombres reales de Especie, Raza y Color.
      */
     public function obtenerPerfilCompleto() {
-        $query = "SELECT m.*, e.Nombre_Especie, r.Nombre_Raza 
+        $query = "SELECT m.*, e.Nombre_Especie, r.Nombre_Raza, c.Nombre_Color 
                   FROM " . $this->tabla . " m
                   INNER JOIN Especies e ON m.ID_Especie = e.ID_Especie
                   LEFT JOIN Razas r ON m.ID_Raza = r.ID_Raza
+                  LEFT JOIN Colores c ON m.ID_Color = c.ID_Color
                   WHERE m.ID_Mascota = :id LIMIT 1";
                   
         $stmt = $this->conexion->prepare($query);
@@ -77,7 +83,6 @@ class Mascota {
 
     /**
      * VER HISTORIAL MÉDICO 
-     * Navega: Mascota -> Expediente -> Consultas
      */
     public function verHistorialMedico() {
         $query = "SELECT 
@@ -105,7 +110,6 @@ class Mascota {
 
     /**
      * ACTUALIZAR DATOS MÉTRICOS
-     * Para cuando la mascota crece, sube de peso o es esterilizada.
      */
     public function actualizarDatos() {
         $query = "UPDATE " . $this->tabla . " 
