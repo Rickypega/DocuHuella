@@ -13,7 +13,7 @@ class Veterinario {
     public $cedula;
     public $sexo;
     public $telefono;
-    public $especialidad;
+    public $id_especialidad; 
     public $direccion;
     public $exequatur; 
     public $colegiatura; 
@@ -26,11 +26,12 @@ class Veterinario {
      * Registro de perfil 
      */
     public function registrarPerfil() {
+       
         $query = "INSERT INTO " . $this->tabla . " 
                   (ID_Usuario, ID_Clinica, Nombre, Apellido, Fecha_Nacimiento, Cedula, 
-                   Sexo, Telefono, Especialidad, Direccion, Exequatur, Colegiatura) 
+                   Sexo, Telefono, ID_Especialidad, Direccion, Exequatur, Colegiatura) 
                   VALUES (:id_usuario, :id_clinica, :nombre, :apellido, :fecha_nacimiento, :cedula, 
-                          :sexo, :telefono, :especialidad, :direccion, :exequatur, :colegiatura)";
+                          :sexo, :telefono, :id_especialidad, :direccion, :exequatur, :colegiatura)";
         
         $stmt = $this->conexion->prepare($query);
 
@@ -39,11 +40,12 @@ class Veterinario {
         $this->apellido = htmlspecialchars(strip_tags($this->apellido));
         $this->cedula = htmlspecialchars(strip_tags($this->cedula));
         $this->telefono = htmlspecialchars(strip_tags($this->telefono));
-        $this->especialidad = htmlspecialchars(strip_tags($this->especialidad));
+        $this->id_especialidad = htmlspecialchars(strip_tags($this->id_especialidad));
         $this->direccion = htmlspecialchars(strip_tags($this->direccion));
         $this->exequatur = htmlspecialchars(strip_tags($this->exequatur));
         $this->colegiatura = htmlspecialchars(strip_tags($this->colegiatura));
 
+        // Vinculación de parámetros
         $stmt->bindParam(':id_usuario', $this->id_usuario);
         $stmt->bindParam(':id_clinica', $this->id_clinica);
         $stmt->bindParam(':nombre', $this->nombre);
@@ -52,7 +54,7 @@ class Veterinario {
         $stmt->bindParam(':cedula', $this->cedula);
         $stmt->bindParam(':sexo', $this->sexo);
         $stmt->bindParam(':telefono', $this->telefono);
-        $stmt->bindParam(':especialidad', $this->especialidad);
+        $stmt->bindParam(':id_especialidad', $this->id_especialidad); 
         $stmt->bindParam(':direccion', $this->direccion);
         $stmt->bindParam(':exequatur', $this->exequatur);
         $stmt->bindParam(':colegiatura', $this->colegiatura);
