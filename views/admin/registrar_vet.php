@@ -17,10 +17,11 @@ $mis_sucursales = $clinicaModel->obtenerClinicasPorAdmin();
 $especialidadModel = new Especialidad($db);
 $lista_especialidades = $especialidadModel->obtenerTodas();
 
-$query = "SELECT v.*, u.Correo, u.Estado, u.ID_Usuario, c.Nombre_Sucursal 
+$query = "SELECT v.*, u.Correo, u.Estado, u.ID_Usuario, c.Nombre_Sucursal, e.Nombre_Especialidad
           FROM Veterinarios v
           INNER JOIN Usuarios u ON v.ID_Usuario = u.ID_Usuario
           INNER JOIN Clinicas c ON v.ID_Clinica = c.ID_Clinica
+          INNER JOIN Especialidades e ON v.ID_Especialidad = e.ID_Especialidad
           WHERE c.ID_Admin = :id_admin ORDER BY v.ID_Veterinario DESC";
 $stmt = $db->prepare($query);
 $stmt->bindParam(':id_admin', $_SESSION['id_perfil']);
@@ -247,7 +248,8 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <tr>
                         <td class="fw-bold"><?= htmlspecialchars($vet['Nombre'] . " " . $vet['Apellido']) ?></td>
                         <td><?= $vet['Cedula'] ?></td>
-                        <td><?= $vet['Telefono'] ?></td> <td><?= htmlspecialchars($vet['Especialidad']) ?></td>
+                        <td><?= $vet['Telefono'] ?></td>
+                        <td><?= htmlspecialchars($vet['Nombre_Especialidad'] ?? 'Sin Especialidad') ?></td>
                         <td><span class="badge bg-info text-dark"><?= htmlspecialchars($vet['Nombre_Sucursal']) ?></span></td>
                         <td><span class="badge <?= $vet['Estado'] == 'Activo' ? 'bg-success' : 'bg-danger' ?>"><?= $vet['Estado'] ?></span></td>
                         <td class="text-center">
