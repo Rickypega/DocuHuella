@@ -12,5 +12,4 @@ Thumbs.db
 
 # Scripts temporales de instalación (Seguridad)
 setup.php
-probar_db.php
-setup_master.php
+db.php
