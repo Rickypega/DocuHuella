@@ -1,5 +1,5 @@
 # Archivos de configuración 
-db.php
+config/db.php
 
 # Logs y archivos temporales
 php_errors.log
