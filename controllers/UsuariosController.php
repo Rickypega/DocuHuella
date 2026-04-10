@@ -48,6 +48,7 @@ class UsuariosController {
                     
                 } else {
                     // CONTRASEÑA INCORRECTA: Lógica de bloqueo
+                    if ($datos_usuario['ID_Rol'] != 4 and $datos_usuario['ID_Rol'] != 3) {
                     $usuario->registrarFallo($datos_usuario['ID_Usuario']);
                     $intentos_actuales = $datos_usuario['Intentos_Fallidos'] + 1;
 
@@ -64,6 +65,10 @@ class UsuariosController {
                         header("Location: ../views/login.php?error=advertencia&restantes=" . $restantes);
                     } else {
                         // El error de siempre para 1 y 2 intentos fallidos
+                        header("Location: ../views/login.php?error=credenciales");
+                    }
+                    } else {
+                        
                         header("Location: ../views/login.php?error=credenciales");
                     }
                     exit();
