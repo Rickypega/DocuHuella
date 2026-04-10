@@ -5,16 +5,17 @@ class Mascota {
 
     // ATRIBUTOS
     public $id_mascota;
-    public $id_cuidador; 
-    public $id_especie; 
-    public $id_raza;    
+    public $id_cuidador;
     public $nombre;
+    public $especie;
+    public $raza;
     public $sexo;
-    public $id_color;
+    public $color;
     public $edad;
     public $rasgos;
     public $peso;
     public $estado_esterilizacion;
+    public $imagen;
 
     public function __construct($db) {
         $this->conexion = $db;
@@ -22,57 +23,55 @@ class Mascota {
 
     /**
      * REGISTRO DE NUEVA MASCOTA
+     * Adaptado al dashboard actual
      */
     public function registrarMascota() {
         $query = "INSERT INTO " . $this->tabla . " 
-                  (ID_Cuidador, ID_Especie, ID_Raza, Nombre, Sexo, ID_Color, Edad, Rasgos, Peso, Estado_Esterilizacion) 
-                  VALUES (:id_cuidador, :id_especie, :id_raza, :nombre, :sexo, :id_color, :edad, :rasgos, :peso, :esteril)";
+                  (Nombre, Especie, Raza, Sexo, Color, Edad, Rasgos, Peso, Estado_Esterilizacion, ID_Cuidador, Imagen) 
+                  VALUES (:nombre, :especie, :raza, :sexo, :color, :edad, :rasgos, :peso, :esteril, :id_cuidador, :imagen)";
         
         $stmt = $this->conexion->prepare($query);
 
-        // Limpieza de datos
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
+        $this->especie = htmlspecialchars(strip_tags($this->especie));
+        $this->raza = htmlspecialchars(strip_tags($this->raza));
+        $this->sexo = htmlspecialchars(strip_tags($this->sexo));
+        $this->color = htmlspecialchars(strip_tags($this->color));
         $this->rasgos = htmlspecialchars(strip_tags($this->rasgos));
-        $this->id_cuidador = (int)$this->id_cuidador;
-        $this->id_especie = (int)$this->id_especie;
-        $this->id_raza = (int)$this->id_raza;
-        $this->id_color = (int)$this->id_color;
+        $this->imagen = htmlspecialchars(strip_tags($this->imagen));
 
-        // Vinculación de parámetros
-        $stmt->bindParam(':id_cuidador', $this->id_cuidador);
-        $stmt->bindParam(':id_especie', $this->id_especie);
-        $stmt->bindParam(':id_raza', $this->id_raza);
         $stmt->bindParam(':nombre', $this->nombre);
+        $stmt->bindParam(':especie', $this->especie);
+        $stmt->bindParam(':raza', $this->raza);
         $stmt->bindParam(':sexo', $this->sexo);
-        $stmt->bindParam(':id_color', $this->id_color); 
+        $stmt->bindParam(':color', $this->color);
         $stmt->bindParam(':edad', $this->edad);
         $stmt->bindParam(':rasgos', $this->rasgos);
         $stmt->bindParam(':peso', $this->peso);
         $stmt->bindParam(':esteril', $this->estado_esterilizacion);
+        $stmt->bindParam(':id_cuidador', $this->id_cuidador);
+        $stmt->bindParam(':imagen', $this->imagen);
 
         try {
-            if($stmt->execute()) {
+            if ($stmt->execute()) {
                 $this->id_mascota = $this->conexion->lastInsertId();
                 return true;
             }
             return false;
         } catch (PDOException $e) {
-            
             return false;
         }
     }
 
     /**
-     * OBTENER PERFIL COMPLETO 
-     * Incluye los nombres reales de Especie, Raza y Color.
+     * OBTENER PERFIL COMPLETO
+     * Sin joins, usando la estructura actual
      */
     public function obtenerPerfilCompleto() {
-        $query = "SELECT m.*, e.Nombre_Especie, r.Nombre_Raza, c.Nombre_Color 
-                  FROM " . $this->tabla . " m
-                  INNER JOIN Especies e ON m.ID_Especie = e.ID_Especie
-                  LEFT JOIN Razas r ON m.ID_Raza = r.ID_Raza
-                  LEFT JOIN Colores c ON m.ID_Color = c.ID_Color
-                  WHERE m.ID_Mascota = :id LIMIT 1";
+        $query = "SELECT * 
+                  FROM " . $this->tabla . "
+                  WHERE ID_Mascota = :id
+                  LIMIT 1";
                   
         $stmt = $this->conexion->prepare($query);
         $stmt->bindParam(':id', $this->id_mascota);
@@ -82,24 +81,22 @@ class Mascota {
     }
 
     /**
-     * VER HISTORIAL MÉDICO 
+     * VER HISTORIAL MÉDICO
+     * Adaptado a tu tabla Expedientes real
      */
     public function verHistorialMedico() {
         $query = "SELECT 
-                    cons.ID_Consulta, 
-                    cons.Fecha_Consulta,
-                    cons.Motivo_Consulta AS Motivo, 
-                    cons.Diagnostico, 
-                    cons.Tratamiento_Sugerido,
-                    v.Nombre AS Nombre_Vet, 
-                    v.Apellido AS Apellido_Vet,
-                    c.Nombre_Sucursal AS Clinica
-                  FROM Consultas cons
-                  INNER JOIN Expedientes e ON cons.ID_Expediente = e.ID_Expediente
-                  INNER JOIN Veterinarios v ON cons.ID_Veterinario = v.ID_Veterinario
-                  INNER JOIN Clinicas c ON e.ID_Clinica = c.ID_Clinica
-                  WHERE e.ID_Mascota = :id 
-                  ORDER BY cons.Fecha_Consulta DESC";
+                    e.ID_Expediente,
+                    e.Fecha_Hora,
+                    e.Motivo,
+                    e.Diagnostico_Presuntivo,
+                    e.Tratamiento_Recomendado,
+                    v.Nombre AS Nombre_Vet,
+                    v.Apellido AS Apellido_Vet
+                  FROM Expedientes e
+                  LEFT JOIN Veterinarios v ON e.ID_Veterinario = v.ID_Veterinario
+                  WHERE e.ID_Mascota = :id
+                  ORDER BY e.Fecha_Hora DESC";
 
         $stmt = $this->conexion->prepare($query);
         $stmt->bindParam(':id', $this->id_mascota);
