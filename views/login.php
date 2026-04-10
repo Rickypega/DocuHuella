@@ -226,6 +226,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function crearHuella() {
             const panel = document.getElementById('panel-huellas');
@@ -267,6 +268,54 @@
                 linea.style.display = 'none';  // Oculta la raya
             }
         });
+    </script>
+
+    <script>
+        // 2. LÓGICA DE ALERTAS 
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        const restantes = urlParams.get('restantes');
+        const exito = urlParams.get('exito');
+
+        if (error) {
+            let titulo = "Error";
+            let mensaje = "Correo o contraseña incorrectos.";
+            let icono = "error";
+
+            if (error === 'credenciales') {
+                mensaje = "El correo o la contraseña no coinciden.";
+            } 
+            else if (error === 'advertencia') {
+                titulo = "¡Atención!";
+                icono = "warning";
+                // Usamos el número de intentos que viene de la URL
+                mensaje = `Contraseña incorrecta. Te quedan ${restantes} intentos antes de suspender tu cuenta.`;
+            } 
+            else if (error === 'cuenta_suspendida') {
+                titulo = "Cuenta Bloqueada";
+                mensaje = "Has superado el límite de intentos. Por seguridad, tu cuenta ha sido suspendida. Contacta al administrador.";
+            }
+
+            Swal.fire({
+                icon: icono,
+                title: titulo,
+                text: mensaje,
+                confirmButtonColor: '#1A2D40' // Color azul de tu proyecto
+            }).then(() => {
+                // Limpia la URL para que el mensaje no salga de nuevo al refrescar
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        }
+
+        // También podemos manejar el éxito del registro aquí
+        if (exito === 'registrado') {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Excelente! 🐾',
+                text: 'Tu cuenta ha sido creada. Ya puedes iniciar sesión.',
+                confirmButtonColor: '#1A2D40'
+            });
+        }
     </script>
 </body>
 </html>

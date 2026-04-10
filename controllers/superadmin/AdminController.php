@@ -157,8 +157,18 @@ class AdminController {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $db = (new Database())->getConnection();
             try {
-                // Alternar Estado
-                $query = "UPDATE usuarios SET Estado = CASE WHEN Estado = 'Inactivo' THEN 'Activo' ELSE 'Inactivo' END WHERE ID_Usuario = :id_u";
+                
+                $query = "UPDATE Usuarios 
+                        SET Estado = CASE 
+                            WHEN Estado = 'Activo' THEN 'Inactivo' 
+                            ELSE 'Activo' 
+                        END,
+                        Intentos_Fallidos = CASE 
+                            WHEN Estado != 'Activo' THEN 0 
+                            ELSE Intentos_Fallidos 
+                        END
+                        WHERE ID_Usuario = :id_u";
+                
                 $stmt = $db->prepare($query);
                 $stmt->bindParam(':id_u', $_POST['id_usuario']);
                 $stmt->execute();
@@ -171,7 +181,6 @@ class AdminController {
             }
         }
     }
-
     // 4. ELIMINAR (Destrucción total)
     public function eliminarFranquicia() {
         $this->verificarSeguridad();

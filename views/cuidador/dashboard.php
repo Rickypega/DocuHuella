@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     exit();
 }
 
-$mascotas = $cuidador->verMisMascotas();
+//$mascotas = $cuidador->verMisMascotas();
 
 $mascotaSeleccionada = null;
 $historial = [];

@@ -183,10 +183,10 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </td>
                             <td class="text-muted small"><?php echo htmlspecialchars($admin['Correo']); ?></td>
                             <td>
-                                <?php if(isset($admin['Estado']) && $admin['Estado'] == 'Inactivo'): ?>
-                                    <span class="text-danger fw-bold"><i class="fas fa-ban"></i> Suspendido</span>
-                                <?php else: ?>
+                                <?php if(isset($admin['Estado']) && $admin['Estado'] == 'Activo'): ?>
                                     <span class="text-success fw-bold"><i class="fas fa-check-circle"></i> Activo</span>
+                                <?php else: ?>
+                                    <span class="text-danger fw-bold"><i class="fas fa-ban"></i> Suspendido</span>
                                 <?php endif; ?>
                             </td>
                             <td class="text-center">

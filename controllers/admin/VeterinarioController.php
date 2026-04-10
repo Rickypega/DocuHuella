@@ -115,9 +115,27 @@ class VeterinarioController {
                 // 7. GESTIÓN DE FALLOS: Si algo salió mal, MySQL deshace todo (Rollback)
                 $db->rollBack();
                 
+                $mensaje = $e->getMessage();
+                $type = 'error_desconocido';
+
+                // Detectar duplicados de MySQL (Código 23000)
+                if (strpos($mensaje, '23000') !== false) {
+                    if (strpos($mensaje, 'Cedula') !== false) {
+                        $type = 'cedula_duplicada';
+                    } elseif (strpos($mensaje, 'Exequatur') !== false) {
+                        $type = 'exequatur_duplicado';
+                    } elseif (strpos($mensaje, 'Colegiatura') !== false) {
+                        $type = 'colegiatura_duplicada';
+                    } elseif (strpos($mensaje, 'correo_ya_existe') !== false) {
+                        $type = 'correo_ya_existe';
+                    }
+                } else {
+                    $type = $mensaje; // Si es un error manual nuestro (ej: 'error_perfil')
+                }
+                
                 echo json_encode([
                     'status' => 'error',
-                    'type' => $e->getMessage()
+                    'type' => $type
                 ]);
             }
         }
