@@ -1,15 +1,17 @@
-# Configuración de XAMPP / Servidor
-.htaccess
+# Archivos de configuración 
+db.php
+
+# Logs y archivos temporales
 php_errors.log
+*.log
 
 # Archivos de Sistema
 .DS_Store
 Thumbs.db
 
-# IDEs (VS Code, PHPStorm)
+# Carpetas de Editores 
 .vscode/
 .idea/
 
-# Scripts temporales de instalación (Seguridad)
+# Scripts de instalación o pruebas
 setup.php
-db.php

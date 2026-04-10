@@ -1,9 +1,9 @@
 <?php
 class Database {
     // Configuración para XAMPP (Local)
-    private $host = "localhost";
-    private $db_name = "Docuhuella";
-    private $username = "root";
+    private $host = "sql208.infinityfree.com";
+    private $db_name = "if0_41631473_docuhuella";
+    private $username = "if0_41631473";
     private $password = ""; 
     public $conn;
 
