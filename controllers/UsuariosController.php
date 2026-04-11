@@ -52,7 +52,7 @@ class UsuariosController {
                     $usuario->registrarFallo($datos_usuario['ID_Usuario']);
                     $intentos_actuales = $datos_usuario['Intentos_Fallidos'] + 1;
 
-                    if ($intentos_actuales >= 5) {
+                    if ($intentos_actuales >= 6) {
                         $usuario->id_usuario = $datos_usuario['ID_Usuario'];
                         $usuario->estado = 'Suspendido';
                         $usuario->cambiarEstado();
@@ -60,7 +60,7 @@ class UsuariosController {
                         // Enviamos error de cuenta suspendida
                         header("Location: ../views/login.php?error=cuenta_suspendida");
                     } elseif ($intentos_actuales >= 3) {
-                        $restantes = 5 - $intentos_actuales;
+                        $restantes = 6 - $intentos_actuales;
                         // Enviamos el error de advertencia y pasamos cuántos quedan
                         header("Location: ../views/login.php?error=advertencia&restantes=" . $restantes);
                     } else {

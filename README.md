@@ -34,7 +34,7 @@ Este sistema ha sido desarrollado bajo el patrón de diseño **MVC (Modelo-Vista
 | **Base de Datos** | MySQL |
 | **Frontend** | HTML5, CSS3 (Bootstrap) y JavaScript |
 | **Entorno de Desarrollo** | XAMPP / Visual Studio Code |
-| **Despliegue** | 000webhost (Hosting gratuito) |
+| **Despliegue** | InfinityFree (Hosting gratuito) |
 
 ---
 
