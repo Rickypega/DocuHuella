@@ -273,7 +273,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mt-4">
-                            <a href="login.php" class="text-white text-decoration-none opacity-75 small"><i class="fas fa-arrow-left me-1"></i> Volver al Login</a>
+                            <a href="login.php" class="text-white text-decoration-none opacity-75 small"><i class="fas fa-arrow-left me-1"></i> Ya Tengo Una Cuenta </a>
                             <button type="submit" class="btn btn-registrar" id="btn-submit" disabled>Registrar Cuidador</button>
                         </div>
 

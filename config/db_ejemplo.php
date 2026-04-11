@@ -1,6 +1,7 @@
 <?php
 // Archivo de configuración para la conexión a la base de datos
 //copien exactamente este código y peguenlo en un nuevo archivo llamado db.php dentro de la carpeta config
+
 class Database {
     // Configuración para XAMPP (Local)
     private $host = "localhost";
