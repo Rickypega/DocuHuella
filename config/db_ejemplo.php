@@ -2,6 +2,7 @@
 // Archivo de configuración para la conexión a la base de datos
 //copien exactamente este código y peguenlo en un nuevo archivo llamado db.php dentro de la carpeta config
 
+define('URL_BASE', 'http://localhost:8080/DocuHuella/');
 class Database {
     // Configuración para XAMPP (Local)
     private $host = "localhost";

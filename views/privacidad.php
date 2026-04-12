@@ -1,4 +1,7 @@
-<?php include_once '../layouts/header.php'; ?>
+<?php 
+include_once '../config/db.php';
+include_once '../layouts/header.php';
+?>
 
 <div class="container my-5 py-5" style="min-height: 70vh;">
     <div class="card shadow-sm p-4 border-0">
