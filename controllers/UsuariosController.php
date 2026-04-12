@@ -52,7 +52,7 @@ class UsuariosController {
                     $usuario->registrarFallo($datos_usuario['ID_Usuario']);
                     $intentos_actuales = $datos_usuario['Intentos_Fallidos'] + 1;
 
-                    if ($intentos_actuales >= 6) {
+                    if ($intentos_actuales >= 5) {
                         $usuario->id_usuario = $datos_usuario['ID_Usuario'];
                         $usuario->estado = 'Suspendido';
                         $usuario->cambiarEstado();
@@ -60,11 +60,11 @@ class UsuariosController {
                         // Enviamos error de cuenta suspendida
                         header("Location: ../views/login.php?error=cuenta_suspendida");
                     } elseif ($intentos_actuales >= 3) {
-                        $restantes = 6 - $intentos_actuales;
+                        $restantes = 5 - $intentos_actuales;
                         // Enviamos el error de advertencia y pasamos cuántos quedan
                         header("Location: ../views/login.php?error=advertencia&restantes=" . $restantes);
                     } else {
-                        // El error de siempre para 1 y 2 intentos fallidos
+                        // El error de siempre para intentos fallidos
                         header("Location: ../views/login.php?error=credenciales");
                     }
                     } else {
@@ -88,7 +88,7 @@ class UsuariosController {
         switch ($rol) {
             case 1: // ADMINISTRADOR
                 $query = "SELECT a.ID_Admin, c.ID_Clinica, a.Nombre 
-                          FROM Administrador a 
+                          FROM administrador a 
                           LEFT JOIN Clinicas c ON a.ID_Admin = c.ID_Admin 
                           WHERE a.ID_Usuario = :id LIMIT 1";
                 $stmt = $db->prepare($query);
@@ -104,7 +104,7 @@ class UsuariosController {
                 break;
 
             case 2: // VETERINARIO
-                $query = "SELECT ID_Veterinario, ID_Clinica, Nombre FROM Veterinarios WHERE ID_Usuario = :id LIMIT 1";
+                $query = "SELECT ID_Veterinario, ID_Clinica, Nombre FROM veterinarios WHERE ID_Usuario = :id LIMIT 1";
                 $stmt = $db->prepare($query);
                 $stmt->bindParam(':id', $id_usuario);
                 $stmt->execute();
@@ -118,7 +118,7 @@ class UsuariosController {
                 break;
 
             case 3: // CUIDADOR
-                $query = "SELECT ID_Cuidador, Nombre FROM Cuidadores WHERE ID_Usuario = :id LIMIT 1";
+                $query = "SELECT ID_Cuidador, Nombre FROM cuidadores WHERE ID_Usuario = :id LIMIT 1";
                 $stmt = $db->prepare($query);
                 $stmt->bindParam(':id', $id_usuario);
                 $stmt->execute();
