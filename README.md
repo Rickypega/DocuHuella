@@ -2,8 +2,8 @@
 
 **DocuHuella** es una solución tecnológica integral diseñada para optimizar la gestión de expedientes clínicos veterinarios. El sistema permite centralizar la información médica de las mascotas, facilitando el trabajo de los profesionales y mejorando el seguimiento para los cuidadores.
 
-LINK: http://localhost:8080/DocuHuella/views/login.php
-LINK: http://localhost/DocuHuella/views/login.php
+LINK: http://localhost:8080/DocuHuella/index.php
+LINK: http://localhost/DocuHuella/index.php
 
 ---
 
