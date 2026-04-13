@@ -59,19 +59,43 @@ if (!$datos) {
     exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Detalle Mascota</title>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle Mascota - DocuHuella</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="<?= URL_BASE ?>/public/images/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="<?= URL_BASE ?>/public/css/style.css">
 </head>
+<body>
 
-<body class="bg-light">
+    <div class="sidebar">
+        <div class="logo-container">
+            <h3 class="fw-bold text-white mb-0"><i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella</h3>
+            <span class="badge bg-success text-white mt-2">Cuidador</span>
+        </div>
 
-<div class="container mt-5">
+        <nav class="mt-3">
+            <a href="<?= URL_BASE ?>/cuidador/dashboard"><i class="fas fa-home"></i> Mi Panel</a>
+            <a href="<?= URL_BASE ?>/views/cuidador/mis_mascotas.php" class="active"><i class="fas fa-bone"></i> Mis Mascotas</a>
+        </nav>
+        
+        <div class="mt-auto">
+            <a href="#" class="btn btn-outline-light d-flex align-items-center justify-content-center gap-2 mb-2" style="border-radius: 10px; padding: 12px; margin: 0 15px; border-color: rgba(255,255,255,0.2);" data-bs-toggle="modal" data-bs-target="#modalPerfilGlobal">
+                <i class="fas fa-user-edit"></i>
+                <span>Mi Perfil</span>
+            </a>
+            <a href="<?= URL_BASE ?>/logout" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius: 10px; padding: 12px; margin: 0 15px 20px; width: auto !important;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
 
     <a href="dashboard.php" class="btn btn-secondary mb-3">← Volver</a>
 
@@ -92,7 +116,7 @@ if (!$datos) {
 
             <div class="col-md-6 text-center">
                 <?php if (!empty($datos['Imagen'])): ?>
-                    <img src="../../<?php echo $datos['Imagen']; ?>" 
+                    <img src="<?= URL_BASE ?>/<?php echo $datos['Imagen']; ?>" 
                          class="img-fluid rounded"
                          style="max-height:250px;">
                 <?php else: ?>
@@ -147,5 +171,7 @@ if (!$datos) {
 
 </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <?php include_once APP_PATH . '/views/includes/modal_perfil.php'; ?>
 </body>
 </html>

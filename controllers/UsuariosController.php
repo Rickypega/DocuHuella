@@ -1,8 +1,6 @@
 <?php
-session_start();
 
-require_once '../config/db.php';
-require_once '../models/Usuario.php';
+require_once 'models/Usuario.php';
 
 class UsuariosController {
     
@@ -25,7 +23,7 @@ class UsuariosController {
 
                 // 1. VERIFICAR BLOQUEO PREVIO (Fail-Fast)
                 if (isset($datos_usuario['Estado']) && $datos_usuario['Estado'] !== 'Activo') {
-                    header("Location: ../views/login.php?error=cuenta_suspendida");
+                    header("Location: " . URL_BASE . "/login?error=cuenta_suspendida");
                     exit();
                 }
 
@@ -58,24 +56,24 @@ class UsuariosController {
                         $usuario->cambiarEstado();
                         
                         // Enviamos error de cuenta suspendida
-                        header("Location: ../views/login.php?error=cuenta_suspendida");
+                        header("Location: " . URL_BASE . "/login?error=cuenta_suspendida");
                     } elseif ($intentos_actuales >= 3) {
                         $restantes = 5 - $intentos_actuales;
                         // Enviamos el error de advertencia y pasamos cuántos quedan
-                        header("Location: ../views/login.php?error=advertencia&restantes=" . $restantes);
+                        header("Location: " . URL_BASE . "/login?error=advertencia&restantes=" . $restantes);
                     } else {
                         // El error de siempre para intentos fallidos
-                        header("Location: ../views/login.php?error=credenciales");
+                        header("Location: " . URL_BASE . "/login?error=credenciales");
                     }
                     } else {
                         
-                        header("Location: ../views/login.php?error=credenciales");
+                        header("Location: " . URL_BASE . "/login?error=credenciales");
                     }
                     exit();
                 }
             } else {
                 // El correo ni siquiera existe
-                header("Location: ../views/login.php?error=credenciales");
+                header("Location: " . URL_BASE . "/login?error=credenciales");
                 exit();
             }
         }
@@ -100,11 +98,12 @@ class UsuariosController {
                     $_SESSION['id_perfil']  = $res['ID_Admin'];
                     $_SESSION['id_clinica'] = $res['ID_Clinica'];
                     $_SESSION['nombre']     = $res['Nombre'];
+                    $_SESSION['sexo']       = 'M'; // Default masculino para Admin
                 }
                 break;
 
             case 2: // VETERINARIO
-                $query = "SELECT ID_Veterinario, ID_Clinica, Nombre FROM veterinarios WHERE ID_Usuario = :id LIMIT 1";
+                $query = "SELECT ID_Veterinario, ID_Clinica, Nombre, Sexo FROM veterinarios WHERE ID_Usuario = :id LIMIT 1";
                 $stmt = $db->prepare($query);
                 $stmt->bindParam(':id', $id_usuario);
                 $stmt->execute();
@@ -114,11 +113,12 @@ class UsuariosController {
                     $_SESSION['id_perfil']  = $res['ID_Veterinario'];
                     $_SESSION['id_clinica'] = $res['ID_Clinica'];
                     $_SESSION['nombre']     = $res['Nombre'];
+                    $_SESSION['sexo']       = $res['Sexo'] ?? 'M';
                 }
                 break;
 
             case 3: // CUIDADOR
-                $query = "SELECT ID_Cuidador, Nombre FROM cuidadores WHERE ID_Usuario = :id LIMIT 1";
+                $query = "SELECT ID_Cuidador, Nombre, Sexo FROM cuidadores WHERE ID_Usuario = :id LIMIT 1";
                 $stmt = $db->prepare($query);
                 $stmt->bindParam(':id', $id_usuario);
                 $stmt->execute();
@@ -127,38 +127,58 @@ class UsuariosController {
                 if($res) {
                     $_SESSION['id_perfil'] = $res['ID_Cuidador'];
                     $_SESSION['nombre']    = $res['Nombre'];
+                    $_SESSION['sexo']      = $res['Sexo'] ?? 'M';
                 }
                 break;
 
             case 4: // SUPERADMIN
-                $_SESSION['nombre'] = "Super Administrador";
+                $_SESSION['nombre'] = "Super Admin";
+                $_SESSION['sexo'] = 'M';
                 break;
         }
     }
 
     private function redireccionarPorRol($rol) {
         switch($rol) {
-            case 4: header("Location: ../views/superadmin/dashboard.php"); break;
-            case 1: header("Location: ../views/admin/dashboard.php"); break;
-            case 2: header("Location: ../views/veterinario/dashboard.php"); break;
-            case 3: header("Location: ../views/cuidador/dashboard.php"); break;
-            default: header("Location: ../views/login.php"); break;
+            case 4: $path = "/superadmin/dashboard"; break;
+            case 1: $path = "/admin/dashboard"; break;
+            case 2: $path = "/veterinario/dashboard"; break;
+            case 3: $path = "/cuidador/dashboard"; break;
+            default: $path = "/login"; break;
         }
+        header("Location: ". URL_BASE . $path);
         exit();
     }
 
     public function logout() {
         session_unset();
         session_destroy();
-        header("Location: ../views/login.php");
+        header("Location: " . URL_BASE . "/login");
         exit();
     }
+
+    
+
+// Muestra la Landing Page
+public function index() {
+    include_once 'views/home.php';
 }
 
-// Ruteo
-if (isset($_GET['action'])) {
-    $controlador = new UsuariosController();
-    if ($_GET['action'] == 'login') $controlador->login();
-    else if ($_GET['action'] == 'logout') $controlador->logout();
+// Muestra el formulario de Login
+public function showLogin() {
+    include_once 'views/login.php';
 }
-?>
+
+// Muestra el formulario de Registro
+public function showRegistro() {
+    include_once 'views/registro.php';
+}
+
+public function privacidad() {
+    include_once 'views/privacidad.php';
+}
+
+public function terminos() {
+    include_once 'views/terminos.php';
+}
+}

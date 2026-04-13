@@ -4,7 +4,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 1) {
-    header("Location: ../../views/login.php?error=acceso_denegado");
+    if(!defined('URL_BASE')) { include_once __DIR__.'/../../config/db.php'; }
+    header("Location: " . URL_BASE . "/login?error=acceso_denegado");
     exit();
 }
 

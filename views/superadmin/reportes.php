@@ -30,66 +30,9 @@ try {
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link rel="icon" href="<?= URL_BASE ?>/public/images/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="<?= URL_BASE ?>/public/css/style.css">
     <style>
-        :root {
-            --dh-beige: #c5aa7f;
-            --dh-navy: #1A2D40;
-            --dh-light-gray: #F8F9FA;
-        }
-
-        body { background-color: var(--dh-light-gray); overflow-x: hidden; font-family: 'Segoe UI', Tahoma, sans-serif; }
-
-        /* Sidebar Genérico */
-        .sidebar {
-            height: 100vh;
-            background-color: var(--dh-navy);
-            color: white;
-            position: fixed;
-            width: 260px;
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-        }
-
-        .sidebar .logo-container {
-            text-align: center;
-            padding: 25px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar a {
-            padding: 15px 25px;
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.7);
-            display: block;
-            transition: 0.3s;
-        }
-
-        .sidebar a:hover, .sidebar a.active {
-            background-color: rgba(234, 218, 193, 0.1); 
-            color: var(--dh-beige);
-            border-left: 4px solid var(--dh-beige);
-        }
-
-        .sidebar i { width: 25px; text-align: center; margin-right: 10px; }
-
-        .btn-logout {
-            background-color: #dc3545; 
-            color: white !important; 
-            margin: auto 15px 20px; 
-            border-radius: 10px;
-            text-align: center;
-            padding: 12px;
-            font-weight: bold;
-            transition: 0.3s;
-            border: none;
-        }
-
-        .btn-logout:hover { background-color: #c82333; transform: scale(1.02); }
-
-        /* Contenido Principal */
-        .main-content { margin-left: 260px; padding: 40px; }
 
         /* Tarjetas de Reportes */
         .report-card {
@@ -134,25 +77,32 @@ try {
     <div class="sidebar">
         <div class="logo-container">
             <h3 class="fw-bold text-white mb-0"><i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella</h3>
-            <span class="badge bg-warning text-dark mt-2">Super Admin</span>
+            <span class="badge bg-warning text-dark mt-2"><?= htmlspecialchars($nombre_rol) ?></span>
         </div>
 
         <nav class="mt-3">
-            <a href="../../controllers/superadmin/DashboardController.php?action=ver"><i class="fas fa-chart-pie"></i> Estadísticas</a>
-            <a href="administrador.php"><i class="fas fa-hospital"></i> Gestión de Clínicas</a>
-            <a href="reportes.php" class="active"><i class="fas fa-file-export"></i> Gestión de Reportes</a>
+            <a href="<?= URL_BASE ?>/superadmin/dashboard"><i class="fas fa-chart-pie"></i> Estadísticas</a>
+            <a href="<?= URL_BASE ?>/views/superadmin/administrador.php"><i class="fas fa-hospital"></i> Gestión de Clínicas</a>
+            <a href="<?= URL_BASE ?>/views/superadmin/reportes.php" class="active"><i class="fas fa-file-export"></i> Gestión de Reportes</a>
         </nav>
         
-        <a href="../../controllers/UsuariosController.php?action=logout" class="btn-logout">
-            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-        </a>
+        <div class="mt-auto">
+            <a href="#" class="btn btn-outline-light d-flex align-items-center justify-content-center gap-2 mb-2" style="border-radius: 10px; padding: 12px; margin: 0 15px; border-color: rgba(255,255,255,0.2);" data-bs-toggle="modal" data-bs-target="#modalPerfilGlobal">
+                <i class="fas fa-user-edit"></i>
+                <span>Mi Perfil</span>
+            </a>
+            <a href="<?= URL_BASE ?>/logout" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius: 10px; padding: 12px; margin: 0 15px 20px; width: auto !important;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
     </div>
 
     <div class="main-content">
 
         <div class="d-flex justify-content-end mb-2">
             <div class="user-profile text-muted d-flex align-items-center">
-                <span>Bienvenido Sr. <strong><?php echo htmlspecialchars($nombre_rol); ?></strong></span>
+                <span>Bienvenido Sr. <strong>Super Admin</strong></span>
                 <i class="fas fa-user-circle fs-3 ms-2 text-secondary"></i>
             </div>
         </div>
@@ -276,5 +226,6 @@ try {
             });
         }
     </script>
+    <?php include_once APP_PATH . '/views/includes/modal_perfil.php'; ?>
 </body>
 </html>

@@ -1,6 +1,6 @@
 <?php 
-include_once '../config/db.php';
-include_once '../layouts/header.php';
+include_once 'config/db.php';
+include_once 'layouts/header.php';
 ?>
 
 <div class="container my-5 py-5" style="min-height: 70vh;">
@@ -25,10 +25,11 @@ include_once '../layouts/header.php';
         <h3>4. Compromiso del Usuario</h3>
         <p>Al registrarse en <strong>DocuHuella</strong>, usted reconoce que ha sido informado sobre el carácter educativo de esta web y acepta interactuar con ella bajo estas condiciones.</p>
 
-        <div class="mt-5 text-center">
-            <a href="../index.php" class="btn btn-dh">Entendido y Acepto</a>
+        <div class="mt-5 d-flex justify-content-between align-items-center">
+            <a href="<?= URL_BASE ?>/" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Volver al Inicio</a>
+            <a href="<?= URL_BASE ?>/privacidad" class="btn btn-dh"><i class="fas fa-user-shield me-2"></i>Ver Política de Privacidad</a>
         </div>
     </div>
 </div>
 
-<?php include_once '../layouts/footer.php'; ?>
+<?php include_once 'layouts/footer.php'; ?>

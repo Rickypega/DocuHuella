@@ -17,81 +17,8 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     <title>Panel Administrador - DocuHuella</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --dh-beige: #c5aa7f;
-            --dh-navy: #1A2D40;
-            --dh-light-gray: #F8F9FA;
-        }
-
-        body { background-color: var(--dh-light-gray); overflow-x: hidden; font-family: 'Segoe UI', Tahoma, sans-serif; }
-
-        /* Diseño del Sidebar Restaurado */
-        .sidebar {
-            height: 100vh;
-            background-color: var(--dh-navy);
-            color: white;
-            position: fixed;
-            width: 260px;
-            display: flex; /* Flexbox para empujar el botón abajo */
-            flex-direction: column;
-        }
-
-        .sidebar .logo-container {
-            text-align: center;
-            padding: 25px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar a {
-            padding: 15px 25px;
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.7);
-            display: block;
-            transition: 0.3s;
-        }
-
-        .sidebar a:hover, .sidebar a.active {
-            background-color: rgba(234, 218, 193, 0.1); 
-            color: var(--dh-beige);
-            border-left: 4px solid var(--dh-beige);
-        }
-
-        .sidebar i { width: 25px; text-align: center; margin-right: 10px; }
-
-        /* Botón de Logout Restaurado */
-        .btn-logout {
-            background-color: #dc3545; 
-            color: white !important; 
-            margin: auto 15px 20px; /* El 'auto' empuja el botón hasta abajo */
-            border-radius: 10px;
-            text-align: center;
-            padding: 12px;
-            font-weight: bold;
-            transition: 0.3s;
-            border: none;
-        }
-
-        .btn-logout:hover { background-color: #c82333; transform: scale(1.02); }
-
-        /* Contenido Principal */
-        .main-content { margin-left: 260px; padding: 40px; }
-
-        /* Tarjetas de Estadísticas */
-        .stat-card {
-            background-color: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border-left: 5px solid var(--dh-navy);
-            transition: 0.3s ease;
-        }
-
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        .stat-icon { font-size: 2.2rem; color: var(--dh-beige); opacity: 0.8; }
-        .stat-number { font-size: 1.8rem; font-weight: bold; color: var(--dh-navy); }
-        .stat-label { color: #6c757d; font-weight: 500; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
-    </style>
+    <link rel="icon" href="<?= URL_BASE ?>/public/images/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="<?= URL_BASE ?>/public/css/style.css">
 </head>
 <body>
 
@@ -102,15 +29,24 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
         </div>
 
         <nav class="mt-3">
-            <a href="../../controllers/admin/DashboardController.php?action=ver" class="active"><i class="fas fa-chart-pie"></i> Mi Resumen</a>
-            <a href="../../views/admin/clinicas.php"><i class="fas fa-hospital"></i> Mis Sucursales</a>
-            <a href="../../views/admin/registrar_vet.php"><i class="fas fa-user-md"></i> Veterinarios</a>
-            <a href="../../views/admin/reportes.php"><i class="fas fa-file-medical-alt"></i> Reportes Clinicos</a>
+            <a href="<?= URL_BASE ?>/admin/dashboard" class="active"><i class="fas fa-chart-pie"></i> Mi Resumen</a>
+            <a href="<?= URL_BASE ?>/views/admin/clinicas.php"><i class="fas fa-hospital"></i> Mis Sucursales</a>
+            <a href="<?= URL_BASE ?>/views/admin/registrar_vet.php"><i class="fas fa-user-md"></i> Veterinarios</a>
+            <a href="<?= URL_BASE ?>/views/admin/reportes.php"><i class="fas fa-file-medical-alt"></i> Reportes Clinicos</a>
         </nav>
         
-        <a href="../../controllers/UsuariosController.php?action=logout" class="btn-logout">
-            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-        </a>
+        <div class="mt-auto">
+            <a href="#" class="btn btn-outline-light d-flex align-items-center justify-content-center gap-2 mb-2" style="border-radius: 10px; padding: 12px; margin: 0 15px; border-color: rgba(255,255,255,0.2);" data-bs-toggle="modal" data-bs-target="#modalPerfilGlobal">
+                <i class="fas fa-user-edit"></i>
+                <span>Mi Perfil</span>
+            </a>
+            <a href="<?= URL_BASE ?>/logout"
+                class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2"
+                style="border-radius: 10px; padding: 12px; margin: 0 15px 20px; width: auto !important;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
     </div>
 
     <div class="main-content">
@@ -124,7 +60,7 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
 
         <div class="d-flex justify-content-end mb-2">
             <div class="user-profile text-muted d-flex align-items-center">
-                <span>Bienvenido, <strong><?php echo htmlspecialchars($_SESSION['nombre']); ?></strong></span>
+                <span>Bienvenido Sr. <strong><?php echo htmlspecialchars($_SESSION['nombre']); ?></strong></span>
                 <i class="fas fa-user-circle fs-3 ms-2 text-secondary"></i>
             </div>
         </div>
@@ -305,5 +241,6 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
             });
         });
     </script>
+    <?php include_once APP_PATH . '/views/includes/modal_perfil.php'; ?>
 </body>
 </html>

@@ -1,10 +1,11 @@
-<?php session_start(); ?>
+<?php if (session_status() === PHP_SESSION_NONE) session_start(); ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Cuidador - DocuHuella</title>
+    <link rel="icon" href="<?= URL_BASE ?>/public/images/favicon.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -31,10 +32,10 @@
         .left-panel {
             background-color: var(--dh-navy);
             color: white;
-            height: 100vh;
+            min-height: 100vh;
             overflow-y: auto;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             padding: 3rem 2rem;
         }
@@ -45,6 +46,8 @@
         .form-content {
             width: 100%;
             max-width: 600px;
+            margin: auto 0;
+            padding-bottom: 2rem;
         }
 
         .right-panel {
@@ -53,12 +56,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
+            position: sticky;
+            top: 0;
             overflow: hidden;
         }
 
         .main-logo {
-            max-width: 70%;
+            max-width: 90%;
+            height: auto;
             position: relative;
             z-index: 10;
             mix-blend-mode: darken; 
@@ -123,7 +128,7 @@
                 <div class="form-content">
                     
                     <div class="mb-4 text-center">
-                        <h2 class="fw-bold">Registro de Cuidador</h2>
+                        <h2 class="fw-bold fs-3 mt-sm-0 mt-3">Registro de Cuidador</h2>
                         <p class="text-white opacity-75 small">Crea tu cuenta para gestionar el expediente de tu mascota.</p>
                     </div>
 
@@ -273,7 +278,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mt-4">
-                            <a href="login.php" class="text-white text-decoration-none opacity-75 small"><i class="fas fa-arrow-left me-1"></i> Ya Tengo Una Cuenta </a>
+                            <a href="<?= URL_BASE ?>/login" class="text-white text-decoration-none opacity-75 small"><i class="fas fa-arrow-left me-1"></i> Ya Tengo Una Cuenta </a>
                             <button type="submit" class="btn btn-registrar" id="btn-submit" disabled>Registrar Cuidador</button>
                         </div>
 
@@ -282,7 +287,8 @@
             </div>
 
             <div class="col-md-5 right-panel d-none d-md-flex" id="panel-huellas">
-                <img src="../public/images/DH.jpg" alt="Logo DocuHuella" class="main-logo">
+                <a href="<?= URL_BASE ?>/" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; display: block; cursor: default;"></a>
+                <img src="<?= URL_BASE ?>/public/images/DH.jpg" alt="Logo DocuHuella" class="main-logo" style="position: relative; z-index: 10;">
             </div>
 
         </div>

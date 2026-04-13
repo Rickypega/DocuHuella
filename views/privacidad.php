@@ -1,6 +1,6 @@
 <?php 
-include_once '../config/db.php';
-include_once '../layouts/header.php';
+include_once 'config/db.php';
+include_once 'layouts/header.php';
 ?>
 
 <div class="container my-5 py-5" style="min-height: 70vh;">
@@ -25,10 +25,11 @@ include_once '../layouts/header.php';
         <h3>4. Eliminación de Datos</h3>
         <p>Toda la información contenida en la base de datos podrá ser eliminada en cualquier momento una vez concluido el periodo académico de evaluación en la universidad.</p>
         
-        <div class="mt-5 text-center">
-            <a href="../index.php" class="btn btn-dh">Volver al Inicio</a>
+        <div class="mt-5 d-flex justify-content-between align-items-center">
+            <a href="<?= URL_BASE ?>/" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Volver al Inicio</a>
+            <a href="<?= URL_BASE ?>/terminos" class="btn btn-dh">Ver Términos de Uso <i class="fas fa-arrow-right ms-2"></i></a>
         </div>
     </div>
 </div>
 
-<?php include_once '../layouts/footer.php'; ?>
+<?php include_once 'layouts/footer.php'; ?>

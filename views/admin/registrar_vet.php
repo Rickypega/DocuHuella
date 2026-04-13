@@ -38,81 +38,12 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="<?= URL_BASE ?>/public/css/style.css">
     <style>
-        
         /* Ocultar el ojo nativo de los navegadores */
         input::-ms-reveal,
         input::-ms-clear {
             display: none;
-        }
-
-        :root { 
-            --dh-beige: #c5aa7f;
-            --dh-navy: #1A2D40; 
-            --dh-light-gray: #F1F3F5; 
-        }
-        
-        body { 
-            background-color: #f8f9fa; 
-            font-family: 'Segoe UI', Tahoma, sans-serif; 
-            overflow-x: hidden; 
-        }
-        
-        .sidebar { 
-            height: 100vh;
-            background-color: var(--dh-navy);
-            color: white;
-            position: fixed;
-            width: 260px;
-            display: flex; 
-            flex-direction: column; 
-            z-index: 1000;
-        }
-        
-        .sidebar .logo-container {
-            text-align: center;
-            padding: 25px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar a { 
-            padding: 15px 25px; 
-            text-decoration: none; 
-            color: rgba(255, 255, 255, 0.7); 
-            display: block; 
-            transition: 0.3s; 
-        }
-
-        .sidebar a:hover, .sidebar a.active {
-            background-color: rgba(234, 218, 193, 0.1); 
-            color: var(--dh-beige);
-            border-left: 4px solid var(--dh-beige); /* La barrita dorada */
-        }
-
-        .sidebar i { width: 25px; text-align: center; margin-right: 10px; }
-
-        /* Botón de Logout Rojo (Estilo Dashboard) */
-        .btn-logout {
-            background-color: #dc3545; 
-            color: white !important; 
-            margin: auto 15px 20px; /* El 'auto' lo empuja hacia abajo */
-            border-radius: 10px;
-            text-align: center;
-            padding: 12px;
-            font-weight: bold;
-            transition: 0.3s;
-            border: none;
-            text-decoration: none;
-        }
-
-        .btn-logout:hover { 
-            background-color: #c82333; 
-            transform: scale(1.02); 
-        }
-
-        .main-content { 
-            margin-left: 260px; 
-            padding: 40px; 
         }
 
         .section-header { 
@@ -203,23 +134,26 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
 
         <nav class="mt-3">
-            <a href="../../controllers/admin/DashboardController.php?action=ver">
+            <a href="<?= URL_BASE ?>/admin/dashboard">
                 <i class="fas fa-chart-pie"></i> Mi Resumen
             </a>
-            <a href="../../views/admin/clinicas.php">
+            <a href="<?= URL_BASE ?>/views/admin/clinicas.php">
                 <i class="fas fa-hospital"></i> Mis Sucursales
             </a>
-            <a href="../../views/admin/registrar_vet.php" class="active">
+            <a href="<?= URL_BASE ?>/views/admin/registrar_vet.php" class="active">
                 <i class="fas fa-user-md"></i> Veterinarios
             </a>
-            <a href="../../views/admin/reportes.php">
+            <a href="<?= URL_BASE ?>/views/admin/reportes.php">
                 <i class="fas fa-file-medical-alt"></i> Reportes Clinicos
             </a>
         </nav>
         
-        <a href="../../controllers/UsuariosController.php?action=logout" class="btn-logout">
-            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-        </a>
+        <div class="mt-auto"> 
+            <a href="<?= URL_BASE ?>/logout" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius: 10px; padding: 12px; margin: auto 15px 20px; width: auto !important;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
     </div>
 
     <div class="main-content">

@@ -12,11 +12,30 @@ class AdminController {
         }
     }
 
+    // Método para validar la Contraseña del SuperAdmin
+    private function validarMasterKey() {
+        if (!isset($_POST['admin_auth']) || empty($_POST['admin_auth'])) {
+            header("Location: ../../views/superadmin/administrador.php?error=clave_requerida");
+            exit();
+        }
+        $db = (new Database())->getConnection();
+        $stmt = $db->prepare("SELECT Contrasena FROM Usuarios WHERE ID_Usuario = :id");
+        $stmt->bindParam(':id', $_SESSION['id_usuario']);
+        $stmt->execute();
+        $hash = $stmt->fetchColumn();
+        
+        if (!password_verify($_POST['admin_auth'], $hash)) {
+            header("Location: ../../views/superadmin/administrador.php?error=clave_incorrecta");
+            exit();
+        }
+    }
+
     // 1. CREAR
     public function registrarFranquicia() {
         $this->verificarSeguridad();
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $this->validarMasterKey();
             
             // Cédula
             $cedula_limpia = preg_replace('/[^0-9]/', '', $_POST['cedula']);
@@ -112,6 +131,7 @@ class AdminController {
         $this->verificarSeguridad();
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $this->validarMasterKey();
             
             // 
             $telefono_limpio = preg_replace('/[^0-9]/', '', $_POST['telefono']);
@@ -155,6 +175,7 @@ class AdminController {
         $this->verificarSeguridad();
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $this->validarMasterKey();
             $db = (new Database())->getConnection();
             try {
                 
@@ -186,6 +207,7 @@ class AdminController {
         $this->verificarSeguridad();
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $this->validarMasterKey();
             $db = (new Database())->getConnection();
             try {
                 $db->beginTransaction();

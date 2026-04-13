@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - DocuHuella</title>
+    <link rel="icon" href="<?= URL_BASE ?>/public/images/favicon.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -81,14 +82,21 @@
             background-color: var(--dh-navy);
             color: var(--dh-white);
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             padding: 2rem;
+            min-height: 100vh;
+            overflow-y: auto;
         }
+
+        .right-panel::-webkit-scrollbar { width: 8px; }
+        .right-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
         .form-content {
             width: 100%;
             max-width: 350px; /* Ancho cómodo del formulario */
+            margin: auto 0;
+            padding-bottom: 2rem;
         }
 
         /* Estilos del Formulario */
@@ -150,7 +158,8 @@
         <div class="row h-100 g-0">
             
             <div class="col-md-6 left-panel d-none d-md-flex" id="panel-huellas">
-                <img src="../public/images/DH.jpg" alt="Logo DocuHuella" class="main-logo position-relative" style="z-index: 10;">
+                <a href="<?= URL_BASE ?>/" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; display: block; cursor: default;"></a>
+                <img src="<?= URL_BASE ?>/public/images/DH.jpg" alt="Logo DocuHuella" class="main-logo" style="position: relative; z-index: 10;">
             </div>
 
             <div class="col-md-6 right-panel">
@@ -179,7 +188,7 @@
                         </div>
                     <?php endif; ?>
 
-                    <form action="../controllers/UsuariosController.php?action=login" method="POST">
+                    <form action="<?= URL_BASE ?>/auth" method="POST">
                         
                        <div class="mb-4">
                             <label for="correo" class="form-label fw-semibold">Correo Electrónico</label>
@@ -216,7 +225,7 @@
                     
                     <div class="mt-4 text-center">
                         <small class="text-white opacity-75">¿No tienes una cuenta aún?</small> <br> 
-                        <a href="registro.php" class="register-link fw-bold">Registrarse</a>
+                        <a href="<?= URL_BASE ?>/registro" class="register-link fw-bold">Registrarse</a>
                     </div>
 
                 </div>

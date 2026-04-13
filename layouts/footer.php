@@ -3,9 +3,9 @@
             <div class="row">
                 <div class="col-md-12 mb-3">
 
-                    <a href="<?php echo URL_BASE; ?>views/privacidad.php" class="text-white text-decoration-none mx-2">Política de Privacidad</a>
+                    <a href="<?= URL_BASE ?>/privacidad" class="text-white text-decoration-none mx-2">Política de Privacidad</a>
                     <span class="opacity-50">|</span>
-                    <a href="<?php echo URL_BASE; ?>views/terminos.php" class="text-white text-decoration-none mx-2">Términos de Uso</a>
+                    <a href="<?= URL_BASE ?>/terminos" class="text-white text-decoration-none mx-2">Términos de Uso</a>
                 </div>
             </div>
             
