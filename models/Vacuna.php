@@ -1,7 +1,7 @@
 <?php
 class Vacuna {
     private $conexion;
-    private $tabla = "Vacunas";
+    private $tabla = "vacunas";
 
     public $id_vacuna;
     public $nombre_vacuna;

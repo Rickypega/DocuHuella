@@ -1,7 +1,7 @@
 <?php
 class Vacunacion {
     private $conexion;
-    private $tabla = "Vacunaciones";
+    private $tabla = "vacunaciones";
 
     // ATRIBUTOS
     public $id_vacunacion;
@@ -66,8 +66,8 @@ class Vacunacion {
                     vet.Nombre AS Nombre_Vet, 
                     vet.Apellido AS Apellido_Vet
                   FROM " . $this->tabla . " vacu
-                  INNER JOIN Vacunas v ON vacu.ID_Vacuna = v.ID_Vacuna
-                  INNER JOIN Veterinarios vet ON vacu.ID_Veterinario = vet.ID_Veterinario
+                  INNER JOIN vacunas v ON vacu.ID_Vacuna = v.ID_Vacuna
+                  INNER JOIN veterinarios vet ON vacu.ID_Veterinario = vet.ID_Veterinario
                   WHERE vacu.ID_Mascota = :id_mascota
                   ORDER BY vacu.Fecha_Aplicacion DESC";
                   

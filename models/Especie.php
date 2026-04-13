@@ -1,7 +1,7 @@
 <?php
 class Especie {
     private $conexion;
-    private $tabla = "Especies";
+    private $tabla = "especies";
 
     public $id_especie;
     public $nombre_especie;

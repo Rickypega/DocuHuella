@@ -1,7 +1,7 @@
 <?php
 class Mascota {
     private $conexion;
-    private $tabla = "Mascotas";
+    private $tabla = "mascotas";
 
     // ATRIBUTOS
     public $id_mascota;
@@ -82,7 +82,7 @@ class Mascota {
 
     /**
      * VER HISTORIAL MÉDICO
-     * Adaptado a tu tabla Expedientes real
+     * Adaptado a tu tabla expedientes real
      */
     public function verHistorialMedico() {
         $query = "SELECT 
@@ -93,8 +93,8 @@ class Mascota {
                     e.Tratamiento_Recomendado,
                     v.Nombre AS Nombre_Vet,
                     v.Apellido AS Apellido_Vet
-                  FROM Expedientes e
-                  LEFT JOIN Veterinarios v ON e.ID_Veterinario = v.ID_Veterinario
+                  FROM expedientes e
+                  LEFT JOIN veterinarios v ON e.ID_Veterinario = v.ID_Veterinario
                   WHERE e.ID_Mascota = :id
                   ORDER BY e.Fecha_Hora DESC";
 

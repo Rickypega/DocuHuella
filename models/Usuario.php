@@ -1,7 +1,7 @@
 <?php
 class Usuario {
     private $conexion;
-    private $tabla = "Usuarios";
+    private $tabla = "usuarios";
 
     // Atributos
     public $id_usuario;

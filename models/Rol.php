@@ -1,7 +1,7 @@
 <?php
 class Rol {
     private $conexion;
-    private $tabla = "Roles";
+    private $tabla = "roles";
 
     // Atributos
     public $id_rol;

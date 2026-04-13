@@ -1,7 +1,7 @@
 <?php
 class Especialidad {
     private $conn;
-    private $table_name = "Especialidades";
+    private $table_name = "especialidades";
 
     public $id_especialidad;
     public $nombre_especialidad;

@@ -2,7 +2,7 @@
 
 class Cuidador {
     private $conexion;
-    private $tabla = "Cuidadores";
+    private $tabla = "cuidadores";
 
     public $id_cuidador;
     public $id_usuario;
@@ -97,7 +97,7 @@ class Cuidador {
     }
 
     public function verMisMascotas() {
-        $query = "SELECT * FROM Mascotas WHERE ID_Cuidador = :id ORDER BY ID_Mascota DESC";
+        $query = "SELECT * FROM mascotas WHERE ID_Cuidador = :id ORDER BY ID_Mascota DESC";
         $stmt = $this->conexion->prepare($query);
         $stmt->bindParam(':id', $this->id_cuidador);
         $stmt->execute();

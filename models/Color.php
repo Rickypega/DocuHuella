@@ -1,7 +1,7 @@
 <?php
 class Color {
     private $conn;
-    private $table_name = "Colores";
+    private $table_name = "colores";
 
     public $id_color;
     public $nombre_color;

@@ -1,7 +1,7 @@
 <?php
 class Clinica {
     private $conexion;
-    private $tabla = "Clinicas";
+    private $tabla = "clinicas";
 
     // ATRIBUTOS
     public $id_clinica;
@@ -72,7 +72,7 @@ class Clinica {
     // ==========================================
 
     /**
-     * Obtener todas las clínicas que le pertenecen a un Administrador
+     * Obtener todas las clínicas que le pertenecen a un administrador
      */
     public function obtenerClinicasPorAdmin() {
         $query = "SELECT * FROM " . $this->tabla . " 

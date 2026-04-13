@@ -1,7 +1,7 @@
 <?php
 class Veterinario {
     private $conexion;
-    private $tabla = "Veterinarios";
+    private $tabla = "veterinarios";
 
     // ATRIBUTOS
     public $id_veterinario;
@@ -80,13 +80,13 @@ class Veterinario {
                     v.Nombre AS Nombre_Vet, 
                     v.Apellido AS Apellido_Vet,
                     c.Nombre_Sucursal AS Clinica
-                  FROM Consultas cons
-                  INNER JOIN Expedientes e ON cons.ID_Expediente = e.ID_Expediente
-                  INNER JOIN Mascotas m ON e.ID_Mascota = m.ID_Mascota
-                  INNER JOIN Especies esp ON m.ID_Especie = esp.ID_Especie
-                  INNER JOIN Cuidadores cui ON m.ID_Cuidador = cui.ID_Cuidador
-                  INNER JOIN Veterinarios v ON cons.ID_Veterinario = v.ID_Veterinario
-                  INNER JOIN Clinicas c ON e.ID_Clinica = c.ID_Clinica
+                  FROM consultas cons
+                  INNER JOIN expedientes e ON cons.ID_Expediente = e.ID_Expediente
+                  INNER JOIN mascotas m ON e.ID_Mascota = m.ID_Mascota
+                  INNER JOIN especies esp ON m.ID_Especie = esp.ID_Especie
+                  INNER JOIN cuidadores cui ON m.ID_Cuidador = cui.ID_Cuidador
+                  INNER JOIN veterinarios v ON cons.ID_Veterinario = v.ID_Veterinario
+                  INNER JOIN clinicas c ON e.ID_Clinica = c.ID_Clinica
                   WHERE e.ID_Mascota = :id 
                   ORDER BY cons.Fecha_Consulta DESC";
         
@@ -110,12 +110,12 @@ class Veterinario {
                     cui.Nombre AS Nombre_Dueno,
                     v.Nombre AS Nombre_Vet,
                     c.Nombre_Sucursal AS Clinica
-                  FROM Consultas cons
-                  INNER JOIN Expedientes e ON cons.ID_Expediente = e.ID_Expediente
-                  INNER JOIN Mascotas m ON e.ID_Mascota = m.ID_Mascota
-                  INNER JOIN Cuidadores cui ON m.ID_Cuidador = cui.ID_Cuidador
-                  INNER JOIN Veterinarios v ON cons.ID_Veterinario = v.ID_Veterinario
-                  INNER JOIN Clinicas c ON e.ID_Clinica = c.ID_Clinica
+                  FROM consultas cons
+                  INNER JOIN expedientes e ON cons.ID_Expediente = e.ID_Expediente
+                  INNER JOIN mascotas m ON e.ID_Mascota = m.ID_Mascota
+                  INNER JOIN cuidadores cui ON m.ID_Cuidador = cui.ID_Cuidador
+                  INNER JOIN veterinarios v ON cons.ID_Veterinario = v.ID_Veterinario
+                  INNER JOIN clinicas c ON e.ID_Clinica = c.ID_Clinica
                   WHERE cui.Cedula = :cedula
                   ORDER BY cons.Fecha_Consulta DESC";
         

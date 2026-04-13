@@ -1,7 +1,7 @@
 <?php
-class Administrador {
+class administrador {
     private $conexion;
-    private $tabla = "Administrador";
+    private $tabla = "administrador";
 
     // ATRIBUTOS 
     public $id_admin;
@@ -53,14 +53,14 @@ class Administrador {
     // ==========================================
 
     /**
-     * Gestionar Veterinarios: Permite al admin ver a los empleados de SUS clínicas
+     * Gestionar veterinarios: Permite al admin ver a los empleados de SUS clínicas
      */
     public function gestionarUsuarios() {
         $query = "SELECT v.ID_Veterinario, u.ID_Usuario, u.Correo, u.Estado, 
                          v.Nombre, v.Apellido, v.Especialidad, c.Nombre_Sucursal 
-                  FROM Veterinarios v
-                  INNER JOIN Usuarios u ON v.ID_Usuario = u.ID_Usuario
-                  INNER JOIN Clinicas c ON v.ID_Clinica = c.ID_Clinica
+                  FROM veterinarios v
+                  INNER JOIN usuarios u ON v.ID_Usuario = u.ID_Usuario
+                  INNER JOIN clinicas c ON v.ID_Clinica = c.ID_Clinica
                   WHERE c.ID_Admin = :id_admin";
         
         $stmt = $this->conexion->prepare($query);
@@ -76,9 +76,9 @@ class Administrador {
     public function generarReportes() {
         // Recorrido de la nueva arquitectura: Admin -> Clinica -> Expediente -> Consulta
         $query = "SELECT COUNT(cons.ID_Consulta) as total_consultas 
-                  FROM Consultas cons
-                  INNER JOIN Expedientes e ON cons.ID_Expediente = e.ID_Expediente
-                  INNER JOIN Clinicas c ON e.ID_Clinica = c.ID_Clinica
+                  FROM consultas cons
+                  INNER JOIN expedientes e ON cons.ID_Expediente = e.ID_Expediente
+                  INNER JOIN clinicas c ON e.ID_Clinica = c.ID_Clinica
                   WHERE c.ID_Admin = :id_admin 
                   AND MONTH(cons.Fecha_Consulta) = MONTH(CURRENT_DATE())
                   AND YEAR(cons.Fecha_Consulta) = YEAR(CURRENT_DATE())";

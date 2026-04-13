@@ -1,7 +1,7 @@
 <?php
 class Consulta {
     private $conexion;
-    private $tabla = "Consultas";
+    private $tabla = "consultas";
 
     // ATRIBUTOS CLÍNICOS
     public $id_consulta;
@@ -15,7 +15,7 @@ class Consulta {
     public $frecuencia_cardiaca;
     public $diagnostico;
     public $tratamiento_sugerido;
-    public $observaciones_privadas; // Notas solo para el staff
+    public $observaciones_privadas; // notas solo para el staff
 
     public function __construct($db) {
         $this->conexion = $db;
@@ -71,7 +71,7 @@ class Consulta {
     public function obtenerPorExpediente($id_expediente) {
         $query = "SELECT c.*, v.Nombre AS Nombre_Vet, v.Apellido AS Apellido_Vet 
                   FROM " . $this->tabla . " c
-                  INNER JOIN Veterinarios v ON c.ID_Veterinario = v.ID_Veterinario
+                  INNER JOIN veterinarios v ON c.ID_Veterinario = v.ID_Veterinario
                   WHERE c.ID_Expediente = :id_exp
                   ORDER BY c.Fecha_Consulta DESC";
                   
@@ -103,11 +103,11 @@ class Consulta {
                     c.Direccion AS Direccion_Clinica, 
                     c.Telefono AS Telefono_Clinica
                   FROM " . $this->tabla . " cons
-                  INNER JOIN Expedientes e ON cons.ID_Expediente = e.ID_Expediente
-                  INNER JOIN Mascotas m ON e.ID_Mascota = m.ID_Mascota
-                  INNER JOIN Cuidadores cui ON m.ID_Cuidador = cui.ID_Cuidador
-                  INNER JOIN Veterinarios v ON cons.ID_Veterinario = v.ID_Veterinario
-                  INNER JOIN Clinicas c ON e.ID_Clinica = c.ID_Clinica
+                  INNER JOIN expedientes e ON cons.ID_Expediente = e.ID_Expediente
+                  INNER JOIN mascotas m ON e.ID_Mascota = m.ID_Mascota
+                  INNER JOIN cuidadores cui ON m.ID_Cuidador = cui.ID_Cuidador
+                  INNER JOIN veterinarios v ON cons.ID_Veterinario = v.ID_Veterinario
+                  INNER JOIN clinicas c ON e.ID_Clinica = c.ID_Clinica
                   WHERE cons.ID_Consulta = :id LIMIT 1";
         
         $stmt = $this->conexion->prepare($query);

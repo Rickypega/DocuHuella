@@ -1,7 +1,7 @@
 <?php
 class Cita {
     private $conexion;
-    private $tabla = "Citas";
+    private $tabla = "citas";
 
     // ATRIBUTOS
     public $id_cita;
@@ -25,7 +25,7 @@ class Cita {
      */
     public function agendarCita() {
         $query = "INSERT INTO " . $this->tabla . " 
-                  (ID_Clinica, ID_Veterinario, ID_Mascota, Fecha_Cita, Hora_Cita, Motivo, Notas) 
+                  (ID_Clinica, ID_Veterinario, ID_Mascota, Fecha_Cita, Hora_Cita, Motivo, notas) 
                   VALUES (:id_clinica, :id_vet, :id_mascota, :fecha, :hora, :motivo, :notas)";
         
         $stmt = $this->conexion->prepare($query);
@@ -58,14 +58,14 @@ class Cita {
      * Trae las citas asignadas a un doctor específico.
      */
     public function obtenerAgendaVeterinario($id_vet) {
-        $query = "SELECT c.ID_Cita, c.Fecha_Cita, c.Hora_Cita, c.Motivo, c.Estado, c.Notas,
+        $query = "SELECT c.ID_Cita, c.Fecha_Cita, c.Hora_Cita, c.Motivo, c.Estado, c.notas,
                          m.Nombre AS Nombre_Mascota, 
                          esp.Nombre_Especie AS Especie,
                          cui.Nombre AS Nombre_Dueno, cui.Apellido AS Apellido_Dueno, cui.Telefono
                   FROM " . $this->tabla . " c
-                  INNER JOIN Mascotas m ON c.ID_Mascota = m.ID_Mascota
-                  INNER JOIN Especies esp ON m.ID_Especie = esp.ID_Especie
-                  INNER JOIN Cuidadores cui ON m.ID_Cuidador = cui.ID_Cuidador
+                  INNER JOIN mascotas m ON c.ID_Mascota = m.ID_Mascota
+                  INNER JOIN especies esp ON m.ID_Especie = esp.ID_Especie
+                  INNER JOIN cuidadores cui ON m.ID_Cuidador = cui.ID_Cuidador
                   WHERE c.ID_Veterinario = :id_vet 
                   AND c.Fecha_Cita >= CURRENT_DATE()
                   ORDER BY c.Fecha_Cita ASC, c.Hora_Cita ASC";
@@ -87,9 +87,9 @@ class Cita {
                          v.Nombre AS Nombre_Vet, v.Apellido AS Apellido_Vet,
                          cli.Nombre_Sucursal AS Clinica, cli.Direccion
                   FROM " . $this->tabla . " c
-                  INNER JOIN Mascotas m ON c.ID_Mascota = m.ID_Mascota
-                  INNER JOIN Veterinarios v ON c.ID_Veterinario = v.ID_Veterinario
-                  INNER JOIN Clinicas cli ON c.ID_Clinica = cli.ID_Clinica
+                  INNER JOIN mascotas m ON c.ID_Mascota = m.ID_Mascota
+                  INNER JOIN veterinarios v ON c.ID_Veterinario = v.ID_Veterinario
+                  INNER JOIN clinicas cli ON c.ID_Clinica = cli.ID_Clinica
                   WHERE m.ID_Cuidador = :id_cuidador
                   ORDER BY c.Fecha_Cita DESC";
                   

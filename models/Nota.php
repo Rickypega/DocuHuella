@@ -1,7 +1,7 @@
 <?php
 class Nota {
     private $conexion;
-    private $tabla = "Notas";
+    private $tabla = "notas";
 
     // ATRIBUTOS
     public $id_nota;
@@ -58,7 +58,7 @@ class Nota {
     public function obtenerNotasPorUsuario() {
         $query = "SELECT n.*, m.Nombre AS Nombre_Mascota 
                   FROM " . $this->tabla . " n
-                  LEFT JOIN Mascotas m ON n.ID_Mascota = m.ID_Mascota
+                  LEFT JOIN mascotas m ON n.ID_Mascota = m.ID_Mascota
                   WHERE n.ID_Usuario = :id_usuario 
                   ORDER BY n.Fecha_Actualizacion DESC";
                   

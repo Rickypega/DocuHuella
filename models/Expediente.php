@@ -1,7 +1,7 @@
 <?php
 class Expediente {
     private $conexion;
-    private $tabla = "Expedientes";
+    private $tabla = "expedientes";
 
     // ATRIBUTOS 
     public $id_expediente;
@@ -50,7 +50,7 @@ class Expediente {
     public function obtenerPorMascota($id_mascota) {
         $query = "SELECT e.*, c.Nombre_Sucursal AS Clinica_Origen 
                   FROM " . $this->tabla . " e
-                  INNER JOIN Clinicas c ON e.ID_Clinica = c.ID_Clinica
+                  INNER JOIN clinicas c ON e.ID_Clinica = c.ID_Clinica
                   WHERE e.ID_Mascota = :id_mascota LIMIT 1";
         
         $stmt = $this->conexion->prepare($query);
