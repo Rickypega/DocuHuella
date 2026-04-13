@@ -30,7 +30,7 @@ class PerfilController {
 
             try {
                 // 1. Validar la contraseña actual de TODO usuario
-                $stmt = $db->prepare("SELECT Contrasena FROM Usuarios WHERE ID_Usuario = :id");
+                $stmt = $db->prepare("SELECT Contrasena FROM usuarios WHERE ID_Usuario = :id");
                 $stmt->bindParam(':id', $id_usuario);
                 $stmt->execute();
                 $hash = $stmt->fetchColumn();
@@ -44,7 +44,7 @@ class PerfilController {
                 // 2. Si hay nueva contraseña, actualizarla en Usuarios
                 if ($password_nueva) {
                     $nuevo_hash = password_hash($password_nueva, PASSWORD_DEFAULT);
-                    $stmtPass = $db->prepare("UPDATE Usuarios SET Contrasena = :pass WHERE ID_Usuario = :id");
+                    $stmtPass = $db->prepare("UPDATE usuarios SET Contrasena = :pass WHERE ID_Usuario = :id");
                     $stmtPass->bindParam(':pass', $nuevo_hash);
                     $stmtPass->bindParam(':id', $id_usuario);
                     $stmtPass->execute();
@@ -54,14 +54,14 @@ class PerfilController {
                 if ($telefono) {
                     if ($id_rol == 1 && $id_perfil) {
                         // Administrador
-                        $stmtAdmin = $db->prepare("UPDATE Administrador SET Telefono = :tel WHERE ID_Admin = :id_perf");
+                        $stmtAdmin = $db->prepare("UPDATE administrador SET Telefono = :tel WHERE ID_Admin = :id_perf");
                         $stmtAdmin->bindParam(':tel', $telefono);
                         $stmtAdmin->bindParam(':id_perf', $id_perfil);
                         $stmtAdmin->execute();
                     }
                     elseif ($id_rol == 2 && $id_perfil) {
                         // Veterinario
-                        $stmtVet = $db->prepare("UPDATE Veterinarios SET Telefono = :tel, Direccion = :dir WHERE ID_Veterinario = :id_perf");
+                        $stmtVet = $db->prepare("UPDATE veterinarios SET Telefono = :tel, Direccion = :dir WHERE ID_Veterinario = :id_perf");
                         $stmtVet->bindParam(':tel', $telefono);
                         $stmtVet->bindParam(':dir', $direccion);
                         $stmtVet->bindParam(':id_perf', $id_perfil);
@@ -69,7 +69,7 @@ class PerfilController {
                     }
                     elseif ($id_rol == 3 && $id_perfil) {
                         // Cuidador
-                        $stmtCuid = $db->prepare("UPDATE Cuidadores SET Telefono = :tel, Direccion = :dir WHERE ID_Cuidador = :id_perf");
+                        $stmtCuid = $db->prepare("UPDATE cuidadores SET Telefono = :tel, Direccion = :dir WHERE ID_Cuidador = :id_perf");
                         $stmtCuid->bindParam(':tel', $telefono);
                         $stmtCuid->bindParam(':dir', $direccion);
                         $stmtCuid->bindParam(':id_perf', $id_perfil);
@@ -88,3 +88,4 @@ class PerfilController {
     }
 }
 ?>
+

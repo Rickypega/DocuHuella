@@ -19,7 +19,7 @@ class AdminController {
             exit();
         }
         $db = (new Database())->getConnection();
-        $stmt = $db->prepare("SELECT Contrasena FROM Usuarios WHERE ID_Usuario = :id");
+        $stmt = $db->prepare("SELECT Contrasena FROM usuarios WHERE ID_Usuario = :id");
         $stmt->bindParam(':id', $_SESSION['id_usuario']);
         $stmt->execute();
         $hash = $stmt->fetchColumn();
@@ -179,7 +179,7 @@ class AdminController {
             $db = (new Database())->getConnection();
             try {
                 
-                $query = "UPDATE Usuarios 
+                $query = "UPDATE usuarios 
                         SET Estado = CASE 
                             WHEN Estado = 'Activo' THEN 'Inactivo' 
                             ELSE 'Activo' 

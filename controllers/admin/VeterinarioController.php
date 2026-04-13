@@ -41,7 +41,7 @@ class VeterinarioController {
 
             // 3. VERIFICACIÓN DE IDENTIDAD DEL ADMINISTRADOR
             $id_usuario_admin = $_SESSION['id_usuario'];
-            $query_check = "SELECT Contrasena FROM Usuarios WHERE ID_Usuario = :id";
+            $query_check = "SELECT Contrasena FROM usuarios WHERE ID_Usuario = :id";
             $stmt_check = $db->prepare($query_check);
             $stmt_check->bindParam(':id', $id_usuario_admin);
             $stmt_check->execute();

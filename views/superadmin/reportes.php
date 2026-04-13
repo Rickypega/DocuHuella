@@ -14,7 +14,7 @@ $db = $database->getConnection();
 // Obtener el rol épico para el saludo
 $nombre_rol = "Super Admin";
 try {
-    $stmt_rol = $db->prepare("SELECT Nombre_Rol FROM Roles WHERE ID_Rol = :id_rol");
+    $stmt_rol = $db->prepare("SELECT Nombre_Rol FROM roles WHERE ID_Rol = :id_rol");
     $stmt_rol->bindParam(':id_rol', $_SESSION['id_rol']);
     $stmt_rol->execute();
     $resultado_rol = $stmt_rol->fetchColumn();

@@ -9,8 +9,8 @@ class VeterinarioController {
         $db = $database->getConnection();
 
         // 2. Realizar consultas COUNT(*) para obtener los totales
-        $total_mascotas = $db->query("SELECT COUNT(*) FROM Mascotas")->fetchColumn();
-        $total_consultas = $db->query("SELECT COUNT(*) FROM Expedientes")->fetchColumn();
+        $total_mascotas = $db->query("SELECT COUNT(*) FROM mascotas")->fetchColumn();
+        $total_consultas = $db->query("SELECT COUNT(*) FROM expedientes")->fetchColumn();
 
         // 3. Incluir la vista
         include_once APP_PATH . '/views/veterinario/dashboard.php';
@@ -25,3 +25,4 @@ if (isset($_GET['action']) && $_GET['action'] == 'ver') {
     $controlador->index();
 }
 ?>
+

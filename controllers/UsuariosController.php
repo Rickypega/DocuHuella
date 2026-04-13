@@ -87,7 +87,7 @@ class UsuariosController {
             case 1: // ADMINISTRADOR
                 $query = "SELECT a.ID_Admin, c.ID_Clinica, a.Nombre 
                           FROM administrador a 
-                          LEFT JOIN Clinicas c ON a.ID_Admin = c.ID_Admin 
+                          LEFT JOIN clinicas c ON a.ID_Admin = c.ID_Admin 
                           WHERE a.ID_Usuario = :id LIMIT 1";
                 $stmt = $db->prepare($query);
                 $stmt->bindParam(':id', $id_usuario);

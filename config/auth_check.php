@@ -25,7 +25,7 @@ $database = new Database();
 $db = $database->getConnection();
 
 try {
-    $stmt = $db->prepare("SELECT Estado FROM Usuarios WHERE ID_Usuario = :id_u");
+    $stmt = $db->prepare("SELECT Estado FROM usuarios WHERE ID_Usuario = :id_u");
     $stmt->bindParam(':id_u', $_SESSION['id_usuario']);
     $stmt->execute();
     $estado_actual = $stmt->fetchColumn();

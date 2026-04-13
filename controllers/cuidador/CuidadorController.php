@@ -9,7 +9,7 @@ class CuidadorController {
         $db = $database->getConnection();
 
         // 2. Realizar consultas COUNT(*) para obtener los totales
-        $stmt_mascotas = $db->prepare("SELECT COUNT(*) FROM Mascotas WHERE ID_Cuidador = :id");
+        $stmt_mascotas = $db->prepare("SELECT COUNT(*) FROM mascotas WHERE ID_Cuidador = :id");
         $stmt_mascotas->execute([':id' => $_SESSION['id_perfil']]);
         $total_mascotas = $stmt_mascotas->fetchColumn();
 
@@ -26,3 +26,4 @@ if (isset($_GET['action']) && $_GET['action'] == 'ver') {
     $controlador->index();
 }
 ?>
+

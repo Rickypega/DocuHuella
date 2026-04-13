@@ -33,9 +33,9 @@ $queryHistorial = "SELECT
                     v.Nombre AS Nombre_Vet, 
                     v.Apellido AS Apellido_Vet,
                     c.Nombre_Sucursal AS Clinica
-                  FROM Expedientes e
-                  INNER JOIN Veterinarios v ON e.ID_Veterinario = v.ID_Veterinario
-                  INNER JOIN Clinicas c ON v.ID_Clinica = c.ID_Clinica
+                  FROM expedientes e
+                  INNER JOIN veterinarios v ON e.ID_Veterinario = v.ID_Veterinario
+                  INNER JOIN clinicas c ON v.ID_Clinica = c.ID_Clinica
                   WHERE e.ID_Mascota = :id 
                   ORDER BY e.Fecha_Hora DESC";
 
@@ -46,7 +46,7 @@ $stmtHistorial->execute();
 $historial = $stmtHistorial->fetchAll(PDO::FETCH_ASSOC);
 
 // 🔥 DATOS DE LA MASCOTA
-$query = "SELECT * FROM Mascotas WHERE ID_Mascota = :id";
+$query = "SELECT * FROM mascotas WHERE ID_Mascota = :id";
 $stmt = $db->prepare($query);
 $stmt->bindParam(':id', $id_mascota);
 $stmt->execute();
