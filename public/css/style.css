@@ -4,21 +4,23 @@
     --dh-light-gray: #F8F9FA;
 }
 
-body { 
-    background-color: var(--dh-light-gray); 
-    overflow-x: hidden; 
-    font-family: 'Segoe UI', Tahoma, sans-serif; 
+body {
+    background-color: var(--dh-light-gray);
+    overflow-x: hidden;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
 /* Diseño del Sidebar Restaurado */
 .sidebar {
     height: 100vh;
+    height: 100dvh;
     background-color: var(--dh-navy) !important;
     color: white !important;
     position: fixed;
     width: 260px;
-    display: flex; /* Flexbox para empujar el botón abajo */
+    display: flex;
     flex-direction: column;
+    overflow-y: auto;
 }
 
 .sidebar .logo-container {
@@ -35,23 +37,25 @@ body {
     transition: 0.3s;
 }
 
-.sidebar a:hover, .sidebar a.active {
-    background-color: rgba(234, 218, 193, 0.1); 
+.sidebar a:hover,
+.sidebar a.active {
+    background-color: rgba(234, 218, 193, 0.1);
     color: var(--dh-beige);
     border-left: 4px solid var(--dh-beige);
 }
 
-.sidebar i { 
-    width: 25px; 
-    text-align: center; 
-    margin-right: 10px; 
+.sidebar i {
+    width: 25px;
+    text-align: center;
+    margin-right: 10px;
 }
 
 /* Botón de Logout Restaurado */
 .btn-logout {
-    background-color: #dc3545; 
-    color: white !important; 
-    margin: auto 15px 20px; /* El 'auto' empuja el botón hasta abajo */
+    background-color: #dc3545;
+    color: white !important;
+    margin: auto 15px 20px;
+    /* El 'auto' empuja el botón hasta abajo */
     border-radius: 10px;
     text-align: center;
     padding: 12px;
@@ -60,15 +64,15 @@ body {
     border: none;
 }
 
-.btn-logout:hover { 
-    background-color: #c82333; 
-    transform: scale(1.02); 
+.btn-logout:hover {
+    background-color: #c82333;
+    transform: scale(1.02);
 }
 
 /* Contenido Principal */
-.main-content { 
-    margin-left: 260px; 
-    padding: 40px; 
+.main-content {
+    margin-left: 260px;
+    padding: 40px;
 }
 
 /* Tarjetas de Estadísticas */
@@ -76,34 +80,34 @@ body {
     background-color: white;
     border-radius: 15px;
     padding: 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     border-left: 5px solid var(--dh-navy);
     transition: 0.3s ease;
 }
 
-.stat-card:hover { 
-    transform: translateY(-5px); 
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-.stat-icon { 
-    font-size: 2.2rem; 
-    color: var(--dh-beige); 
-    opacity: 0.8; 
+.stat-icon {
+    font-size: 2.2rem;
+    color: var(--dh-beige);
+    opacity: 0.8;
 }
 
-.stat-number { 
-    font-size: 1.8rem; 
-    font-weight: bold; 
-    color: var(--dh-navy); 
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--dh-navy);
 }
 
-.stat-label { 
-    color: #6c757d; 
-    font-weight: 500; 
-    text-transform: uppercase; 
-    font-size: 0.75rem; 
-    letter-spacing: 1px; 
+.stat-label {
+    color: #6c757d;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
 }
 
 /* RESPONSIVE: Diseño para Móviles en Tableros */
@@ -112,7 +116,7 @@ body {
         width: 280px !important;
         border-right: none;
     }
-    
+
     /* Navbar top header solo en móviles */
     .mobile-header {
         position: sticky;
@@ -125,10 +129,9 @@ body {
         margin-left: 0;
         padding: 20px 15px;
     }
-    
+
     /* Pequeño ajuste para las tarjetas estadísticas en móviles */
     .stat-card {
         margin-bottom: 10px;
     }
 }
-
