@@ -9,7 +9,7 @@ if (!isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 1) {
     exit();
 }
 
-require_once '../../config/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 class DashboardController {
     
@@ -116,7 +116,7 @@ class DashboardController {
             $mis_clinicas = [];
         }
 
-        require_once '../../views/admin/dashboard.php';
+        require_once __DIR__ . '/../../views/admin/dashboard.php';
     }
 }
 

@@ -1,5 +1,5 @@
 <?php 
-require_once '../../config/auth_check.php';
+require_once __DIR__ . '/../../config/auth_check.php';
 
 // SEGURIDAD: Evitar acceso directo a la vista. 
 // Si alguien teclea "dashboard.php" en la URL, lo mandamos a su controlador respectivo.
