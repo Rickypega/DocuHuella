@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,24 +9,29 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-       
-       /* Ocultar el ojo nativo de los navegadores */
+        /* Ocultar el ojo nativo de los navegadores */
         input::-ms-reveal,
         input::-ms-clear {
             display: none;
         }
 
         :root {
-            --dh-beige: #EADAC1; /* Fondo izquierdo */
-            --dh-navy: #1A2D40;  /* Fondo derecho, texto botones, etc. */
-            --dh-light-gray: #F8F9FA; /* Fondos de input, texto secundario */
-            --dh-white: #FFFFFF; /* Botón principal, texto claro */
+            --dh-beige: #EADAC1;
+            /* Fondo izquierdo */
+            --dh-navy: #1A2D40;
+            /* Fondo derecho, texto botones, etc. */
+            --dh-light-gray: #F8F9FA;
+            /* Fondos de input, texto secundario */
+            --dh-white: #FFFFFF;
+            /* Botón principal, texto claro */
         }
 
-        body, html {
+        body,
+        html {
             height: 100%;
             margin: 0;
-            overflow: hidden; /* Evita scroll en pantalla completa */
+            overflow: hidden;
+            /* Evita scroll en pantalla completa */
         }
 
         .login-container {
@@ -35,8 +41,8 @@
         /* Sección Izquierda: Beige con Logo */
         .left-panel {
             background-color: var(--dh-beige);
-            position: relative; 
-            overflow: hidden;   
+            position: relative;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -45,8 +51,8 @@
         /* Estilos de las huellas flotantes */
         .huella-animada {
             position: absolute;
-            bottom: -50px; 
-            color: var(--dh-navy); 
+            bottom: -50px;
+            color: var(--dh-navy);
             z-index: 1;
             animation: flotarHaciaArriba linear forwards;
         }
@@ -57,20 +63,23 @@
                 transform: translateY(0) rotate(0deg);
                 opacity: 0;
             }
+
             10% {
-                opacity: 0.15; 
+                opacity: 0.15;
             }
+
             90% {
                 opacity: 0.15;
             }
+
             100% {
-                transform: translateY(-120vh) rotate(25deg); 
+                transform: translateY(-120vh) rotate(25deg);
                 opacity: 0;
             }
         }
 
         .main-logo {
-            max-width: 80%; 
+            max-width: 80%;
             height: auto;
             position: relative;
             z-index: 10;
@@ -89,12 +98,19 @@
             overflow-y: auto;
         }
 
-        .right-panel::-webkit-scrollbar { width: 8px; }
-        .right-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        .right-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .right-panel::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
 
         .form-content {
             width: 100%;
-            max-width: 350px; /* Ancho cómodo del formulario */
+            max-width: 350px;
+            /* Ancho cómodo del formulario */
             margin: auto 0;
             padding-bottom: 2rem;
         }
@@ -106,7 +122,8 @@
 
         .form-control {
             background-color: var(--dh-light-gray);
-            border-radius: 20px; /* Borde sutilmente redondeado como el mockup */
+            border-radius: 20px;
+            /* Borde sutilmente redondeado como el mockup */
             padding: 10px 15px;
         }
 
@@ -152,66 +169,60 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="container-fluid g-0 login-container">
         <div class="row h-100 g-0">
-            
+
             <div class="col-md-6 left-panel d-none d-md-flex" id="panel-huellas">
-                <a href="<?= URL_BASE ?>/" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; display: block; cursor: default;"></a>
-                <img src="<?= URL_BASE ?>/public/images/DH.jpg" alt="Logo DocuHuella" class="main-logo" style="position: relative; z-index: 10;">
+                <a href="<?= URL_BASE ?>/"
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; display: block; cursor: default;"></a>
+                <img src="<?= URL_BASE ?>/public/images/DH.jpg" alt="Logo DocuHuella" class="main-logo"
+                    style="position: relative; z-index: 10;">
             </div>
 
             <div class="col-md-6 right-panel">
                 <div class="form-content">
-                    
+
                     <h2 class="text-center mb-5 fw-bold">Iniciar Sesión</h2>
 
-                    <?php if (isset($_GET['error']) && $_GET['error'] == 'credenciales'): ?>
-                        <div class="alert alert-danger dh-alert-error p-2 text-center" role="alert">
-                            <small>Correo o contraseña incorrectos.</small>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if(isset($_GET['error']) && $_GET['error'] == 'cuenta_suspendida'): ?>
-                        <div class="alert alert-danger alert-dismissible fade show text-center fw-bold shadow-sm" role="alert" style="border-radius: 15px;">
-                            <i class="fas fa-ban fs-4 mb-2 d-block"></i>
-                            Su cuenta ha sido suspendida.<br>Por favor, comuníquese con el administrador.
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if(isset($_GET['exito']) && $_GET['exito'] == 'registrado'): ?>
-                        <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
-                            <strong>¡Excelente! 🐾</strong> Tu cuenta ha sido creada. Ya puedes iniciar sesión.
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    <?php endif; ?>
+                    <!-- Las alertas PHP fueron eliminadas por limpieza; SweetAlert cargará las notificaciones en pantalla -->
 
                     <form action="<?= URL_BASE ?>/auth" method="POST">
-                        
-                       <div class="mb-4">
+
+                        <div class="mb-4">
                             <label for="correo" class="form-label fw-semibold">Correo Electrónico</label>
                             <div class="input-group">
-                                <span class="input-group-text" style="background-color: var(--dh-light-gray); border: none; border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-left: 20px;">
+                                <span class="input-group-text"
+                                    style="background-color: var(--dh-light-gray); border: none; border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-left: 20px;">
                                     <i class="fas fa-envelope" style="color: #1a1a1a;"></i>
                                 </span>
-                                
-                                <input type="email" class="form-control" id="correo" name="correo" required placeholder="ejemplo@mail.com" style="background-color: var(--dh-light-gray); border: none; border-top-right-radius: 20px; border-bottom-right-radius: 20px; padding-left: 10px;">
+
+                                <input type="email" class="form-control" id="correo" name="correo" required
+                                    placeholder="ejemplo@mail.com"
+                                    style="background-color: var(--dh-light-gray); border: none; border-top-right-radius: 20px; border-bottom-right-radius: 20px; padding-left: 10px;">
                             </div>
                         </div>
-                        
+
                         <div class="mb-5">
                             <label for="contrasena" class="form-label fw-semibold">Contraseña</label>
                             <div class="input-group">
-                                <span class="input-group-text" style="background-color: var(--dh-light-gray); border: none; border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-left: 20px;">
+                                <span class="input-group-text"
+                                    style="background-color: var(--dh-light-gray); border: none; border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-left: 20px;">
                                     <i class="fas fa-lock" style="color: #1a1a1a;"></i>
                                 </span>
-                                
-                                <input type="password" class="form-control" id="pass-login" name="contrasena" required placeholder="••••••••" style="background-color: var(--dh-light-gray); border: none; border-radius: 0; padding-left: 10px;">
-                                
-                                <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center" type="button" id="btn-ojo-login" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: var(--dh-light-gray); border: none; padding: 0 20px;">
-                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+                                <input type="password" class="form-control" id="pass-login" name="contrasena" required
+                                    placeholder="••••••••"
+                                    style="background-color: var(--dh-light-gray); border: none; border-radius: 0; padding-left: 10px;">
+
+                                <button
+                                    class="btn btn-outline-secondary d-flex align-items-center justify-content-center"
+                                    type="button" id="btn-ojo-login"
+                                    style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: var(--dh-light-gray); border: none; padding: 0 20px;">
+                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M5 13 Q 12 5 19 13" />
                                         <circle cx="12" cy="14" r="2.5" />
                                         <line id="linea-login" x1="4" y1="4" x2="20" y2="20" style="display: none;" />
@@ -219,12 +230,12 @@
                                 </button>
                             </div>
                         </div>
-                        
+
                         <button type="submit" class="btn-entrar text-uppercase">Entrar</button>
                     </form>
-                    
+
                     <div class="mt-4 text-center">
-                        <small class="text-white opacity-75">¿No tienes una cuenta aún?</small> <br> 
+                        <small class="text-white opacity-75">¿No tienes una cuenta aún?</small> <br>
                         <a href="<?= URL_BASE ?>/registro" class="register-link fw-bold">Registrarse</a>
                     </div>
 
@@ -265,10 +276,10 @@
         setInterval(crearHuella, 800);
 
         // Lógica para mostrar/ocultar contraseña
-        document.getElementById('btn-ojo-login').addEventListener('click', function() {
+        document.getElementById('btn-ojo-login').addEventListener('click', function () {
             const input = document.getElementById('pass-login');
             const linea = document.getElementById('linea-login');
-            
+
             if (input.type === 'password') {
                 input.type = 'text';
                 linea.style.display = 'block'; // Muestra la raya diagonal
@@ -293,13 +304,13 @@
 
             if (error === 'credenciales') {
                 mensaje = "El correo o la contraseña no coinciden.";
-            } 
+            }
             else if (error === 'advertencia') {
                 titulo = "¡Atención!";
                 icono = "warning";
                 // Usamos el número de intentos que viene de la URL
                 mensaje = `Contraseña incorrecta. Te quedan ${restantes} intentos antes de suspender tu cuenta.`;
-            } 
+            }
             else if (error === 'cuenta_suspendida') {
                 titulo = "Cuenta Bloqueada";
                 mensaje = "Has superado el límite de intentos. Por seguridad, tu cuenta ha sido suspendida. Contacta al administrador.";
@@ -327,4 +338,5 @@
         }
     </script>
 </body>
+
 </html>

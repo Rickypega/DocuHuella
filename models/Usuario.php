@@ -1,5 +1,6 @@
 <?php
-class Usuario {
+class Usuario
+{
     private $conexion;
     private $tabla = "usuarios";
 
@@ -8,25 +9,27 @@ class Usuario {
     public $correo;
     public $contrasena;
     public $id_rol;
-    public $estado; 
+    public $estado;
     public $intentos_fallidos;
-    public $fecha_registro; 
+    public $fecha_registro;
 
-    public function __construct($db) {
+    public function __construct($db)
+    {
         $this->conexion = $db;
     }
 
     // ==========================================
     // Acción: Iniciar Sesión
     // ==========================================
-    public function login() {
+    public function login()
+    {
         // CORRECCIÓN: Agregamos Intentos_Fallidos al SELECT
         $query = "SELECT ID_Usuario, Correo, Contrasena, ID_Rol, Estado, Intentos_Fallidos 
                   FROM " . $this->tabla . " 
                   WHERE Correo = :correo LIMIT 1";
 
         $stmt = $this->conexion->prepare($query);
-        
+
         $this->correo = htmlspecialchars(strip_tags($this->correo));
         $stmt->bindParam(':correo', $this->correo);
         $stmt->execute();
@@ -37,7 +40,8 @@ class Usuario {
     // ==========================================
     // Acción: Crear cuenta 
     // ==========================================
-    public function registrarUsuario() {
+    public function registrarUsuario()
+    {
         $query = "INSERT INTO " . $this->tabla . " 
                   (Correo, Contrasena, ID_Rol) 
                   VALUES (:correo, :pass, :rol)";
@@ -45,7 +49,7 @@ class Usuario {
         $stmt = $this->conexion->prepare($query);
 
         if (empty($this->id_rol)) {
-            $this->id_rol = 3; 
+            $this->id_rol = 3;
         }
 
         $this->correo = htmlspecialchars(strip_tags($this->correo));
@@ -54,15 +58,15 @@ class Usuario {
         $stmt->bindParam(':correo', $this->correo);
         $stmt->bindParam(':pass', $password_hash);
         $stmt->bindParam(':rol', $this->id_rol);
-        
+
         try {
-            if($stmt->execute()) {
+            if ($stmt->execute()) {
                 $this->id_usuario = $this->conexion->lastInsertId();
                 return true;
             }
             return false;
         } catch (PDOException $e) {
-            if ($e->getCode() == 23000) { 
+            if ($e->getCode() == 23000) {
                 return 'correo_duplicado';
             } else {
                 return 'error_desconocido';
@@ -77,25 +81,27 @@ class Usuario {
     /**
      * ACTUALIZAR ESTADO DE USUARIO (Manual o Automático)
      */
-    public function cambiarEstado() {
+    public function cambiarEstado()
+    {
         $query = "UPDATE " . $this->tabla . " 
                   SET Estado = :estado 
                   WHERE ID_Usuario = :id";
-        
+
         $stmt = $this->conexion->prepare($query);
-        
+
         $this->estado = htmlspecialchars(strip_tags($this->estado));
-        
+
         $stmt->bindParam(':estado', $this->estado);
         $stmt->bindParam(':id', $this->id_usuario);
-        
+
         return $stmt->execute();
     }
 
     /**
      * Incrementa el contador de fallos
      */
-    public function registrarFallo($id) {
+    public function registrarFallo($id)
+    {
         $sql = "UPDATE " . $this->tabla . " 
                 SET Intentos_Fallidos = Intentos_Fallidos + 1 
                 WHERE ID_Usuario = :id";
@@ -107,7 +113,8 @@ class Usuario {
     /**
      * Limpia el contador tras un login exitoso
      */
-    public function resetearIntentos($id) {
+    public function resetearIntentos($id)
+    {
         $sql = "UPDATE " . $this->tabla . " 
                 SET Intentos_Fallidos = 0 
                 WHERE ID_Usuario = :id";

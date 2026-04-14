@@ -1,6 +1,8 @@
-<?php if (session_status() === PHP_SESSION_NONE) session_start(); ?>
+<?php if (session_status() === PHP_SESSION_NONE)
+    session_start(); ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +10,8 @@
     <link rel="icon" href="<?= URL_BASE ?>/public/images/favicon.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    
+
+
     <style>
         /* Ocultar el ojo nativo de los navegadores */
         input::-ms-reveal,
@@ -23,7 +25,8 @@
             --dh-light-gray: #F8F9FA;
         }
 
-        body, html {
+        body,
+        html {
             height: 100%;
             margin: 0;
             background-color: var(--dh-navy);
@@ -40,8 +43,14 @@
             padding: 3rem 2rem;
         }
 
-        .left-panel::-webkit-scrollbar { width: 8px; }
-        .left-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        .left-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .left-panel::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
 
         .form-content {
             width: 100%;
@@ -66,7 +75,7 @@
             height: auto;
             position: relative;
             z-index: 10;
-            mix-blend-mode: darken; 
+            mix-blend-mode: darken;
         }
 
         .form-label {
@@ -75,7 +84,8 @@
             color: rgba(255, 255, 255, 0.85);
         }
 
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             background-color: var(--dh-light-gray);
             border-radius: 20px;
             padding: 8px 15px;
@@ -112,60 +122,83 @@
         }
 
         @keyframes flotarHaciaArriba {
-            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.15; }
-            90% { opacity: 0.15; }
-            100% { transform: translateY(-120vh) rotate(25deg); opacity: 0; }
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.15;
+            }
+
+            90% {
+                opacity: 0.15;
+            }
+
+            100% {
+                transform: translateY(-120vh) rotate(25deg);
+                opacity: 0;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <div class="container-fluid g-0">
         <div class="row g-0 h-100">
-            
+
             <div class="col-md-7 left-panel">
                 <div class="form-content">
-                    
+
                     <div class="mb-4 text-center">
                         <h2 class="fw-bold fs-3 mt-sm-0 mt-3">Registro de Cuidador</h2>
-                        <p class="text-white opacity-75 small">Crea tu cuenta para gestionar el expediente de tu mascota.</p>
+                        <p class="text-white opacity-75 small">Crea tu cuenta para gestionar el expediente de tu
+                            mascota.</p>
                     </div>
 
-                    <?php 
-                        if(isset($_GET['error'])): 
-                            // Configuraciones por defecto
-                            $clase_alerta = 'alert-danger'; 
-                            $titulo = '¡Atención!';
-                            $mensaje = 'Ha ocurrido un error inesperado.';
+                    <?php
+                    if (isset($_GET['error'])):
+                        // Configuraciones por defecto
+                        $clase_alerta = 'alert-danger';
+                        $titulo = '¡Atención!';
+                        $mensaje = 'Ha ocurrido un error inesperado.';
 
-                            // Evaluamos qué error llegó
-                            switch ($_GET['error']) {
-                                case 'correo_ya_existe':
-                                    $titulo = '¡Ups!';
-                                    $mensaje = 'Este correo ya está registrado en DocuHuella.';
-                                    break;
-                                case 'pass_no_coincide':
-                                    $clase_alerta = 'alert-warning'; 
-                                    $titulo = '¡Cuidado!';
-                                    $mensaje = 'Las contraseñas no coinciden.';
-                                    break;
-                                case 'correo_no_coincide':
-                                    $clase_alerta = 'alert-warning'; 
-                                    $titulo = '¡Cuidado!';
-                                    $mensaje = 'Los correos no coinciden.';
-                                    break;
-                                case 'menor_de_edad':
-                                    $titulo = '¡Acceso denegado!';
-                                    $mensaje = 'Debes ser mayor de 18 años para registrarte como responsable legal de una mascota.';
-                                    break;
-                            }
+                        // Evaluamos qué error llegó
+                        switch ($_GET['error']) {
+                            case 'correo_ya_existe':
+                                $titulo = '¡Ups!';
+                                $mensaje = 'Este correo ya está registrado en DocuHuella.';
+                                break;
+                            case 'pass_no_coincide':
+                                $clase_alerta = 'alert-warning';
+                                $titulo = '¡Cuidado!';
+                                $mensaje = 'Las contraseñas no coinciden.';
+                                break;
+                            case 'correo_no_coincide':
+                                $clase_alerta = 'alert-warning';
+                                $titulo = '¡Cuidado!';
+                                $mensaje = 'Los correos no coinciden.';
+                                break;
+                            case 'menor_de_edad':
+                                $titulo = '¡Acceso denegado!';
+                                $mensaje = 'Debes ser mayor de 18 años para registrarte como responsable legal de una mascota.';
+                                break;
+                            case 'cedula_duplicada':
+                                $titulo = '¡Cédula en uso!';
+                                $mensaje = 'La cédula ingresada ya está registrada en el sistema.';
+                                break;
+                            case 'perfil_fallo':
+                                $titulo = '¡Error de Perfil!';
+                                $mensaje = 'No se pudo crear el perfil correctamente. Verifica tus datos e intenta de nuevo.';
+                                break;
+                        }
                         ?>
-                            <div class="alert <?= $clase_alerta ?> alert-dismissible fade show" role="alert">
-                                <strong><?= $titulo ?></strong> <?= $mensaje ?>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        <?php endif; ?>
+                        <div class="alert <?= $clase_alerta ?> alert-dismissible fade show" role="alert">
+                            <strong><?= $titulo ?></strong> <?= $mensaje ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php endif; ?>
 
                     <?php if (isset($_GET['exito']) && $_GET['exito'] == 'registrado'): ?>
                         <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
@@ -174,31 +207,33 @@
                         </div>
                     <?php endif; ?>
 
-                    <form action="../controllers/RegistroController.php?action=registrar_cuidador" method="POST">
-                        
+                    <form id="form-registro" action="../controllers/RegistroController.php?action=registrar_cuidador" method="POST">
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Nombre</label>
-                                <input type="text" class="form-control" name="nombre" required 
-                                       value="<?php echo isset($_SESSION['datos_temporales']['nombre']) ? htmlspecialchars($_SESSION['datos_temporales']['nombre']) : ''; ?>">
+                                <input type="text" class="form-control" name="nombre" required
+                                    value="<?php echo isset($_SESSION['datos_temporales']['nombre']) ? htmlspecialchars($_SESSION['datos_temporales']['nombre']) : ''; ?>">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Apellido</label>
                                 <input type="text" class="form-control" name="apellido" required
-                                       value="<?php echo isset($_SESSION['datos_temporales']['apellido']) ? htmlspecialchars($_SESSION['datos_temporales']['apellido']) : ''; ?>">
+                                    value="<?php echo isset($_SESSION['datos_temporales']['apellido']) ? htmlspecialchars($_SESSION['datos_temporales']['apellido']) : ''; ?>">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Cédula</label>
-                                <input type="text" name="cedula" class="form-control mascara-cedula" maxlength="13" placeholder="000-0000000-0" inputmode="numeric" required
-                                       value="<?php echo isset($_SESSION['datos_temporales']['cedula']) ? htmlspecialchars($_SESSION['datos_temporales']['cedula']) : ''; ?>">
+                                <input type="text" name="cedula" class="form-control mascara-cedula" maxlength="13"
+                                    placeholder="000-0000000-0" inputmode="numeric" required
+                                    value="<?php echo isset($_SESSION['datos_temporales']['cedula']) ? htmlspecialchars($_SESSION['datos_temporales']['cedula']) : ''; ?>">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Teléfono</label>
-                                <input type="text" name="telefono" class="form-control mascara-telefono" maxlength="12" placeholder="809-000-0000" inputmode="numeric" required
-                                       value="<?php echo isset($_SESSION['datos_temporales']['telefono']) ? htmlspecialchars($_SESSION['datos_temporales']['telefono']) : ''; ?>">
+                                <input type="text" name="telefono" class="form-control mascara-telefono" maxlength="12"
+                                    placeholder="809-000-0000" inputmode="numeric" required
+                                    value="<?php echo isset($_SESSION['datos_temporales']['telefono']) ? htmlspecialchars($_SESSION['datos_temporales']['telefono']) : ''; ?>">
                             </div>
                         </div>
 
@@ -206,15 +241,18 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Fecha de Nacimiento</label>
                                 <input type="date" class="form-control" name="fecha_nacimiento" required
-                                       value="<?php echo isset($_SESSION['datos_temporales']['fecha_nacimiento']) ? htmlspecialchars($_SESSION['datos_temporales']['fecha_nacimiento']) : ''; ?>">
+                                    value="<?php echo isset($_SESSION['datos_temporales']['fecha_nacimiento']) ? htmlspecialchars($_SESSION['datos_temporales']['fecha_nacimiento']) : ''; ?>">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Sexo</label>
                                 <?php $sexo_temp = isset($_SESSION['datos_temporales']['sexo']) ? $_SESSION['datos_temporales']['sexo'] : ''; ?>
                                 <select class="form-select" name="sexo" required>
-                                    <option value="" <?php echo ($sexo_temp == '') ? 'selected' : ''; ?> disabled>Seleccione...</option>
-                                    <option value="M" <?php echo ($sexo_temp == 'M') ? 'selected' : ''; ?>>Masculino</option>
-                                    <option value="F" <?php echo ($sexo_temp == 'F') ? 'selected' : ''; ?>>Femenino</option>
+                                    <option value="" <?php echo ($sexo_temp == '') ? 'selected' : ''; ?> disabled>
+                                        Seleccione...</option>
+                                    <option value="M" <?php echo ($sexo_temp == 'M') ? 'selected' : ''; ?>>Masculino
+                                    </option>
+                                    <option value="F" <?php echo ($sexo_temp == 'F') ? 'selected' : ''; ?>>Femenino
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -223,7 +261,7 @@
                             <div class="col-12">
                                 <label class="form-label fw-semibold">Dirección</label>
                                 <input type="text" class="form-control" name="direccion" required
-                                       value="<?php echo isset($_SESSION['datos_temporales']['direccion']) ? htmlspecialchars($_SESSION['datos_temporales']['direccion']) : ''; ?>">
+                                    value="<?php echo isset($_SESSION['datos_temporales']['direccion']) ? htmlspecialchars($_SESSION['datos_temporales']['direccion']) : ''; ?>">
                             </div>
                         </div>
 
@@ -233,53 +271,71 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Correo Electrónico</label>
                                 <input type="email" class="form-control" name="correo" required
-                                       value="<?php echo isset($_SESSION['datos_temporales']['correo']) ? htmlspecialchars($_SESSION['datos_temporales']['correo']) : ''; ?>">
+                                    value="<?php echo isset($_SESSION['datos_temporales']['correo']) ? htmlspecialchars($_SESSION['datos_temporales']['correo']) : ''; ?>">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Confirmar Correo</label>
                                 <input type="email" class="form-control" name="confirmar_correo" required
-                                       value="<?php echo isset($_SESSION['datos_temporales']['confirmar_correo']) ? htmlspecialchars($_SESSION['datos_temporales']['confirmar_correo']) : ''; ?>">
+                                    value="<?php echo isset($_SESSION['datos_temporales']['confirmar_correo']) ? htmlspecialchars($_SESSION['datos_temporales']['confirmar_correo']) : ''; ?>">
                             </div>
                         </div>
 
-                      <div class="row mb-4">
+                        <div class="row mb-4">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Contraseña</label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control" name="contrasena" id="pass-input" required style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
-                                    <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center" type="button" id="btn-ojo-pass" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: var(--dh-light-gray); border: none; padding: 0 15px;">
-                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <input type="password" class="form-control" name="contrasena" id="pass-input"
+                                        required style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                                    <button
+                                        class="btn btn-outline-secondary d-flex align-items-center justify-content-center"
+                                        type="button" id="btn-ojo-pass"
+                                        style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: var(--dh-light-gray); border: none; padding: 0 15px;">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M5 13 Q 12 5 19 13" />
                                             <circle cx="12" cy="14" r="2.5" />
-                                            <line id="linea-pass" x1="4" y1="4" x2="20" y2="20" style="display: none;" />
+                                            <line id="linea-pass" x1="4" y1="4" x2="20" y2="20"
+                                                style="display: none;" />
                                         </svg>
                                     </button>
                                 </div>
                                 <div class="progress mt-2" style="height: 5px; background-color: var(--dh-navy);">
-                                    <div id="barra-fuerza" class="progress-bar bg-danger" role="progressbar" style="width: 0%;"></div>
+                                    <div id="barra-fuerza" class="progress-bar bg-danger" role="progressbar"
+                                        style="width: 0%;"></div>
                                 </div>
-                                <small id="texto-fuerza" class="text-white opacity-50" style="font-size: 0.8rem;">Recomendado 8 caracteres mínimos</small>
+                                <small id="texto-fuerza" class="text-white opacity-50"
+                                    style="font-size: 0.8rem;">Recomendado 8 caracteres mínimos</small>
                             </div>
-                            
+
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Confirmar Contraseña</label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control" name="confirmar_contrasena" id="pass-confirm-input" required style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
-                                    <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center" type="button" id="btn-ojo-confirm" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: var(--dh-light-gray); border: none; padding: 0 15px;">
-                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <input type="password" class="form-control" name="confirmar_contrasena"
+                                        id="pass-confirm-input" required
+                                        style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                                    <button
+                                        class="btn btn-outline-secondary d-flex align-items-center justify-content-center"
+                                        type="button" id="btn-ojo-confirm"
+                                        style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: var(--dh-light-gray); border: none; padding: 0 15px;">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M5 13 Q 12 5 19 13" />
                                             <circle cx="12" cy="14" r="2.5" />
-                                            <line id="linea-confirm" x1="4" y1="4" x2="20" y2="20" style="display: none;" />
+                                            <line id="linea-confirm" x1="4" y1="4" x2="20" y2="20"
+                                                style="display: none;" />
                                         </svg>
                                     </button>
                                 </div>
-                                <small id="texto-coincidencia" class="text-danger fw-bold d-none" style="font-size: 0.8rem;">Las contraseñas no coinciden</small>
+                                <small id="texto-coincidencia" class="text-danger fw-bold d-none"
+                                    style="font-size: 0.8rem;">Las contraseñas no coinciden</small>
                             </div>
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mt-4">
-                            <a href="<?= URL_BASE ?>/login" class="text-white text-decoration-none opacity-75 small"><i class="fas fa-arrow-left me-1"></i> Ya Tengo Una Cuenta </a>
-                            <button type="submit" class="btn btn-registrar" id="btn-submit" disabled>Registrar Cuidador</button>
+                            <a href="<?= URL_BASE ?>/login" class="text-white text-decoration-none opacity-75 small"><i
+                                    class="fas fa-arrow-left me-1"></i> Ya Tengo Una Cuenta </a>
+                            <button type="submit" class="btn btn-registrar" id="btn-submit" disabled>Registrar
+                                Cuidador</button>
                         </div>
 
                     </form>
@@ -287,8 +343,10 @@
             </div>
 
             <div class="col-md-5 right-panel d-none d-md-flex" id="panel-huellas">
-                <a href="<?= URL_BASE ?>/" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; display: block; cursor: default;"></a>
-                <img src="<?= URL_BASE ?>/public/images/DH.jpg" alt="Logo DocuHuella" class="main-logo" style="position: relative; z-index: 10;">
+                <a href="<?= URL_BASE ?>/"
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; display: block; cursor: default;"></a>
+                <img src="<?= URL_BASE ?>/public/images/DH.jpg" alt="Logo DocuHuella" class="main-logo"
+                    style="position: relative; z-index: 10;">
             </div>
 
         </div>
@@ -298,7 +356,7 @@
         // Animación de huellas
         function crearHuella() {
             const panel = document.getElementById('panel-huellas');
-            if(!panel) return;
+            if (!panel) return;
             const huella = document.createElement('i');
             huella.classList.add('fas', 'fa-paw', 'huella-animada');
             huella.style.left = Math.random() * 90 + '%';
@@ -311,7 +369,7 @@
         }
         setInterval(crearHuella, 800);
 
-       // Lógica del Medidor de Contraseñas y Habilitación del Botón
+        // Lógica del Medidor de Contraseñas y Habilitación del Botón
         const passInput = document.getElementById('pass-input');
         const confirmInput = document.getElementById('pass-confirm-input');
         const btnSubmit = document.getElementById('btn-submit');
@@ -322,7 +380,7 @@
             const confirmPass = confirmInput.value;
             const barra = document.getElementById('barra-fuerza');
             const texto = document.getElementById('texto-fuerza');
-            
+
             let fuerza = 0;
             let esFuerte = false;
 
@@ -371,17 +429,35 @@
                 textoCoincidencia.classList.add('d-none');
             }
 
-            // El botón solo se activa si la contraseña es fuerte y ambas coinciden
-            if (esFuerte && coinciden) {
+            // Validar coincidencia de correo
+            const correo = document.querySelector('input[name="correo"]').value;
+            const confirmCorreo = document.querySelector('input[name="confirmar_correo"]').value;
+            const correosCoinciden = (correo === confirmCorreo && correo.trim() !== '');
+
+            // Validar que todos los campos requeridos tengan algún valor
+            let todosLlenos = true;
+            const camposRequeridos = document.querySelectorAll('#form-registro input[required], #form-registro select[required]');
+            camposRequeridos.forEach(campo => {
+                if (!campo.value.trim()) {
+                    todosLlenos = false;
+                }
+            });
+
+            // El botón solo se activa si la contraseña es fuerte, ambas contraseñas coinciden,
+            // los correos coinciden, y TODOS los campos están llenos.
+            if (esFuerte && coinciden && correosCoinciden && todosLlenos) {
                 btnSubmit.disabled = false;
             } else {
                 btnSubmit.disabled = true;
             }
         }
 
-        // Escuchamos ambos campos para validar en tiempo real
-        passInput.addEventListener('input', validarFormulario);
-        confirmInput.addEventListener('input', validarFormulario);
+        // Escuchamos absolutamente todos los campos para validar en tiempo real
+        const formInputs = document.querySelectorAll('#form-registro input[required], #form-registro select[required]');
+        formInputs.forEach(input => {
+            input.addEventListener('input', validarFormulario);
+            input.addEventListener('change', validarFormulario);
+        });
 
         // Lógica para mostrar/ocultar contraseña
         function toggleVisibilidad(inputId, lineId) {
@@ -389,58 +465,59 @@
             const linea = document.getElementById(lineId);
             if (input.type === 'password') {
                 input.type = 'text';
-                linea.style.display = 'block'; 
+                linea.style.display = 'block';
             } else {
                 input.type = 'password';
-                linea.style.display = 'none';  
+                linea.style.display = 'none';
             }
         }
 
-        document.getElementById('btn-ojo-pass').addEventListener('click', function() {
+        document.getElementById('btn-ojo-pass').addEventListener('click', function () {
             toggleVisibilidad('pass-input', 'linea-pass');
         });
-        document.getElementById('btn-ojo-confirm').addEventListener('click', function() {
+        document.getElementById('btn-ojo-confirm').addEventListener('click', function () {
             toggleVisibilidad('pass-confirm-input', 'linea-confirm');
         });
     </script>
 
     <script>
-    // ... tu código de las huellas y contraseñas ...
+        // ... tu código de las huellas y contraseñas ...
 
-    //  MÁSCARAS DIRECTAS EN LA VISTA
-    function soloNumerosYFormato(e) {
-        // Permitir teclas de borrado y flechas
-        if (['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'].includes(e.key)) return;
-        
-        // Bloquear si intentan escribir una letra (si no es un número del 0 al 9)
-        if (!/^[0-9]$/.test(e.key)) {
-            e.preventDefault();
+        //  MÁSCARAS DIRECTAS EN LA VISTA
+        function soloNumerosYFormato(e) {
+            // Permitir teclas de borrado y flechas
+            if (['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'].includes(e.key)) return;
+
+            // Bloquear si intentan escribir una letra (si no es un número del 0 al 9)
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+            }
         }
-    }
 
-    // Aplicar a Cédula
-    const inputCedula = document.querySelector('.mascara-cedula');
-    if(inputCedula) {
-        inputCedula.addEventListener('keydown', soloNumerosYFormato);
-        inputCedula.addEventListener('input', function(e) {
-            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,7})(\d{0,1})/);
-            e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
-        });
-    }
+        // Aplicar a Cédula
+        const inputCedula = document.querySelector('.mascara-cedula');
+        if (inputCedula) {
+            inputCedula.addEventListener('keydown', soloNumerosYFormato);
+            inputCedula.addEventListener('input', function (e) {
+                let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,7})(\d{0,1})/);
+                e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
+            });
+        }
 
-    // Aplicar a Teléfono
-    const inputTelefono = document.querySelector('.mascara-telefono');
-    if(inputTelefono) {
-        inputTelefono.addEventListener('keydown', soloNumerosYFormato);
-        inputTelefono.addEventListener('input', function(e) {
-            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
-            e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
-        });
-    }
+        // Aplicar a Teléfono
+        const inputTelefono = document.querySelector('.mascara-telefono');
+        if (inputTelefono) {
+            inputTelefono.addEventListener('keydown', soloNumerosYFormato);
+            inputTelefono.addEventListener('input', function (e) {
+                let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+                e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
+            });
+        }
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <?php unset($_SESSION['datos_temporales']); ?>
 </body>
+
 </html>
