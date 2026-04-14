@@ -74,9 +74,10 @@ class ReportesController {
 
             case 'veterinarios':
                 $tituloReporte = "Reporte de Personal Veterinario";
-                $query = "SELECT v.Nombre, v.Apellido, v.Especialidad, v.Telefono, u.Correo, u.Estado, DATE(u.Fecha_Registro) AS Fecha_Registro 
+                $query = "SELECT v.Nombre, v.Apellido, e.Nombre_Especialidad AS Especialidad, v.Telefono, u.Correo, u.Estado, DATE(u.Fecha_Registro) AS Fecha_Registro 
                           FROM veterinarios v
-                          INNER JOIN usuarios u ON v.ID_Usuario = u.ID_Usuario WHERE 1=1";
+                          INNER JOIN usuarios u ON v.ID_Usuario = u.ID_Usuario
+                          LEFT JOIN especialidades e ON v.ID_Especialidad = e.ID_Especialidad WHERE 1=1";
                 break;
 
             case 'cuidadores':
@@ -88,10 +89,13 @@ class ReportesController {
 
             case 'mascotas':
                 $tituloReporte = "Reporte Poblacional de Mascotas";
-                $query = "SELECT m.Nombre AS Mascota, m.Especie, m.Raza, m.Sexo, m.Color, c.Nombre AS Dueno, u.Estado, DATE(u.Fecha_Registro) AS Fecha_Registro 
+                $query = "SELECT m.Nombre AS Mascota, e.Nombre_Especie AS Especie, r.Nombre_Raza AS Raza, m.Sexo, co.Nombre_Color AS Color, c.Nombre AS Dueno, u.Estado, DATE(u.Fecha_Registro) AS Fecha_Registro 
                           FROM mascotas m
                           INNER JOIN cuidadores c ON m.ID_Cuidador = c.ID_Cuidador
-                          INNER JOIN usuarios u ON c.ID_Usuario = u.ID_Usuario WHERE 1=1";
+                          INNER JOIN usuarios u ON c.ID_Usuario = u.ID_Usuario
+                          LEFT JOIN especies e ON m.ID_Especie = e.ID_Especie
+                          LEFT JOIN razas r ON m.ID_Raza = r.ID_Raza
+                          LEFT JOIN colores co ON m.ID_Color = co.ID_Color WHERE 1=1";
                 break;
 
             default:
