@@ -225,15 +225,17 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Cédula</label>
-                                <input type="text" name="cedula" class="form-control mascara-cedula" maxlength="13"
+                                <input type="text" name="cedula" id="cedula-input" class="form-control mascara-cedula" maxlength="13"
                                     placeholder="000-0000000-0" inputmode="numeric" required
                                     value="<?php echo isset($_SESSION['datos_temporales']['cedula']) ? htmlspecialchars($_SESSION['datos_temporales']['cedula']) : ''; ?>">
+                                <small id="texto-cedula" class="text-danger fw-bold d-none" style="font-size: 0.8rem;">Debe tener 11 dígitos</small>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Teléfono</label>
-                                <input type="text" name="telefono" class="form-control mascara-telefono" maxlength="12"
+                                <input type="text" name="telefono" id="telefono-input" class="form-control mascara-telefono" maxlength="12"
                                     placeholder="809-000-0000" inputmode="numeric" required
                                     value="<?php echo isset($_SESSION['datos_temporales']['telefono']) ? htmlspecialchars($_SESSION['datos_temporales']['telefono']) : ''; ?>">
+                                <small id="texto-telefono" class="text-danger fw-bold d-none" style="font-size: 0.8rem;">Debe tener 10 dígitos</small>
                             </div>
                         </div>
 
@@ -270,13 +272,15 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Correo Electrónico</label>
-                                <input type="email" class="form-control" name="correo" required
+                                <input type="email" class="form-control" name="correo" id="correo-input" required
                                     value="<?php echo isset($_SESSION['datos_temporales']['correo']) ? htmlspecialchars($_SESSION['datos_temporales']['correo']) : ''; ?>">
+                                <small id="texto-correo-valido" class="text-danger fw-bold d-none" style="font-size: 0.8rem;">Ingrese un correo válido</small>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Confirmar Correo</label>
-                                <input type="email" class="form-control" name="confirmar_correo" required
+                                <input type="email" class="form-control" name="confirmar_correo" id="confirmar-correo-input" required
                                     value="<?php echo isset($_SESSION['datos_temporales']['confirmar_correo']) ? htmlspecialchars($_SESSION['datos_temporales']['confirmar_correo']) : ''; ?>">
+                                <small id="texto-correo-coincide" class="text-danger fw-bold d-none" style="font-size: 0.8rem;">Los correos no coinciden</small>
                             </div>
                         </div>
 
@@ -429,10 +433,48 @@
                 textoCoincidencia.classList.add('d-none');
             }
 
+            // Validar correo válido
+            const correoInput = document.getElementById('correo-input');
+            const confirmCorreoInput = document.getElementById('confirmar-correo-input');
+            const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const esCorreoValido = regexCorreo.test(correoInput.value);
+            const textoCorreoValido = document.getElementById('texto-correo-valido');
+            
+            if (correoInput.value.length > 0 && !esCorreoValido) {
+                textoCorreoValido.classList.remove('d-none');
+            } else {
+                textoCorreoValido.classList.add('d-none');
+            }
+
             // Validar coincidencia de correo
-            const correo = document.querySelector('input[name="correo"]').value;
-            const confirmCorreo = document.querySelector('input[name="confirmar_correo"]').value;
-            const correosCoinciden = (correo === confirmCorreo && correo.trim() !== '');
+            const correosCoinciden = (correoInput.value === confirmCorreoInput.value && correoInput.value.trim() !== '');
+            const textoCorreoCoincide = document.getElementById('texto-correo-coincide');
+            
+            if (confirmCorreoInput.value.length > 0 && !correosCoinciden) {
+                textoCorreoCoincide.classList.remove('d-none');
+            } else {
+                textoCorreoCoincide.classList.add('d-none');
+            }
+
+            // Validar cédula (11 dígitos, 2 guiones = 13)
+            const cedulaInput = document.getElementById('cedula-input');
+            const cedulaCompleta = cedulaInput.value.length === 13;
+            const textoCedula = document.getElementById('texto-cedula');
+            if (cedulaInput.value.length > 0 && !cedulaCompleta) {
+                textoCedula.classList.remove('d-none');
+            } else {
+                textoCedula.classList.add('d-none');
+            }
+
+            // Validar teléfono (10 dígitos, 2 guiones = 12)
+            const telefonoInput = document.getElementById('telefono-input');
+            const telefonoCompleto = telefonoInput.value.length === 12;
+            const textoTelefono = document.getElementById('texto-telefono');
+            if (telefonoInput.value.length > 0 && !telefonoCompleto) {
+                textoTelefono.classList.remove('d-none');
+            } else {
+                textoTelefono.classList.add('d-none');
+            }
 
             // Validar que todos los campos requeridos tengan algún valor
             let todosLlenos = true;
@@ -444,8 +486,8 @@
             });
 
             // El botón solo se activa si la contraseña es fuerte, ambas contraseñas coinciden,
-            // los correos coinciden, y TODOS los campos están llenos.
-            if (esFuerte && coinciden && correosCoinciden && todosLlenos) {
+            // los correos coinciden y son válidos, la cédula y el teléfono están completos, y TODOS los campos están llenos.
+            if (esFuerte && coinciden && esCorreoValido && correosCoinciden && cedulaCompleta && telefonoCompleto && todosLlenos) {
                 btnSubmit.disabled = false;
             } else {
                 btnSubmit.disabled = true;
