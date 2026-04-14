@@ -31,7 +31,7 @@ try {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="<?= URL_BASE ?>/public/images/favicon.png" type="image/x-icon">
-    <link rel="stylesheet" href="<?= URL_BASE ?>/public/css/style.css">
+    <link rel="stylesheet" href="<?= URL_BASE ?>/public/css/style.css?v=<?= time() ?>">
     <style>
 
         /* Tarjetas de Reportes */
@@ -74,7 +74,16 @@ try {
 </head>
 <body>
 
-    <div class="sidebar">
+        <!-- Encabezado Móvil (Solo visible en pantallas pequeñas) -->
+    <div class="mobile-header d-md-none p-3 d-flex justify-content-between align-items-center shadow-sm">
+        <h4 class="mb-0 fw-bold text-white"><i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella</h4>
+        <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Menú Lateral -->
+    <div class="offcanvas-md offcanvas-start sidebar" tabindex="-1" id="sidebarMenu">
         <div class="logo-container">
             <h3 class="fw-bold text-white mb-0"><i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella</h3>
             <span class="badge bg-warning text-dark mt-2"><?= htmlspecialchars($nombre_rol) ?></span>

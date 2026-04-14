@@ -200,7 +200,7 @@
                                 </span>
 
                                 <input type="email" class="form-control" id="correo" name="correo" required
-                                    placeholder="ejemplo@mail.com"
+                                    placeholder="ejemplo@mail.com" value="<?php echo isset($_GET['correo']) ? htmlspecialchars($_GET['correo']) : ''; ?>"
                                     style="background-color: var(--dh-light-gray); border: none; border-top-right-radius: 20px; border-bottom-right-radius: 20px; padding-left: 10px;">
                             </div>
                         </div>

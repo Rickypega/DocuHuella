@@ -47,7 +47,7 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css">
     <link rel="icon" href="<?= URL_BASE ?>/public/images/favicon.png" type="image/x-icon">
 
-    <link rel="stylesheet" href="<?= URL_BASE ?>/public/css/style.css">
+    <link rel="stylesheet" href="<?= URL_BASE ?>/public/css/style.css?v=<?= time() ?>">
     <style>
         .card-dh {
             background-color: white;
@@ -74,7 +74,16 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <body>
 
-    <div class="sidebar">
+        <!-- Encabezado Móvil (Solo visible en pantallas pequeñas) -->
+    <div class="mobile-header d-md-none p-3 d-flex justify-content-between align-items-center shadow-sm">
+        <h4 class="mb-0 fw-bold text-white"><i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella</h4>
+        <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Menú Lateral -->
+    <div class="offcanvas-md offcanvas-start sidebar" tabindex="-1" id="sidebarMenu">
         <div class="logo-container">
             <h3 class="fw-bold text-white mb-0"><i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella
             </h3>
@@ -119,7 +128,7 @@ $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <p class="text-muted mt-1">Gestión y control de clientes</p>
         </div>
 
-        <div class="d-flex justify-content-end mb-3">
+        <div class="d-flex justify-content-end mb-3 flex-wrap gap-2">
             <button class="btn btn-dh-navy shadow" data-bs-toggle="modal" data-bs-target="#modalRegistro">
                 <i class="fas fa-plus-circle me-2"></i> Nueva Franquicia
             </button>

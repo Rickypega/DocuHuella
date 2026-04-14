@@ -38,7 +38,7 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="<?= URL_BASE ?>/public/css/style.css">
+    <link rel="stylesheet" href="<?= URL_BASE ?>/public/css/style.css?v=<?= time() ?>">
     <style>
         /* Ocultar el ojo nativo de los navegadores */
         input::-ms-reveal,
@@ -81,7 +81,8 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         .dataTables_filter input {
-            width: 350px !important; 
+            width: 100% !important;
+            max-width: 350px !important;
             background-color: white !important;
             border: 1px solid #dee2e6 !important; 
             border-radius: 20px !important; 
@@ -125,7 +126,16 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
 
-   <div class="sidebar">
+       <!-- Encabezado Móvil (Solo visible en pantallas pequeñas) -->
+    <div class="mobile-header d-md-none p-3 d-flex justify-content-between align-items-center shadow-sm">
+        <h4 class="mb-0 fw-bold text-white"><i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella</h4>
+        <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Menú Lateral -->
+    <div class="offcanvas-md offcanvas-start sidebar" tabindex="-1" id="sidebarMenu">
         <div class="logo-container">
             <h3 class="fw-bold text-white mb-0">
                 <i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella
@@ -157,7 +167,7 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <div class="main-content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
             <h2 class="fw-bold" style="color: var(--dh-navy);">Gestión de Veterinarios</h2>
             <button class="btn btn-dark shadow px-4 py-2" data-bs-toggle="modal" data-bs-target="#modalRegistroVet">
                 <i class="fas fa-user-plus me-2"></i> Nuevo Médico
@@ -165,7 +175,8 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
 
         <div class="card border-0 shadow-sm p-4" style="border-radius: 15px;">
-            <table id="tablaVets" class="table table-hover align-middle">
+            <div class="table-responsive">
+                <table id="tablaVets" class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
                         <th>Nombre del Veterinario</th>
@@ -200,6 +211,7 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 

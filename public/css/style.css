@@ -13,8 +13,8 @@ body {
 /* Diseño del Sidebar Restaurado */
 .sidebar {
     height: 100vh;
-    background-color: var(--dh-navy);
-    color: white;
+    background-color: var(--dh-navy) !important;
+    color: white !important;
     position: fixed;
     width: 260px;
     display: flex; /* Flexbox para empujar el botón abajo */
@@ -109,62 +109,16 @@ body {
 /* RESPONSIVE: Diseño para Móviles en Tableros */
 @media (max-width: 768px) {
     .sidebar {
-        width: 100%;
-        height: auto;
-        position: static;
-        flex-direction: column;
+        width: 280px !important;
+        border-right: none;
     }
     
-    .sidebar .logo-container {
-        padding: 15px;
-    }
-    
-    .sidebar nav {
-        display: flex;
-        flex-direction: row;
-        overflow-x: auto;
-        white-space: nowrap;
-        padding: 0 10px;
-    }
-    
-    .sidebar nav::-webkit-scrollbar { height: 6px; }
-    .sidebar nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-
-    .sidebar a {
-        display: inline-flex;
-        align-items: center;
-        padding: 10px 15px;
-        margin-right: 5px;
-        border-left: none !important;
-        border-bottom: 2px solid transparent;
-    }
-
-    .sidebar a:hover, .sidebar a.active {
-        border-bottom: 2px solid var(--dh-beige);
-        border-left: none !important;
-    }
-    
-    .sidebar .mt-auto {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: center;
-        padding: 0 15px 15px;
-        margin-top: 15px !important;
-    }
-    
-    .sidebar .mt-auto a {
-        margin: 0 !important;
-        flex: 1;
-        min-width: 140px;
-        text-align: center;
-        padding: 10px 12px !important;
-    }
-    
-    .btn-logout {
-        margin: 0 !important;
-        flex: 1;
-        min-width: 140px;
+    /* Navbar top header solo en móviles */
+    .mobile-header {
+        position: sticky;
+        top: 0;
+        z-index: 1040;
+        background-color: var(--dh-navy);
     }
 
     .main-content {

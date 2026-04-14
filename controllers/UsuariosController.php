@@ -23,7 +23,7 @@ class UsuariosController {
 
                 // 1. VERIFICAR BLOQUEO PREVIO (Fail-Fast)
                 if (isset($datos_usuario['Estado']) && $datos_usuario['Estado'] !== 'Activo') {
-                    header("Location: " . URL_BASE . "/login?error=cuenta_suspendida");
+                    header("Location: " . URL_BASE . "/login?error=cuenta_suspendida&correo=" . urlencode($correo_ingresado));
                     exit();
                 }
 
@@ -56,24 +56,24 @@ class UsuariosController {
                         $usuario->cambiarEstado();
                         
                         // Enviamos error de cuenta suspendida
-                        header("Location: " . URL_BASE . "/login?error=cuenta_suspendida");
+                        header("Location: " . URL_BASE . "/login?error=cuenta_suspendida&correo=" . urlencode($correo_ingresado));
                     } elseif ($intentos_actuales >= 3) {
                         $restantes = 5 - $intentos_actuales;
                         // Enviamos el error de advertencia y pasamos cuántos quedan
-                        header("Location: " . URL_BASE . "/login?error=advertencia&restantes=" . $restantes);
+                        header("Location: " . URL_BASE . "/login?error=advertencia&restantes=" . $restantes . "&correo=" . urlencode($correo_ingresado));
                     } else {
                         // El error de siempre para intentos fallidos
-                        header("Location: " . URL_BASE . "/login?error=credenciales");
+                        header("Location: " . URL_BASE . "/login?error=credenciales&correo=" . urlencode($correo_ingresado));
                     }
                     } else {
                         
-                        header("Location: " . URL_BASE . "/login?error=credenciales");
+                        header("Location: " . URL_BASE . "/login?error=credenciales&correo=" . urlencode($correo_ingresado));
                     }
                     exit();
                 }
             } else {
                 // El correo ni siquiera existe
-                header("Location: " . URL_BASE . "/login?error=credenciales");
+                header("Location: " . URL_BASE . "/login?error=credenciales&correo=" . urlencode($correo_ingresado));
                 exit();
             }
         }
