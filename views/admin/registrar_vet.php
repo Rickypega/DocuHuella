@@ -40,6 +40,7 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <link rel="icon" href="<?= URL_BASE ?>/public/images/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="<?= URL_BASE ?>/public/css/style.css?v=<?= time() ?>">
     <style>
         /* Ocultar el ojo nativo de los navegadores */
@@ -194,9 +195,15 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </nav>
 
         <div class="mt-auto">
+            <a href="#" class="btn btn-outline-light d-flex align-items-center justify-content-center gap-2 mb-2"
+               style="border-radius: 10px; padding: 12px; margin: 0 15px; border-color: rgba(255,255,255,0.2);"
+               data-bs-toggle="modal" data-bs-target="#modalPerfilGlobal">
+                <i class="fas fa-user-edit"></i>
+                <span>Mi Perfil</span>
+            </a>
             <a href="<?= URL_BASE ?>/logout"
                 class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2"
-                style="border-radius: 10px; padding: 12px; margin: auto 15px 20px; width: auto !important;">
+                style="border-radius: 10px; padding: 12px; margin: 0 15px 20px; width: auto !important;">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Cerrar Sesión</span>
             </a>
@@ -911,6 +918,7 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     </script>
 
+    <?php include_once APP_PATH . '/views/includes/modal_perfil.php'; ?>
 </body>
 
 </html>

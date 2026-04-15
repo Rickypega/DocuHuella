@@ -18,10 +18,11 @@ $mis_clinicas = $stmt_cli->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reportes Clínicos — DocuHuella</title>
+    <title>DocuHuella</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="<?= URL_BASE ?>/public/images/favicon.png" type="image/x-icon">
@@ -32,34 +33,56 @@ $mis_clinicas = $stmt_cli->fetchAll(PDO::FETCH_ASSOC);
             background-color: white;
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
             border: none;
             border-top: 5px solid var(--dh-navy);
             transition: transform 0.3s ease;
             height: 100%;
         }
+
         .report-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
+
         .report-icon {
             font-size: 2.5rem;
             color: var(--dh-beige);
             margin-bottom: 15px;
         }
-        .btn-pdf   { background-color: #dc3545; color: white; border: none; }
-        .btn-pdf:hover { background-color: #c82333; color: white; }
-        .btn-excel { background-color: #198754; color: white; border: none; }
-        .btn-excel:hover { background-color: #157347; color: white; }
+
+        .btn-pdf {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+        }
+
+        .btn-pdf:hover {
+            background-color: #c82333;
+            color: white;
+        }
+
+        .btn-excel {
+            background-color: #198754;
+            color: white;
+            border: none;
+        }
+
+        .btn-excel:hover {
+            background-color: #157347;
+            color: white;
+        }
+
         .filtro-caja {
             background-color: white;
             border-radius: 10px;
             padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
             border-left: 4px solid var(--dh-beige);
         }
     </style>
 </head>
+
 <body>
 
     <!-- Encabezado Móvil -->
@@ -73,23 +96,26 @@ $mis_clinicas = $stmt_cli->fetchAll(PDO::FETCH_ASSOC);
     <!-- Sidebar -->
     <div class="offcanvas-md offcanvas-start sidebar" tabindex="-1" id="sidebarMenu">
         <div class="logo-container">
-            <h3 class="fw-bold text-white mb-0"><i class="fas fa-paw" style="color:var(--dh-beige);"></i> DocuHuella</h3>
+            <h3 class="fw-bold text-white mb-0"><i class="fas fa-paw" style="color:var(--dh-beige);"></i> DocuHuella
+            </h3>
             <span class="badge bg-warning text-dark mt-2">Administrador</span>
         </div>
         <nav class="mt-3">
             <a href="<?= URL_BASE ?>/admin/dashboard"><i class="fas fa-chart-pie"></i> Mi Resumen</a>
             <a href="<?= URL_BASE ?>/views/admin/clinicas.php"><i class="fas fa-hospital"></i> Mis Sucursales</a>
             <a href="<?= URL_BASE ?>/views/admin/registrar_vet.php"><i class="fas fa-user-md"></i> Veterinarios</a>
-            <a href="<?= URL_BASE ?>/views/admin/reportes.php" class="active"><i class="fas fa-file-medical-alt"></i> Reportes Clínicos</a>
+            <a href="<?= URL_BASE ?>/views/admin/reportes.php" class="active"><i class="fas fa-file-medical-alt"></i>
+                Reportes Clínicos</a>
         </nav>
         <div class="mt-auto">
             <a href="#" class="btn btn-outline-light d-flex align-items-center justify-content-center gap-2 mb-2"
-               style="border-radius:10px;padding:12px;margin:0 15px;border-color:rgba(255,255,255,0.2);"
-               data-bs-toggle="modal" data-bs-target="#modalPerfilGlobal">
+                style="border-radius:10px;padding:12px;margin:0 15px;border-color:rgba(255,255,255,0.2);"
+                data-bs-toggle="modal" data-bs-target="#modalPerfilGlobal">
                 <i class="fas fa-user-edit"></i><span>Mi Perfil</span>
             </a>
-            <a href="<?= URL_BASE ?>/logout" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2"
-               style="border-radius:10px;padding:12px;margin:0 15px 20px;width:auto !important;">
+            <a href="<?= URL_BASE ?>/logout"
+                class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2"
+                style="border-radius:10px;padding:12px;margin:0 15px 20px;width:auto !important;">
                 <i class="fas fa-sign-out-alt"></i><span>Cerrar Sesión</span>
             </a>
         </div>
@@ -151,7 +177,8 @@ $mis_clinicas = $stmt_cli->fetchAll(PDO::FETCH_ASSOC);
 
                 <!-- Botón aplicar -->
                 <div class="col-md-3">
-                    <button type="button" class="btn w-100 fw-bold" style="background-color:var(--dh-navy);color:white;" onclick="aplicarFiltros()">
+                    <button type="button" class="btn w-100 fw-bold" style="background-color:var(--dh-navy);color:white;"
+                        onclick="aplicarFiltros()">
                         <i class="fas fa-filter"></i> Aplicar Filtros
                     </button>
                 </div>
@@ -167,10 +194,14 @@ $mis_clinicas = $stmt_cli->fetchAll(PDO::FETCH_ASSOC);
                 <div class="report-card text-center">
                     <i class="fas fa-hospital report-icon"></i>
                     <h5 class="fw-bold" style="color:var(--dh-navy);">Mis Sucursales</h5>
-                    <p class="text-muted small mb-4">Listado de tus clínicas registradas con RNC, dirección, teléfono y estado.</p>
+                    <p class="text-muted small mb-4">Listado de tus clínicas registradas con RNC, dirección, teléfono y
+                        estado.</p>
                     <div class="d-flex justify-content-center gap-2">
-                        <button class="btn btn-sm btn-pdf w-50 fw-bold" onclick="generarReporte('sucursales','pdf')"><i class="fas fa-file-pdf"></i> PDF</button>
-                        <button class="btn btn-sm btn-excel w-50 fw-bold" onclick="generarReporte('sucursales','excel')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <button class="btn btn-sm btn-pdf w-50 fw-bold" onclick="generarReporte('sucursales','pdf')"><i
+                                class="fas fa-file-pdf"></i> PDF</button>
+                        <button class="btn btn-sm btn-excel w-50 fw-bold"
+                            onclick="generarReporte('sucursales','excel')"><i class="fas fa-file-excel"></i>
+                            Excel</button>
                     </div>
                 </div>
             </div>
@@ -180,10 +211,14 @@ $mis_clinicas = $stmt_cli->fetchAll(PDO::FETCH_ASSOC);
                 <div class="report-card text-center" style="border-top-color:#0d6efd;">
                     <i class="fas fa-user-md report-icon" style="color:#0d6efd;"></i>
                     <h5 class="fw-bold" style="color:var(--dh-navy);">Personal Veterinario</h5>
-                    <p class="text-muted small mb-4">Directorio de los médicos veterinarios de tus sucursales con especialidades y estado.</p>
+                    <p class="text-muted small mb-4">Directorio de los médicos veterinarios de tus sucursales con
+                        especialidades y estado.</p>
                     <div class="d-flex justify-content-center gap-2">
-                        <button class="btn btn-sm btn-pdf w-50 fw-bold" onclick="generarReporte('veterinarios','pdf')"><i class="fas fa-file-pdf"></i> PDF</button>
-                        <button class="btn btn-sm btn-excel w-50 fw-bold" onclick="generarReporte('veterinarios','excel')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <button class="btn btn-sm btn-pdf w-50 fw-bold"
+                            onclick="generarReporte('veterinarios','pdf')"><i class="fas fa-file-pdf"></i> PDF</button>
+                        <button class="btn btn-sm btn-excel w-50 fw-bold"
+                            onclick="generarReporte('veterinarios','excel')"><i class="fas fa-file-excel"></i>
+                            Excel</button>
                     </div>
                 </div>
             </div>
@@ -193,10 +228,14 @@ $mis_clinicas = $stmt_cli->fetchAll(PDO::FETCH_ASSOC);
                 <div class="report-card text-center" style="border-top-color:#198754;">
                     <i class="fas fa-paw report-icon" style="color:#198754;"></i>
                     <h5 class="fw-bold" style="color:var(--dh-navy);">Población de Mascotas</h5>
-                    <p class="text-muted small mb-4">Reporte demográfico de mascotas con expedientes abiertos en tus sucursales.</p>
+                    <p class="text-muted small mb-4">Reporte demográfico de mascotas con expedientes abiertos en tus
+                        sucursales.</p>
                     <div class="d-flex justify-content-center gap-2">
-                        <button class="btn btn-sm btn-pdf w-50 fw-bold" onclick="generarReporte('mascotas','pdf')"><i class="fas fa-file-pdf"></i> PDF</button>
-                        <button class="btn btn-sm btn-excel w-50 fw-bold" onclick="generarReporte('mascotas','excel')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <button class="btn btn-sm btn-pdf w-50 fw-bold" onclick="generarReporte('mascotas','pdf')"><i
+                                class="fas fa-file-pdf"></i> PDF</button>
+                        <button class="btn btn-sm btn-excel w-50 fw-bold"
+                            onclick="generarReporte('mascotas','excel')"><i class="fas fa-file-excel"></i>
+                            Excel</button>
                     </div>
                 </div>
             </div>
@@ -208,8 +247,11 @@ $mis_clinicas = $stmt_cli->fetchAll(PDO::FETCH_ASSOC);
                     <h5 class="fw-bold" style="color:var(--dh-navy);">Cuidadores / Clientes</h5>
                     <p class="text-muted small mb-4">Listado de dueños de mascotas atendidas en tus clínicas.</p>
                     <div class="d-flex justify-content-center gap-2">
-                        <button class="btn btn-sm btn-pdf w-50 fw-bold" onclick="generarReporte('cuidadores','pdf')"><i class="fas fa-file-pdf"></i> PDF</button>
-                        <button class="btn btn-sm btn-excel w-50 fw-bold" onclick="generarReporte('cuidadores','excel')"><i class="fas fa-file-excel"></i> Excel</button>
+                        <button class="btn btn-sm btn-pdf w-50 fw-bold" onclick="generarReporte('cuidadores','pdf')"><i
+                                class="fas fa-file-pdf"></i> PDF</button>
+                        <button class="btn btn-sm btn-excel w-50 fw-bold"
+                            onclick="generarReporte('cuidadores','excel')"><i class="fas fa-file-excel"></i>
+                            Excel</button>
                     </div>
                 </div>
             </div>
@@ -232,9 +274,9 @@ $mis_clinicas = $stmt_cli->fetchAll(PDO::FETCH_ASSOC);
         }
 
         function generarReporte(tipo, formato) {
-            const f_inicio  = document.getElementById('fecha_inicio').value;
-            const f_fin     = document.getElementById('fecha_fin').value;
-            const estado    = document.getElementById('estado').value;
+            const f_inicio = document.getElementById('fecha_inicio').value;
+            const f_fin = document.getElementById('fecha_fin').value;
+            const estado = document.getElementById('estado').value;
             const id_clinica = document.getElementById('filtro_clinica').value;
 
             const url = `../../controllers/admin/ReportesController.php?action=generar&tipo=${tipo}&formato=${formato}&inicio=${f_inicio}&fin=${f_fin}&estado=${estado}&id_clinica=${id_clinica}`;
@@ -252,4 +294,5 @@ $mis_clinicas = $stmt_cli->fetchAll(PDO::FETCH_ASSOC);
     </script>
     <?php include_once APP_PATH . '/views/includes/modal_perfil.php'; ?>
 </body>
+
 </html>
