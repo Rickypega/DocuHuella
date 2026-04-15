@@ -1,11 +1,12 @@
-<?php 
+<?php
 require_once '../../config/auth_check.php';
 require_once '../../config/db.php';
 require_once '../../models/Clinica.php';
 require_once '../../models/Especialidad.php';
 
 if (!isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 1) {
-    header("Location: ../login.php?error=acceso_denegado"); exit();
+    header("Location: ../login.php?error=acceso_denegado");
+    exit();
 }
 
 $database = new Database();
@@ -31,6 +32,7 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -46,90 +48,123 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             display: none;
         }
 
-        .section-header { 
-            border-bottom: 2px solid var(--dh-beige); 
-            color: var(--dh-navy); 
-            font-weight: bold; 
-            margin-bottom: 15px; 
-            padding-bottom: 5px; 
-            font-size: 0.85rem; 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-        }
-        
-        /* Estilos personalizados para los Inputs redondeados */
-        .input-group-text, .form-control, .btn-ojo { 
-            border: none !important; 
+        .section-header {
+            border-bottom: 2px solid var(--dh-beige);
+            color: var(--dh-navy);
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .error-msg { 
-            font-size: 0.75rem; 
-            font-weight: bold; 
-            margin-top: 3px; 
-            display: block; 
+        /* Estilos personalizados para los Inputs redondeados — solo en el formulario de REGISTRO */
+        #formRegistroVet .input-group-text,
+        #formRegistroVet .form-control,
+        #formRegistroVet .btn-ojo {
+            border: none !important;
         }
 
-        .security-box { 
-            background-color: #fff9db; 
-            border: 1px solid #ffec99; 
-            border-radius: 12px; 
-            padding: 20px; 
+        /* Asegurar que el modal de edición SI muestre bordes normales */
+        #formEditar .form-control,
+        #formEditar .form-select {
+            border: 1px solid #dee2e6 !important;
         }
-        /* Ajustes para el Buscador de la Tabla */
-        .dataTables_filter {
-            margin-bottom: 20px; /* Espacio entre el buscador y la tabla */
+
+        #formEditar .border-danger {
+            border-color: #dc3545 !important;
+        }
+
+        .error-msg {
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-top: 3px;
+            display: block;
+        }
+
+        .security-box {
+            background-color: #fff9db;
+            border: 1px solid #ffec99;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        /* Ajustes para el Buscador de la Tabla — alineado a la IZQUIERDA */
+        div.dataTables_wrapper div.dataTables_filter {
+            text-align: left !important;
+            margin-bottom: 16px;
+        }
+
+        .dataTables_filter label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.88rem;
         }
 
         .dataTables_filter input {
-            width: 100% !important;
-            max-width: 350px !important;
+            width: 260px !important;
             background-color: white !important;
-            border: 1px solid #dee2e6 !important; 
-            border-radius: 20px !important; 
-            padding: 8px 15px !important;
-            margin-left: 10px !important;
+            border: 1px solid #dee2e6 !important;
+            border-radius: 20px !important;
+            padding: 7px 14px !important;
             outline: none !important;
-            transition: 0.3s;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            margin-left: 6px !important;
         }
 
         .dataTables_filter input:focus {
             border-color: var(--dh-beige) !important;
-            box-shadow: 0 0 0 0.25 margin rgba(197, 170, 127, 0.25) !important;
+            box-shadow: 0 0 0 3px rgba(197, 170, 127, 0.25) !important;
+        }
+
+        /* Layout top row: buscador izq, paginación/length der */
+        div.dataTables_wrapper div.dataTables_length {
+            display: none;
+            /* Ocultamos el selector de cantidad para compactar */
         }
 
         /* Ajuste de los textos de la tabla */
-        .dataTables_info, .dataTables_paginate {
+        .dataTables_info,
+        .dataTables_paginate {
             font-size: 0.85rem;
             color: #6c757d;
             margin-top: 15px;
         }
 
         .btn-vibrante {
-        background-color: #28a745; /* Un verde éxito vibrante */
-        color: white;
-        border-radius: 20px;
-        font-weight: bold;
-        transition: 0.3s;
-        border: none;
-    }
-    .btn-vibrante:hover {
-        background-color: #218838;
-        transform: scale(1.05);
-        color: white;
-    }
-    .btn-vibrante:disabled {
-        background-color: #6c757d;
-        transform: scale(1);
-    }
+            background-color: #28a745;
+            /* Un verde éxito vibrante */
+            color: white;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: 0.3s;
+            border: none;
+        }
 
+        .btn-vibrante:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+            color: white;
+        }
+
+        .btn-vibrante:disabled {
+            background-color: #6c757d;
+            transform: scale(1);
+        }
     </style>
 </head>
+
 <body>
 
-       <!-- Encabezado Móvil (Solo visible en pantallas pequeñas) -->
+    <!-- Encabezado Móvil (Solo visible en pantallas pequeñas) -->
     <div class="mobile-header d-md-none p-3 d-flex justify-content-between align-items-center shadow-sm">
         <h4 class="mb-0 fw-bold text-white"><i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella</h4>
-        <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+        <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+            aria-controls="sidebarMenu">
             <i class="fas fa-bars"></i>
         </button>
     </div>
@@ -157,9 +192,11 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <i class="fas fa-file-medical-alt"></i> Reportes Clinicos
             </a>
         </nav>
-        
-        <div class="mt-auto"> 
-            <a href="<?= URL_BASE ?>/logout" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius: 10px; padding: 12px; margin: auto 15px 20px; width: auto !important;">
+
+        <div class="mt-auto">
+            <a href="<?= URL_BASE ?>/logout"
+                class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2"
+                style="border-radius: 10px; padding: 12px; margin: auto 15px 20px; width: auto !important;">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Cerrar Sesión</span>
             </a>
@@ -177,40 +214,52 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="card border-0 shadow-sm p-4" style="border-radius: 15px;">
             <div class="table-responsive">
                 <table id="tablaVets" class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Nombre del Veterinario</th>
-                        <th>Cédula</th>
-                        <th>Teléfono</th> 
-                        <th>Especialidad</th>
-                        <th>Clinica</th>
-                        <th>Estado</th>
-                        <th class="text-center">Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach($veterinarios as $vet): ?>
-                    <tr>
-                        <td class="fw-bold"><?= htmlspecialchars($vet['Nombre'] . " " . $vet['Apellido']) ?></td>
-                        <td><?= $vet['Cedula'] ?></td>
-                        <td><?= $vet['Telefono'] ?></td>
-                        <td><?= htmlspecialchars($vet['Nombre_Especialidad'] ?? 'Sin Especialidad') ?></td>
-                        <td><span class="badge bg-info text-dark"><?= htmlspecialchars($vet['Nombre_Sucursal']) ?></span></td>
-                        <td><span class="badge <?= $vet['Estado'] == 'Activo' ? 'bg-success' : 'bg-danger' ?>"><?= $vet['Estado'] ?></span></td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-outline-secondary btn-editar" 
-                                data-idusu="<?= $vet['ID_Usuario'] ?>"
-                                data-nombre="<?= htmlspecialchars($vet['Nombre']) ?>"
-                                data-apellido="<?= htmlspecialchars($vet['Apellido']) ?>"
-                                data-estado="<?= $vet['Estado'] ?>"
-                                data-bs-toggle="modal" data-bs-target="#modalEditar">
-                                <i class="fas fa-cog"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nombre del Veterinario</th>
+                            <th>Cédula</th>
+                            <th>Teléfono</th>
+                            <th>Especialidad</th>
+                            <th>Clinica</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($veterinarios as $vet): ?>
+                            <tr>
+                                <td class="fw-bold"><?= htmlspecialchars($vet['Nombre'] . " " . $vet['Apellido']) ?></td>
+                                <td><?= $vet['Cedula'] ?></td>
+                                <td><?= $vet['Telefono'] ?></td>
+                                <td><?= htmlspecialchars($vet['Nombre_Especialidad'] ?? 'Sin Especialidad') ?></td>
+                                <td><span
+                                        class="badge bg-info text-dark"><?= htmlspecialchars($vet['Nombre_Sucursal']) ?></span>
+                                </td>
+                                <td>
+                                    <?php if ($vet['Estado'] == 'Activo'): ?>
+                                        <span class="text-success fw-bold"><i class="fas fa-check-circle"></i> Activo</span>
+                                    <?php else: ?>
+                                        <span class="text-danger fw-bold"><i class="fas fa-ban"></i> Suspendido</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary btn-editar"
+                                        data-idvet="<?= $vet['ID_Veterinario'] ?>" data-idusu="<?= $vet['ID_Usuario'] ?>"
+                                        data-nombre="<?= htmlspecialchars($vet['Nombre']) ?>"
+                                        data-apellido="<?= htmlspecialchars($vet['Apellido']) ?>"
+                                        data-telefono="<?= htmlspecialchars($vet['Telefono']) ?>"
+                                        data-especialidad="<?= $vet['ID_Especialidad'] ?>"
+                                        data-clinica="<?= $vet['ID_Clinica'] ?>"
+                                        data-direccion="<?= htmlspecialchars($vet['Direccion'] ?? '') ?>"
+                                        data-estado="<?= $vet['Estado'] ?>" data-bs-toggle="modal"
+                                        data-bs-target="#modalEditar">
+                                        <i class="fas fa-cog"></i> Gestionar
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -218,9 +267,12 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="modal fade" id="modalRegistroVet" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                <form id="formRegistroVet" action="../../controllers/admin/VeterinarioController.php?action=registrar" method="POST">
-                    <div class="modal-header text-white" style="background-color: var(--dh-navy); border-radius: 20px 20px 0 0;">
-                        <h5 class="modal-title"><i class="fas fa-id-card-alt me-2"></i> Registro Profesional de Salud</h5>
+                <form id="formRegistroVet" action="../../controllers/admin/VeterinarioController.php?action=registrar"
+                    method="POST">
+                    <div class="modal-header text-white"
+                        style="background-color: var(--dh-navy); border-radius: 20px 20px 0 0;">
+                        <h5 class="modal-title"><i class="fas fa-id-card-alt me-2"></i> Registro Profesional de Salud
+                        </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
 
@@ -230,27 +282,40 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="section-header">1. Credenciales de Acceso</div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Correo Electrónico</label>
-                                    <input type="email" name="correo" id="email_v" class="form-control" placeholder="medico@docuhuella.com" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
-                                    <small id="err_email" class="error-msg text-danger d-none">Formato de correo inválido</small>
+                                    <input type="email" name="correo" id="email_v" class="form-control"
+                                        placeholder="medico@docuhuella.com" required
+                                        style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
+                                    <small id="err_email" class="error-msg text-danger d-none">Formato de correo
+                                        inválido</small>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Confirmar Correo</label>
-                                    <input type="email" id="email_conf" name="confirmar_correo" class="form-control" placeholder="Repite el correo" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
-                                    <small id="err_email_conf" class="error-msg text-danger d-none">Los correos no coinciden</small>
+                                    <input type="email" id="email_conf" name="confirmar_correo" class="form-control"
+                                        placeholder="Repite el correo" required
+                                        style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
+                                    <small id="err_email_conf" class="error-msg text-danger d-none">Los correos no
+                                        coinciden</small>
                                 </div>
-                                
+
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Contraseña Temporal</label>
                                     <div class="input-group">
-                                        <span class="input-group-text" style="background-color: var(--dh-light-gray); border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-left: 20px;">
+                                        <span class="input-group-text"
+                                            style="background-color: var(--dh-light-gray); border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-left: 20px;">
                                             <i class="fas fa-lock" style="color: #1a1a1a;"></i>
                                         </span>
-                                        <input type="password" class="form-control" id="pass_v" name="contrasena" required placeholder="••••••••" style="background-color: var(--dh-light-gray); padding-left: 10px;">
-                                        <button class="btn d-flex align-items-center justify-content-center" type="button" onclick="togglePassword('pass_v', 'linea-v')" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: var(--dh-light-gray); padding: 0 20px;">
-                                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <input type="password" class="form-control" id="pass_v" name="contrasena"
+                                            required placeholder="••••••••"
+                                            style="background-color: var(--dh-light-gray); padding-left: 10px;">
+                                        <button class="btn d-flex align-items-center justify-content-center"
+                                            type="button" onclick="togglePassword('pass_v', 'linea-v')"
+                                            style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: var(--dh-light-gray); padding: 0 20px;">
+                                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M5 13 Q 12 5 19 13" />
                                                 <circle cx="12" cy="14" r="2.5" />
-                                                <line id="linea-v" x1="4" y1="4" x2="20" y2="20" style="display: none;" />
+                                                <line id="linea-v" x1="4" y1="4" x2="20" y2="20"
+                                                    style="display: none;" />
                                             </svg>
                                         </button>
                                     </div>
@@ -259,42 +324,63 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Confirmar Contraseña</label>
                                     <div class="input-group">
-                                        <span class="input-group-text" style="background-color: var(--dh-light-gray); border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-left: 20px;">
+                                        <span class="input-group-text"
+                                            style="background-color: var(--dh-light-gray); border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-left: 20px;">
                                             <i class="fas fa-lock" style="color: #1a1a1a;"></i>
                                         </span>
-                                        <input type="password" class="form-control" id="pass_conf" name="confirmar_contrasena" required placeholder="••••••••" style="background-color: var(--dh-light-gray); padding-left: 10px;">
-                                        <button class="btn d-flex align-items-center justify-content-center" type="button" onclick="togglePassword('pass_conf', 'linea-conf')" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: var(--dh-light-gray); padding: 0 20px;">
-                                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <input type="password" class="form-control" id="pass_conf"
+                                            name="confirmar_contrasena" required placeholder="••••••••"
+                                            style="background-color: var(--dh-light-gray); padding-left: 10px;">
+                                        <button class="btn d-flex align-items-center justify-content-center"
+                                            type="button" onclick="togglePassword('pass_conf', 'linea-conf')"
+                                            style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: var(--dh-light-gray); padding: 0 20px;">
+                                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M5 13 Q 12 5 19 13" />
                                                 <circle cx="12" cy="14" r="2.5" />
-                                                <line id="linea-conf" x1="4" y1="4" x2="20" y2="20" style="display: none;" />
+                                                <line id="linea-conf" x1="4" y1="4" x2="20" y2="20"
+                                                    style="display: none;" />
                                             </svg>
                                         </button>
                                     </div>
-                                    <small id="err_pass_conf" class="error-msg text-danger d-none">Las contraseñas no coinciden</small>
+                                    <small id="err_pass_conf" class="error-msg text-danger d-none">Las contraseñas no
+                                        coinciden</small>
                                 </div>
                             </div>
 
                             <div class="col-lg-4 border-end px-4">
                                 <div class="section-header">2. Información Personal</div>
                                 <div class="row g-2 mb-3">
-                                    <div class="col-6"><label class="form-label fw-semibold">Nombre</label><input type="text" name="nombre" class="form-control" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;"></div>
-                                    <div class="col-6"><label class="form-label fw-semibold">Apellido</label><input type="text" name="apellido" class="form-control" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;"></div>
+                                    <div class="col-6"><label class="form-label fw-semibold">Nombre</label><input
+                                            type="text" name="nombre" class="form-control" required
+                                            style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
+                                    </div>
+                                    <div class="col-6"><label class="form-label fw-semibold">Apellido</label><input
+                                            type="text" name="apellido" class="form-control" required
+                                            style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Cédula de Identidad</label>
-                                    <input type="text" name="cedula" id="cedula_v" class="form-control mascara-cedula" placeholder="000-0000000-0" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
-                                    <small id="err_cedula" class="error-msg text-danger d-none">Cédula incompleta (11 dígitos)</small>
+                                    <input type="text" name="cedula" id="cedula_v" class="form-control mascara-cedula"
+                                        placeholder="000-0000000-0" required
+                                        style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
+                                    <small id="err_cedula" class="error-msg text-danger d-none">Cédula incompleta (11
+                                        dígitos)</small>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Número de Teléfono</label>
-                                    <input type="text" name="telefono" id="tel_v" class="form-control mascara-telefono" placeholder="809-000-0000" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
-                                    <small id="err_tel" class="error-msg text-danger d-none">Teléfono incompleto (10 dígitos)</small>
+                                    <input type="text" name="telefono" id="tel_v" class="form-control mascara-telefono"
+                                        placeholder="809-000-0000" required
+                                        style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
+                                    <small id="err_tel" class="error-msg text-danger d-none">Teléfono incompleto (10
+                                        dígitos)</small>
                                 </div>
                                 <div class="row g-2">
                                     <div class="col-6">
                                         <label class="form-label fw-semibold">Género</label>
-                                        <select name="sexo" class="form-select" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
+                                        <select name="sexo" class="form-select" required
+                                            style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
                                             <option value="">...</option>
                                             <option value="M">Masculino</option>
                                             <option value="F">Femenino</option>
@@ -302,13 +388,16 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label fw-semibold">Nacimiento</label>
-                                        <input type="date" name="fecha_nacimiento" id="fecha_n" class="form-control" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
-                                        <small id="err_edad" class="error-msg text-danger d-none">Debe ser mayor de 18 años</small>
+                                        <input type="date" name="fecha_nacimiento" id="fecha_n" class="form-control"
+                                            required
+                                            style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
+                                        <small id="err_edad" class="error-msg text-danger d-none">Debe ser mayor de 18
+                                            años</small>
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Dirección Residencial </label>
-                                    <textarea name="direccion" id="direccion_v" class="form-control" rows="2" 
+                                    <textarea name="direccion" id="direccion_v" class="form-control" rows="2"
                                         placeholder="Calle, No. de casa, Sector y Ciudad..." required
                                         style="background-color: var(--dh-light-gray); border-radius: 15px; padding: 10px 20px; resize: none;"></textarea>
                                     <div class="invalid-feedback">Este campo es obligatorio para el registro.</div>
@@ -319,9 +408,10 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="section-header">3. Datos Clínicos</div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Especialidad Médica</label>
-                                    <select name="id_especialidad" id="especialidad_v" class="form-select" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
+                                    <select name="id_especialidad" id="especialidad_v" class="form-select" required
+                                        style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
                                         <option value="">Seleccionar especialidad...</option>
-                                        <?php foreach($lista_especialidades as $esp): ?>
+                                        <?php foreach ($lista_especialidades as $esp): ?>
                                             <option value="<?= $esp['ID_Especialidad'] ?>">
                                                 <?= htmlspecialchars($esp['Nombre_Especialidad']) ?>
                                             </option>
@@ -333,22 +423,29 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Sucursal de Asignación</label>
-                                    <select name="id_clinica" class="form-select" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
+                                    <select name="id_clinica" class="form-select" required
+                                        style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
                                         <option value="">Seleccionar sucursal...</option>
-                                        <?php foreach($mis_sucursales as $s): ?>
+                                        <?php foreach ($mis_sucursales as $s): ?>
                                             <option value="<?= $s['ID_Clinica'] ?>"><?= $s['Nombre_Sucursal'] ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Exequatur (5 dígitos)</label>
-                                    <input type="text" name="exequatur" id="ex_v" class="form-control solo-num" maxlength="5" placeholder="12345" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
-                                    <small id="err_ex" class="error-msg text-danger d-none">Debe tener 5 dígitos exactos</small>
+                                    <input type="text" name="exequatur" id="ex_v" class="form-control solo-num"
+                                        maxlength="5" placeholder="12345" required
+                                        style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
+                                    <small id="err_ex" class="error-msg text-danger d-none">Debe tener 5 dígitos
+                                        exactos</small>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">No. Colegiatura (4 dígitos)</label>
-                                    <input type="text" name="colegiatura" id="col_v" class="form-control solo-num" maxlength="4" placeholder="1234" required style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
-                                    <small id="err_col" class="error-msg text-danger d-none">Debe tener 4 dígitos exactos</small>
+                                    <input type="text" name="colegiatura" id="col_v" class="form-control solo-num"
+                                        maxlength="4" placeholder="1234" required
+                                        style="background-color: var(--dh-light-gray); border-radius: 20px; padding: 10px 20px;">
+                                    <small id="err_col" class="error-msg text-danger d-none">Debe tener 4 dígitos
+                                        exactos</small>
                                 </div>
                             </div>
                         </div>
@@ -356,21 +453,31 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="security-box mt-4">
                             <div class="row align-items-center">
                                 <div class="col-md-7">
-                                    <h6 class="mb-1 fw-bold text-dark"><i class="fas fa-user-shield text-warning me-2"></i> Verificación del Administrador</h6>
+                                    <h6 class="mb-1 fw-bold text-dark"><i
+                                            class="fas fa-user-shield text-warning me-2"></i> Verificación del
+                                        Administrador</h6>
                                     <p class="small text-muted mb-0">Confirma que eres el <strong>ADMIN</strong>.</p>
-                                    <p class="small text-muted mb-1"> (Recuerda que todos los campos deben estar llenos).</p>
+                                    <p class="small text-muted mb-1"> (Recuerda que todos los campos deben estar
+                                        llenos).</p>
                                 </div>
                                 <div class="col-md-5">
                                     <div class="input-group">
-                                        <span class="input-group-text" style="background-color: white; border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-left: 20px;">
+                                        <span class="input-group-text"
+                                            style="background-color: white; border-top-left-radius: 20px; border-bottom-left-radius: 20px; padding-left: 20px;">
                                             <i class="fas fa-key" style="color: #f59f00;"></i>
                                         </span>
-                                        <input type="password" class="form-control" id="admin_auth" name="contrasena_admin" required placeholder="Contraseña Admin" style="background-color: white; padding-left: 10px;">
-                                        <button class="btn d-flex align-items-center justify-content-center" type="button" onclick="togglePassword('admin_auth', 'linea-admin')" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: white; padding: 0 20px;">
-                                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <input type="password" class="form-control" id="admin_auth"
+                                            name="contrasena_admin" required placeholder="Contraseña Admin"
+                                            style="background-color: white; padding-left: 10px;">
+                                        <button class="btn d-flex align-items-center justify-content-center"
+                                            type="button" onclick="togglePassword('admin_auth', 'linea-admin')"
+                                            style="border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-color: white; padding: 0 20px;">
+                                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M5 13 Q 12 5 19 13" />
                                                 <circle cx="12" cy="14" r="2.5" />
-                                                <line id="linea-admin" x1="4" y1="4" x2="20" y2="20" style="display: none;" />
+                                                <line id="linea-admin" x1="4" y1="4" x2="20" y2="20"
+                                                    style="display: none;" />
                                             </svg>
                                         </button>
                                     </div>
@@ -380,9 +487,116 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
 
                     <div class="modal-footer border-0 p-4 pt-0">
-                        <button type="button" class="btn btn-secondary px-4 fw-semibold" data-bs-dismiss="modal" style="border-radius: 20px;">Cancelar</button>
+                        <button type="button" class="btn btn-secondary px-4 fw-semibold" data-bs-dismiss="modal"
+                            style="border-radius: 20px;">Cancelar</button>
                         <button type="submit" id="btnSubmitVet" class="btn btn-vibrante px-5 shadow fw-bold" disabled>
                             Autorizar y Registrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL EDITAR VETERINARIO ===== -->
+    <div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                <form id="formEditar">
+                    <input type="hidden" name="id_vet" id="edit_id_vet">
+                    <input type="hidden" name="id_usuario" id="edit_id_usuario">
+                    <input type="hidden" name="estado" id="edit_estado_hidden">
+
+                    <div class="modal-header text-white"
+                        style="background-color: var(--dh-navy); border-radius: 20px 20px 0 0;">
+                        <h5 class="modal-title"><i class="fas fa-user-cog me-2"></i> Gestionar Veterinario</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+
+                            <!-- Teléfono -->
+                            <div class="col-md-6">
+                                <label class="form-label">Teléfono</label>
+                                <input type="text" name="telefono" id="edit_telefono"
+                                    class="form-control mascara-telefono-edit" maxlength="12" placeholder="809-000-0000"
+                                    inputmode="numeric" required>
+                                <small id="msg_tel_edit" class="text-danger d-none fw-bold"
+                                    style="font-size:0.75rem;">Teléfono incompleto</small>
+                            </div>
+
+                            <!-- Especialidad -->
+                            <div class="col-md-6">
+                                <label class="form-label">Especialidad</label>
+                                <select name="id_especialidad" id="edit_especialidad" class="form-select" required>
+                                    <option value="">Seleccionar...</option>
+                                    <?php foreach ($lista_especialidades as $esp): ?>
+                                        <option value="<?= $esp['ID_Especialidad'] ?>">
+                                            <?= htmlspecialchars($esp['Nombre_Especialidad']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <!-- Sucursal -->
+                            <div class="col-md-6">
+                                <label class="form-label">Sucursal Asignada</label>
+                                <select name="id_clinica" id="edit_clinica" class="form-select" required>
+                                    <option value="">Seleccionar...</option>
+                                    <?php foreach ($mis_sucursales as $s): ?>
+                                        <option value="<?= $s['ID_Clinica'] ?>">
+                                            <?= htmlspecialchars($s['Nombre_Sucursal']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <!-- Dirección -->
+                            <div class="col-md-6">
+                                <label class="form-label">Dirección Residencial</label>
+                                <input type="text" name="direccion" id="edit_direccion" class="form-control"
+                                    placeholder="Calle, No., Sector y Ciudad..." required>
+                            </div>
+
+                            <!-- Contraseña Admin con borde rojo (igual que superadmin) -->
+                            <div class="col-md-12 mt-2">
+                                <label class="form-label text-danger fw-bold">
+                                    <i class="fas fa-lock"></i> Contraseña Admin (Requerida)
+                                </label>
+                                <input type="password" name="contrasena_admin" id="edit_admin_pass"
+                                    class="form-control border-danger" required
+                                    placeholder="Ingrese su contraseña de Administrador">
+                            </div>
+
+                            <!-- ZONA DE RIESGO (igual que superadmin) -->
+                            <div class="col-md-12">
+                                <div class="mt-2 p-3 rounded"
+                                    style="background-color:#fff3f3; border: 1px dashed #dc3545;">
+                                    <h6 class="fw-bold text-danger mb-2">
+                                        <i class="fas fa-exclamation-triangle"></i> Zona de Riesgo
+                                    </h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-dark fw-bold" id="edit_estado_texto">Estado: Activo</p>
+                                            <small class="text-muted">Suspender desactiva el acceso del veterinario al
+                                                sistema.</small>
+                                        </div>
+                                        <button type="button" id="btn_suspender_vet"
+                                            class="btn btn-warning text-dark fw-bold" onclick="toggleEstadoVet()">
+                                            <i class="fas fa-ban"></i> Suspender
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light" style="border-radius: 0 0 20px 20px;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" id="btnGuardarEditar" class="btn btn-primary px-4"
+                            style="background-color:#0d6efd;" disabled>
+                            Guardar Cambios
                         </button>
                     </div>
                 </form>
@@ -398,24 +612,17 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <script>
         // 1. INICIALIZACIÓN DE TABLA
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#tablaVets').DataTable({
                 "language": {
-                    "processing": "Procesando...",
-                    "lengthMenu": "Mostrar _MENU_ registros",
-                    "zeroRecords": "No se encontraron resultados",
-                    "emptyTable": "Ningún dato disponible en esta tabla",
+                    "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json",
                     "info": "Mostrando página _PAGE_ de _PAGES_ con un total de _TOTAL_ registros",
                     "infoEmpty": "Mostrando página 0 de 0 con un total de 0 registros",
-                    "infoFiltered": "(filtrado de un total de _MAX_ registros)",
-                    "search": "Buscar Dr.Veterinario:",
-                    "paginate": {
-                        "next": "Siguiente",
-                        "previous": "Anterior"
-                    }
+                    "infoFiltered": "(filtrado de un total de _MAX_ registros)"
                 },
                 "pageLength": 10,
-                "dom": '<"d-flex justify-content-between align-items-center mb-3"lf>rt<"d-flex justify-content-between align-items-center"ip>' 
+                /* buscador izq, paginación der */
+                "dom": '<"d-flex align-items-center mb-3"f>rt<"d-flex justify-content-between align-items-center mt-3"ip>'
             });
         });
 
@@ -433,74 +640,74 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         // 3. MÁSCARAS DE ENTRADA
-        $('.mascara-cedula').on('input', function() {
-            let v = $(this).val().replace(/\D/g, '').substring(0,11);
+        $('.mascara-cedula').on('input', function () {
+            let v = $(this).val().replace(/\D/g, '').substring(0, 11);
             if (v.length > 10) v = v.replace(/^(\d{3})(\d{7})(\d{1})$/, "$1-$2-$3");
             else if (v.length > 3) v = v.replace(/^(\d{3})(\d{0,7})$/, "$1-$2");
             $(this).val(v);
         });
 
-        $('.mascara-telefono').on('input', function() {
-            let v = $(this).val().replace(/\D/g, '').substring(0,10);
+        $('.mascara-telefono').on('input', function () {
+            let v = $(this).val().replace(/\D/g, '').substring(0, 10);
             if (v.length > 6) v = v.replace(/^(\d{3})(\d{3})(\d{4})$/, "$1-$2-$3");
             else if (v.length > 3) v = v.replace(/^(\d{3})(\d{0,3})$/, "$1-$2");
             $(this).val(v);
         });
 
-        $('.solo-num').on('input', function() { $(this).val($(this).val().replace(/\D/g, '')); });
+        $('.solo-num').on('input', function () { $(this).val($(this).val().replace(/\D/g, '')); });
 
         // 4. VALIDACIÓN MAESTRA Y ENVÍO AJAX
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('formRegistroVet');
             const btn = document.getElementById('btnSubmitVet');
 
             // --- Validación en tiempo real para habilitar botón ---
-            form.addEventListener('input', function() {
+            form.addEventListener('input', function () {
                 let ok = true;
-                form.querySelectorAll('[required]').forEach(i => { if(!i.value.trim()) ok = false; });
+                form.querySelectorAll('[required]').forEach(i => { if (!i.value.trim()) ok = false; });
 
                 const email = document.getElementById('email_v').value;
                 const emailC = document.getElementById('email_conf').value;
                 const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
                 document.getElementById('err_email').classList.toggle('d-none', isEmail || !email);
                 document.getElementById('err_email_conf').classList.toggle('d-none', (email === emailC && email !== "") || !emailC);
-                if(!isEmail || email !== emailC) ok = false;
+                if (!isEmail || email !== emailC) ok = false;
 
                 const pass = document.getElementById('pass_v').value;
                 const passC = document.getElementById('pass_conf').value;
                 document.getElementById('err_pass_conf').classList.toggle('d-none', (pass === passC && pass !== "") || !passC);
-                if(pass !== passC) ok = false;
+                if (pass !== passC) ok = false;
 
                 const ced = document.getElementById('cedula_v').value;
                 const tel = document.getElementById('tel_v').value;
-                if(ced.length !== 13 || tel.length !== 12) ok = false;
+                if (ced.length !== 13 || tel.length !== 12) ok = false;
                 const direccion = document.getElementById('direccion_v').value.trim();
-                if(direccion.length < 3) ok = false;
+                if (direccion.length < 3) ok = false;
 
                 const esp = document.getElementById('especialidad_v').value;
-                if(!esp) ok = false;
+                if (!esp) ok = false;
                 const ex = document.getElementById('ex_v').value;
                 const col = document.getElementById('col_v').value;
-                if(ex.length !== 5 || col.length !== 4) ok = false;
+                if (ex.length !== 5 || col.length !== 4) ok = false;
 
                 const fecha = document.getElementById('fecha_n').value;
-                if(fecha){
+                if (fecha) {
                     const hoy = new Date();
                     const cumple = new Date(fecha);
                     let edad = hoy.getFullYear() - cumple.getFullYear();
                     if (hoy.getMonth() < cumple.getMonth() || (hoy.getMonth() === cumple.getMonth() && hoy.getDate() < cumple.getDate())) edad--;
                     document.getElementById('err_edad').classList.toggle('d-none', edad >= 18);
-                    if(edad < 18) ok = false;
+                    if (edad < 18) ok = false;
                 } else { ok = false; }
 
                 btn.disabled = !ok;
             });
 
             // --- Envío del Formulario vía AJAX ---
-            form.addEventListener('submit', function(e) {
+            form.addEventListener('submit', function (e) {
                 e.preventDefault();
                 const formData = new FormData(this);
-                
+
                 btn.disabled = true;
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Autorizando...';
 
@@ -508,56 +715,202 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     method: 'POST',
                     body: formData
                 })
-                .then(response => {
-                    // Si el servidor manda un error de PHP, esto lo atrapará
-                    return response.text().then(text => {
-                        try {
-                            return JSON.parse(text);
-                        } catch (err) {
-                            console.log("Respuesta cruda del servidor:", text);
-                            throw new Error("El servidor no envió un JSON válido. Revisa la consola.");
+                    .then(response => {
+                        // Si el servidor manda un error de PHP, esto lo atrapará
+                        return response.text().then(text => {
+                            try {
+                                return JSON.parse(text);
+                            } catch (err) {
+                                console.log("Respuesta cruda del servidor:", text);
+                                throw new Error("El servidor no envió un JSON válido. Revisa la consola.");
+                            }
+                        });
+                    })
+                    .then(data => {
+                        if (data.status === 'success') {
+                            $('#modalRegistroVet').modal('hide');
+                            Swal.fire({ icon: 'success', title: '¡Éxito!', text: 'Veterinario registrado.', showConfirmButton: false, timer: 1500 })
+                                .then(() => { location.reload(); });
+                        } else {
+
+                            let msg = "Error en el registro.";
+                            if (data.type === 'auth_admin_fallida') {
+                                msg = "Contraseña de administrador incorrecta.";
+                            } else if (data.type === 'correo_ya_existe') {
+                                msg = "Este correo electrónico ya está registrado por otro usuario.";
+                            } else if (data.type === 'cedula_duplicada') {
+                                msg = "Error: Esta cédula ya pertenece a otro veterinario en el sistema.";
+                            } else if (data.type === 'exequatur_duplicado') {
+                                msg = "Error: Este número de Exequátur ya está registrado.";
+                            } else if (data.type === 'colegiatura_duplicada') {
+                                msg = "Error: El número de colegiatura ya está registrado.";
+                            } else if (data.type === 'campos_incompletos') {
+                                msg = "Por favor, completa todos los campos requeridos correctamente.";
+                            } else if (data.type === 'error_perfil') {
+                                msg = "No se pudo crear el perfil médico. Intenta de nuevo.";
+                            }
+
+                            Swal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonColor: '#1A2D40' });
+                            btn.disabled = false;
+                            btn.innerHTML = 'Autorizar y Registrar';
+                            document.getElementById('admin_auth').value = "";
                         }
-                    });
-                })
-                .then(data => {
-                    if (data.status === 'success') {
-                        $('#modalRegistroVet').modal('hide');
-                        Swal.fire({ icon: 'success', title: '¡Éxito!', text: 'Veterinario registrado.', showConfirmButton: false, timer: 1500 })
-                        .then(() => { location.reload(); });
-                    } else {
-                        
-                    let msg = "Error en el registro.";
-                        if (data.type === 'auth_admin_fallida') {
-                            msg = "Contraseña de administrador incorrecta.";
-                        } else if (data.type === 'correo_ya_existe') {
-                            msg = "Este correo electrónico ya está registrado por otro usuario.";
-                        } else if (data.type === 'cedula_duplicada') {
-                            msg = "Error: Esta cédula ya pertenece a otro veterinario en el sistema.";
-                        } else if (data.type === 'exequatur_duplicado') {
-                            msg = "Error: Este número de Exequátur ya está registrado.";
-                        } else if (data.type === 'colegiatura_duplicada') {
-                            msg = "Error: El número de colegiatura ya está registrado.";
-                        } else if (data.type === 'campos_incompletos') {
-                            msg = "Por favor, completa todos los campos requeridos correctamente.";
-                        } else if (data.type === 'error_perfil') {
-                            msg = "No se pudo crear el perfil médico. Intenta de nuevo.";
-                        }
-                        
-                        Swal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonColor: '#1A2D40' });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({ icon: 'error', title: 'Error Crítico', text: error.message });
                         btn.disabled = false;
                         btn.innerHTML = 'Autorizar y Registrar';
-                        document.getElementById('admin_auth').value = ""; 
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({ icon: 'error', title: 'Error Crítico', text: error.message });
-                    btn.disabled = false;
-                    btn.innerHTML = 'Autorizar y Registrar';
-                });
+                    });
             });
         });
     </script>
 
+    <script>
+        // ===== MODAL EDITAR: Lógica de llenado y envío =====
+        $(document).ready(function () {
+
+            // Bootstrap 5 pasa el botón que disparó el modal como event.relatedTarget
+            // Esto es 100% confiable: no hay variables compartidas ni timers
+            $('#modalEditar').on('show.bs.modal', function (event) {
+                const btn = $(event.relatedTarget); // botón "Gestionar" exacto que fue clickeado
+
+                // Campos hidden
+                $('#edit_id_vet').val(btn.data('idvet'));
+                $('#edit_id_usuario').val(btn.data('idusu'));
+
+                // Inputs de texto — disponibles inmediatamente
+                $('#edit_telefono').val(btn.data('telefono'));
+                $('#edit_direccion').val(btn.data('direccion'));
+
+                // Selects — el modal ya está en el DOM (Bootstrap lo garantiza en show.bs.modal)
+                // NO usamos .trigger('change') para no disparar validación prematura
+                $('#edit_especialidad').val(btn.data('especialidad'));
+                $('#edit_clinica').val(btn.data('clinica'));
+
+                // Estado: hidden + Zona de Riesgo
+                const estado = btn.data('estado');
+                $('#edit_estado_hidden').val(estado);
+                actualizarZonaRiesgo(estado);
+
+                // Limpiar contraseña y bloquear botón guardar
+                $('#edit_admin_pass').val('');
+                $('#btnGuardarEditar').prop('disabled', true);
+            });
+
+            // Al CERRAR: solo limpiar contraseña y bloquear botón (no reset() del form completo)
+            $('#modalEditar').on('hidden.bs.modal', function () {
+                $('#edit_admin_pass').val('');
+                $('#btnGuardarEditar').prop('disabled', true);
+            });
+
+            // Validación en tiempo real — el botón solo se habilita cuando TODO está correcto
+            $('#formEditar').on('input change', validarFormEditar);
+
+            // Máscara de teléfono en el modal de edición
+            $(document).on('input', '.mascara-telefono-edit', function () {
+                let v = $(this).val().replace(/\D/g, '').substring(0, 10);
+                if (v.length > 6) v = v.replace(/^(\d{3})(\d{3})(\d{4})$/, '$1-$2-$3');
+                else if (v.length > 3) v = v.replace(/^(\d{3})(\d{0,3})$/, '$1-$2');
+                $(this).val(v);
+            });
+
+            // Botón Guardar Cambios — confirma con SweetAlert2 antes de enviar
+            $('#btnGuardarEditar').on('click', function () {
+                Swal.fire({
+                    title: '¿Guardar cambios?',
+                    text: 'Los datos del veterinario serán actualizados.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0d6efd',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, guardar',
+                    cancelButtonText: 'Cancelar'
+                }).then(function (result) {
+                    if (result.isConfirmed) enviarActualizacion();
+                });
+            });
+        });
+
+        // Actualiza el texto y el botón de la Zona de Riesgo
+        function actualizarZonaRiesgo(estado) {
+            const esActivo = (estado === 'Activo');
+            if (esActivo) {
+                $('#edit_estado_texto').html('Estado: <span class="text-success">Activo</span>');
+                $('#btn_suspender_vet').html('<i class="fas fa-ban"></i> Suspender')
+                    .removeClass('btn-success').addClass('btn-warning text-dark');
+            } else {
+                $('#edit_estado_texto').html('Estado: <span class="text-danger">Suspendido</span>');
+                $('#btn_suspender_vet').html('<i class="fas fa-check"></i> Reactivar')
+                    .removeClass('btn-warning text-dark').addClass('btn-success');
+            }
+        }
+
+        // Alterna el estado y actualiza visual + hidden input
+        function toggleEstadoVet() {
+            const actual = $('#edit_estado_hidden').val();
+            const nuevo = (actual === 'Activo') ? 'Inactivo' : 'Activo';
+            $('#edit_estado_hidden').val(nuevo);
+            actualizarZonaRiesgo(nuevo);
+            validarFormEditar();
+        }
+
+        function validarFormEditar() {
+            const tel = $('#edit_telefono').val();
+            const esp = $('#edit_especialidad').val();
+            const cli = $('#edit_clinica').val();
+            const dir = $('#edit_direccion').val().trim();
+            const pass = $('#edit_admin_pass').val();
+
+            const telOk = tel.length === 12;
+            $('#msg_tel_edit').toggleClass('d-none', telOk || tel === '');
+
+            const ok = telOk && esp !== '' && cli !== '' && dir.length >= 3 && pass !== '';
+            $('#btnGuardarEditar').prop('disabled', !ok);
+        }
+
+        function enviarActualizacion() {
+            const btn = document.getElementById('btnGuardarEditar');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Guardando...';
+
+            const formData = new FormData(document.getElementById('formEditar'));
+
+            fetch('../../controllers/admin/VeterinarioController.php?action=actualizar', {
+                method: 'POST',
+                body: formData
+            })
+                .then(function (res) {
+                    return res.text().then(function (text) {
+                        try { return JSON.parse(text); }
+                        catch (e) { throw new Error('Respuesta inesperada del servidor.'); }
+                    });
+                })
+                .then(function (data) {
+                    if (data.status === 'success') {
+                        $('#modalEditar').modal('hide');
+                        Swal.fire({ icon: 'success', title: '¡Éxito!', text: 'Datos actualizados correctamente.', showConfirmButton: false, timer: 1500 })
+                            .then(function () { location.reload(); });
+                    } else {
+                        let msg = 'Error al actualizar.';
+                        if (data.type === 'auth_admin_fallida') msg = 'Contraseña de administrador incorrecta.';
+                        else if (data.type === 'campos_incompletos') msg = 'Completa todos los campos obligatorios.';
+                        else if (data.type === 'acceso_denegado') msg = 'Acceso denegado. Recarga la página.';
+
+                        Swal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonColor: '#1A2D40' });
+                        btn.disabled = false;
+                        btn.innerHTML = 'Guardar Cambios';
+                        document.getElementById('edit_admin_pass').value = '';
+                    }
+                })
+                .catch(function (err) {
+                    Swal.fire({ icon: 'error', title: 'Error Crítico', text: err.message });
+                    btn.disabled = false;
+                    btn.innerHTML = 'Guardar Cambios';
+                });
+        }
+    </script>
+
 </body>
+
 </html>

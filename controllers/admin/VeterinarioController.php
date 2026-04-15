@@ -140,10 +140,88 @@ class VeterinarioController {
             }
         }
     }
+    public function actualizar() {
+        // 1. SEGURIDAD: Solo Administradores
+        if (!isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 1) {
+            echo json_encode(['status' => 'error', 'type' => 'acceso_denegado']);
+            exit();
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $database = new Database();
+            $db = $database->getConnection();
+
+            // 2. VALIDAR CAMPOS OBLIGATORIOS
+            $campos = ['id_vet', 'id_usuario', 'telefono', 'id_especialidad', 'id_clinica', 'estado', 'direccion', 'contrasena_admin'];
+            foreach ($campos as $campo) {
+                if (!isset($_POST[$campo]) || trim($_POST[$campo]) === '') {
+                    echo json_encode(['status' => 'error', 'type' => 'campos_incompletos']);
+                    exit();
+                }
+            }
+
+            // 3. VERIFICAR CONTRASEÑA DEL ADMINISTRADOR
+            $id_usuario_admin = $_SESSION['id_usuario'];
+            $stmt_check = $db->prepare("SELECT Contrasena FROM usuarios WHERE ID_Usuario = :id");
+            $stmt_check->bindParam(':id', $id_usuario_admin);
+            $stmt_check->execute();
+            $admin_db = $stmt_check->fetch(PDO::FETCH_ASSOC);
+
+            if (!$admin_db || !password_verify($_POST['contrasena_admin'], $admin_db['Contrasena'])) {
+                echo json_encode(['status' => 'error', 'type' => 'auth_admin_fallida']);
+                exit();
+            }
+
+            // 4. FORMATEAR TELÉFONO
+            $tel_limpio = preg_replace('/[^0-9]/', '', $_POST['telefono']);
+            $tel_final  = substr($tel_limpio, 0, 3) . '-' . substr($tel_limpio, 3, 3) . '-' . substr($tel_limpio, 6, 4);
+
+            $id_vet        = (int) $_POST['id_vet'];
+            $id_usuario    = (int) $_POST['id_usuario'];
+            $id_esp        = (int) $_POST['id_especialidad'];
+            $id_clinica    = (int) $_POST['id_clinica'];
+            $estado        = $_POST['estado'];
+            $direccion     = trim($_POST['direccion']);
+
+            // 5. ACTUALIZAR EN TRANSACCIÓN
+            $db->beginTransaction();
+            try {
+                // Actualizar perfil del veterinario
+                $stmt_vet = $db->prepare(
+                    "UPDATE veterinarios
+                     SET Telefono = :tel, ID_Especialidad = :esp, ID_Clinica = :cli, Direccion = :dir
+                     WHERE ID_Veterinario = :id_vet"
+                );
+                $stmt_vet->bindParam(':tel',    $tel_final);
+                $stmt_vet->bindParam(':esp',    $id_esp,     PDO::PARAM_INT);
+                $stmt_vet->bindParam(':cli',    $id_clinica, PDO::PARAM_INT);
+                $stmt_vet->bindParam(':dir',    $direccion);
+                $stmt_vet->bindParam(':id_vet', $id_vet,     PDO::PARAM_INT);
+                $stmt_vet->execute();
+
+                // Actualizar estado en la tabla usuarios
+                $stmt_usu = $db->prepare("UPDATE usuarios SET Estado = :estado WHERE ID_Usuario = :id_usu");
+                $stmt_usu->bindParam(':estado',  $estado);
+                $stmt_usu->bindParam(':id_usu',  $id_usuario, PDO::PARAM_INT);
+                $stmt_usu->execute();
+
+                $db->commit();
+                echo json_encode(['status' => 'success']);
+
+            } catch (Exception $e) {
+                $db->rollBack();
+                echo json_encode(['status' => 'error', 'type' => 'error_db', 'msg' => $e->getMessage()]);
+            }
+        }
+    }
 }
 
 // Ejecución del ruteo
-if (isset($_GET['action']) && $_GET['action'] == 'registrar') {
+if (isset($_GET['action'])) {
     $controlador = new VeterinarioController();
-    $controlador->registrar();
+    if ($_GET['action'] == 'registrar') {
+        $controlador->registrar();
+    } elseif ($_GET['action'] == 'actualizar') {
+        $controlador->actualizar();
+    }
 }

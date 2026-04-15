@@ -15,7 +15,7 @@ class Especialidad {
         $query = "SELECT * FROM " . $this->table_name . " ORDER BY Nombre_Especialidad ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
-        return $stmt;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 ?>
