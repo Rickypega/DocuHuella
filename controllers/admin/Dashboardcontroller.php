@@ -4,19 +4,23 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!isset($_SESSION['id_rol']) || $_SESSION['id_rol'] != 1) {
-    if(!defined('URL_BASE')) { include_once __DIR__.'/../../config/db.php'; }
+    if (!defined('URL_BASE')) {
+        include_once __DIR__ . '/../../config/db.php';
+    }
     header("Location: " . URL_BASE . "/login?error=acceso_denegado");
     exit();
 }
 
 require_once __DIR__ . '/../../config/db.php';
 
-class DashboardController {
-    
-    public function ver() {
+class DashboardController
+{
+
+    public function ver()
+    {
         $database = new Database();
         $db = $database->getConnection();
-        
+
         $id_admin = $_SESSION['id_perfil'];
 
         // 1. CAPTURAR FILTROS (Si existen)
@@ -45,7 +49,7 @@ class DashboardController {
             // 4. CONSTRUIR CONDICIONES SQL DINÁMICAS
             // Filtro de sucursal: Si eligió una, usamos esa. Si no, usamos TODAS las del admin.
             $whereClinica = $filtro_clinica ? "ID_Clinica = :id_clinica" : "ID_Clinica IN (SELECT ID_Clinica FROM clinicas WHERE ID_Admin = :id_admin)";
-            
+
             // Filtro de fechas 
             $filtroFechasCita = ($fecha_inicio && $fecha_fin) ? " AND Fecha_Cita BETWEEN :inicio AND :fin" : "";
             $filtroFechasExp = ($fecha_inicio && $fecha_fin) ? " AND Fecha_Creacion BETWEEN :inicio AND :fin" : "";
@@ -55,14 +59,17 @@ class DashboardController {
             // Sucursales
             $stmt = $db->prepare("SELECT COUNT(*) FROM clinicas WHERE ID_Admin = :id_admin" . ($filtro_clinica ? " AND ID_Clinica = :id_clinica" : ""));
             $stmt->bindParam(':id_admin', $id_admin);
-            if ($filtro_clinica) $stmt->bindParam(':id_clinica', $filtro_clinica);
+            if ($filtro_clinica)
+                $stmt->bindParam(':id_clinica', $filtro_clinica);
             $stmt->execute();
             $total_sucursales = $stmt->fetchColumn();
 
             // Citas
             $stmt = $db->prepare("SELECT COUNT(*) FROM citas WHERE $whereClinica $filtroFechasCita");
-            if (!$filtro_clinica) $stmt->bindParam(':id_admin', $id_admin);
-            if ($filtro_clinica) $stmt->bindParam(':id_clinica', $filtro_clinica);
+            if (!$filtro_clinica)
+                $stmt->bindParam(':id_admin', $id_admin);
+            if ($filtro_clinica)
+                $stmt->bindParam(':id_clinica', $filtro_clinica);
             if ($fecha_inicio && $fecha_fin) {
                 $stmt->bindParam(':inicio', $fecha_inicio);
                 $stmt->bindParam(':fin', $fecha_fin);
@@ -72,15 +79,19 @@ class DashboardController {
 
             // Veterinarios (No se ven afectados por el filtro de fecha, solo por la sucursal)
             $stmt = $db->prepare("SELECT COUNT(*) FROM veterinarios WHERE $whereClinica");
-            if (!$filtro_clinica) $stmt->bindParam(':id_admin', $id_admin);
-            if ($filtro_clinica) $stmt->bindParam(':id_clinica', $filtro_clinica);
+            if (!$filtro_clinica)
+                $stmt->bindParam(':id_admin', $id_admin);
+            if ($filtro_clinica)
+                $stmt->bindParam(':id_clinica', $filtro_clinica);
             $stmt->execute();
             $total_veterinarios = $stmt->fetchColumn();
 
             // Expedientes
             $stmt = $db->prepare("SELECT COUNT(*) FROM expedientes WHERE $whereClinica $filtroFechasExp");
-            if (!$filtro_clinica) $stmt->bindParam(':id_admin', $id_admin);
-            if ($filtro_clinica) $stmt->bindParam(':id_clinica', $filtro_clinica);
+            if (!$filtro_clinica)
+                $stmt->bindParam(':id_admin', $id_admin);
+            if ($filtro_clinica)
+                $stmt->bindParam(':id_clinica', $filtro_clinica);
             if ($fecha_inicio && $fecha_fin) {
                 $stmt->bindParam(':inicio', $fecha_inicio);
                 $stmt->bindParam(':fin', $fecha_fin);
@@ -90,8 +101,10 @@ class DashboardController {
 
             // Mascotas únicas
             $stmt = $db->prepare("SELECT COUNT(DISTINCT ID_Mascota) FROM expedientes WHERE $whereClinica $filtroFechasExp");
-            if (!$filtro_clinica) $stmt->bindParam(':id_admin', $id_admin);
-            if ($filtro_clinica) $stmt->bindParam(':id_clinica', $filtro_clinica);
+            if (!$filtro_clinica)
+                $stmt->bindParam(':id_admin', $id_admin);
+            if ($filtro_clinica)
+                $stmt->bindParam(':id_clinica', $filtro_clinica);
             if ($fecha_inicio && $fecha_fin) {
                 $stmt->bindParam(':inicio', $fecha_inicio);
                 $stmt->bindParam(':fin', $fecha_fin);
@@ -101,8 +114,10 @@ class DashboardController {
 
             // Cuidadores únicos
             $stmt = $db->prepare("SELECT COUNT(DISTINCT m.ID_Cuidador) FROM expedientes e INNER JOIN mascotas m ON e.ID_Mascota = m.ID_Mascota WHERE e.$whereClinica $filtroFechasExp");
-            if (!$filtro_clinica) $stmt->bindParam(':id_admin', $id_admin);
-            if ($filtro_clinica) $stmt->bindParam(':id_clinica', $filtro_clinica);
+            if (!$filtro_clinica)
+                $stmt->bindParam(':id_admin', $id_admin);
+            if ($filtro_clinica)
+                $stmt->bindParam(':id_clinica', $filtro_clinica);
             if ($fecha_inicio && $fecha_fin) {
                 $stmt->bindParam(':inicio', $fecha_inicio);
                 $stmt->bindParam(':fin', $fecha_fin);

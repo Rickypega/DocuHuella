@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once __DIR__ . '/../../config/auth_check.php';
 
 // SEGURIDAD: Evitar acceso directo a la vista. 
@@ -11,6 +11,7 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,12 +21,14 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     <link rel="icon" href="<?= URL_BASE ?>/public/images/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="<?= URL_BASE ?>/public/css/style.css?v=<?= time() ?>">
 </head>
+
 <body>
 
-        <!-- Encabezado Móvil (Solo visible en pantallas pequeñas) -->
+    <!-- Encabezado Móvil (Solo visible en pantallas pequeñas) -->
     <div class="mobile-header d-md-none p-3 d-flex justify-content-between align-items-center shadow-sm">
         <h4 class="mb-0 fw-bold text-white"><i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella</h4>
-        <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+        <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+            aria-controls="sidebarMenu">
             <i class="fas fa-bars"></i>
         </button>
     </div>
@@ -33,7 +36,8 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     <!-- Menú Lateral -->
     <div class="offcanvas-md offcanvas-start sidebar" tabindex="-1" id="sidebarMenu">
         <div class="logo-container">
-            <h3 class="fw-bold text-white mb-0"><i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella</h3>
+            <h3 class="fw-bold text-white mb-0"><i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella
+            </h3>
             <span class="badge bg-warning text-dark mt-2">Administrador</span>
         </div>
 
@@ -41,11 +45,14 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
             <a href="<?= URL_BASE ?>/admin/dashboard" class="active"><i class="fas fa-chart-pie"></i> Mi Resumen</a>
             <a href="<?= URL_BASE ?>/views/admin/clinicas.php"><i class="fas fa-hospital"></i> Mis Sucursales</a>
             <a href="<?= URL_BASE ?>/views/admin/registrar_vet.php"><i class="fas fa-user-md"></i> Veterinarios</a>
-            <a href="<?= URL_BASE ?>/views/admin/reportes.php"><i class="fas fa-file-medical-alt"></i> Reportes Clinicos</a>
+            <a href="<?= URL_BASE ?>/views/admin/reportes.php"><i class="fas fa-file-medical-alt"></i> Reportes
+                Clinicos</a>
         </nav>
-        
+
         <div class="mt-auto">
-            <a href="#" class="btn btn-outline-light d-flex align-items-center justify-content-center gap-2 mb-2" style="border-radius: 10px; padding: 12px; margin: 0 15px; border-color: rgba(255,255,255,0.2);" data-bs-toggle="modal" data-bs-target="#modalPerfilGlobal">
+            <a href="#" class="btn btn-outline-light d-flex align-items-center justify-content-center gap-2 mb-2"
+                style="border-radius: 10px; padding: 12px; margin: 0 15px; border-color: rgba(255,255,255,0.2);"
+                data-bs-toggle="modal" data-bs-target="#modalPerfilGlobal">
                 <i class="fas fa-user-edit"></i>
                 <span>Mi Perfil</span>
             </a>
@@ -59,7 +66,7 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     </div>
 
     <div class="main-content">
-        
+
         <?php if (isset($_GET['exito']) && $_GET['exito'] == 'vet_registrado'): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <strong>¡Excelente!</strong> El veterinario ha sido registrado y asignado a la sucursal correctamente.
@@ -76,20 +83,22 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
 
         <div class="d-flex justify-content-between align-items-end mb-4 pb-2 border-bottom flex-wrap gap-3">
             <div>
-                <h2 class="fw-bold mb-0" style="color: var(--dh-navy);"><?php echo htmlspecialchars($titulo_dashboard); ?></h2>
+                <h2 class="fw-bold mb-0" style="color: var(--dh-navy);">
+                    <?php echo htmlspecialchars($titulo_dashboard); ?></h2>
                 <p class="text-muted mt-1">Estado de tus sucursales y personal</p>
             </div>
 
-            <form method="GET" action="../../controllers/admin/DashboardController.php" class="d-flex flex-wrap gap-2 align-items-end bg-white p-3 rounded shadow-sm border">
+            <form method="GET" action="<?= URL_BASE ?>/admin/dashboard"
+                class="d-flex flex-wrap gap-2 align-items-end bg-white p-3 rounded shadow-sm border">
+
                 <input type="hidden" name="action" value="ver">
-                
+
                 <div>
                     <label class="form-label text-muted" style="font-size: 0.8rem; margin-bottom: 2px;">Sucursal</label>
                     <select name="id_clinica" class="form-select form-select-sm" style="min-width: 150px;">
                         <option value="">Todas las Clínicas</option>
-                        <?php foreach($mis_clinicas as $clinica): ?>
-                            <option value="<?php echo $clinica['ID_Clinica']; ?>" 
-                                <?php echo (isset($_GET['id_clinica']) && $_GET['id_clinica'] == $clinica['ID_Clinica']) ? 'selected' : ''; ?>>
+                        <?php foreach ($mis_clinicas as $clinica): ?>
+                            <option value="<?php echo $clinica['ID_Clinica']; ?>" <?php echo (isset($_GET['id_clinica']) && $_GET['id_clinica'] == $clinica['ID_Clinica']) ? 'selected' : ''; ?>>
                                 <?php echo htmlspecialchars($clinica['Nombre_Sucursal']); ?>
                             </option>
                         <?php endforeach; ?>
@@ -98,22 +107,23 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
 
                 <div>
                     <label class="form-label text-muted" style="font-size: 0.8rem; margin-bottom: 2px;">Desde</label>
-                    <input type="date" name="fecha_inicio" class="form-control form-control-sm" 
-                           value="<?php echo isset($_GET['fecha_inicio']) ? $_GET['fecha_inicio'] : ''; ?>">
+                    <input type="date" name="fecha_inicio" class="form-control form-control-sm"
+                        value="<?php echo isset($_GET['fecha_inicio']) ? $_GET['fecha_inicio'] : ''; ?>">
                 </div>
 
                 <div>
                     <label class="form-label text-muted" style="font-size: 0.8rem; margin-bottom: 2px;">Hasta</label>
-                    <input type="date" name="fecha_fin" class="form-control form-control-sm" 
-                           value="<?php echo isset($_GET['fecha_fin']) ? $_GET['fecha_fin'] : ''; ?>">
+                    <input type="date" name="fecha_fin" class="form-control form-control-sm"
+                        value="<?php echo isset($_GET['fecha_fin']) ? $_GET['fecha_fin'] : ''; ?>">
                 </div>
 
                 <button type="submit" class="btn btn-sm text-white" style="background-color: #0060ef;">
                     <i class="fas fa-filter"></i> Filtrar
                 </button>
-                
-                <?php if(!empty($_GET['id_clinica']) || !empty($_GET['fecha_inicio'])): ?>
-                    <a href="../../controllers/admin/DashboardController.php?action=ver" class="btn btn-sm text-white btn-outline-secondary" style="background-color: #8b0d2c;">
+
+                <?php if (!empty($_GET['id_clinica']) || !empty($_GET['fecha_inicio'])): ?>
+                    <a href="<?= URL_BASE ?>/admin/dashboard?action=ver" class="btn btn-sm text-white btn-outline-secondary"
+                        style="background-color: #8b0d2c;">
                         <i class="fas fa-times"></i> Limpiar
                     </a>
                 <?php endif; ?>
@@ -121,7 +131,7 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
         </div>
 
         <div class="row g-4">
-            
+
             <div class="col-md-3">
                 <div class="stat-card" style="border-left-color: #f59f00;">
                     <div class="d-flex justify-content-between align-items-center">
@@ -214,9 +224,9 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const ctx = document.getElementById('graficoSistema').getContext('2d');
-            
+
             new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -240,11 +250,11 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { 
-                        y: { 
-                            beginAtZero: true, 
-                            ticks: { stepSize: 1 } 
-                        } 
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
                     }
                 }
             });
@@ -252,4 +262,5 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     </script>
     <?php include_once APP_PATH . '/views/includes/modal_perfil.php'; ?>
 </body>
+
 </html>
