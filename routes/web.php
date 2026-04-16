@@ -11,6 +11,9 @@ return [
     'terminos'      => ['controller' => 'UsuariosController', 'method' => 'terminos'],   // Terminos
 
     'superadmin/dashboard' => ['controller' => 'superadmin/DashboardController', 'method' => 'index'], // Dashboard SuperAdmin
+    'superadmin/catalogos' => ['controller' => 'superadmin/CatalogosController', 'method' => 'index'], // Gestión de Catálogos
+    'superadmin/catalogos/guardar' => ['controller' => 'superadmin/CatalogosController', 'method' => 'guardar'], // Guardar Catálogo
+    'superadmin/catalogos/eliminar' => ['controller' => 'superadmin/CatalogosController', 'method' => 'eliminar'], // Eliminar Catálogo
     'admin/dashboard'       => ['controller' => 'admin/DashboardController', 'method' => 'ver'],     // Dashboard Administrador
     'veterinario/dashboard' => ['controller' => 'veterinario/VeterinarioController', 'method' => 'index'], // Dashboard Veterinario
     'veterinario/pacientes' => ['controller' => 'veterinario/VeterinarioController', 'method' => 'pacientes'], // Gestión de Pacientes

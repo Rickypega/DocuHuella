@@ -42,5 +42,40 @@ class Vacuna {
         
         return $stmt->execute();
     }
+
+    public function actualizar() {
+        $query = "UPDATE " . $this->tabla . " 
+                  SET Nombre_Vacuna = :nombre, 
+                      Descripcion = :desc, 
+                      Periodo_Refuerzo_Meses = :meses 
+                  WHERE ID_Vacuna = :id";
+                  
+        $stmt = $this->conexion->prepare($query);
+        
+        $this->nombre_vacuna = htmlspecialchars(strip_tags($this->nombre_vacuna));
+        $this->descripcion = htmlspecialchars(strip_tags($this->descripcion));
+        
+        $stmt->bindParam(':nombre', $this->nombre_vacuna);
+        $stmt->bindParam(':desc', $this->descripcion);
+        $stmt->bindParam(':meses', $this->periodo_refuerzo_meses);
+        $stmt->bindParam(':id', $this->id_vacuna);
+        
+        return $stmt->execute();
+    }
+
+    public function eliminar($id) {
+        $query = "DELETE FROM " . $this->tabla . " WHERE ID_Vacuna = :id";
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
+    }
+
+    public function tieneRelaciones($id) {
+        $query = "SELECT COUNT(*) FROM vacunaciones WHERE ID_Vacuna = :id";
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetchColumn() > 0;
+    }
 }
 ?>

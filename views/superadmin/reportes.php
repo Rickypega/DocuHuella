@@ -93,6 +93,7 @@ try {
             <a href="<?= URL_BASE ?>/superadmin/dashboard"><i class="fas fa-chart-pie"></i> Estadísticas</a>
             <a href="<?= URL_BASE ?>/views/superadmin/administrador.php"><i class="fas fa-hospital"></i> Gestión de Clínicas</a>
             <a href="<?= URL_BASE ?>/views/superadmin/reportes.php" class="active"><i class="fas fa-file-export"></i> Gestión de Reportes</a>
+            <a href="<?= URL_BASE ?>/superadmin/catalogos"><i class="fas fa-tags"></i> Gestión de Catálogos</a>
             <a href="#" id="enlace-mis-notas"
                onclick="mostrarPanelNotas(); marcarActivoSidebar(this); return false;">
                 <i class="fas fa-sticky-note"></i> Mis Notas

@@ -335,6 +335,13 @@
                             </div>
                         </div>
 
+                        <div class="mb-3 d-flex align-items-start gap-2">
+                            <input type="checkbox" id="check-terminos" class="form-check-input" required style="margin-top: 4px; min-width: 18px; min-height: 18px; cursor: pointer;">
+                            <label for="check-terminos" class="text-white opacity-75 small mb-0" style="cursor: pointer;">
+                                Acepto los <a href="<?= URL_BASE ?>/terminos" target="_blank" class="text-white fw-bold text-decoration-none border-bottom">términos de uso</a> y la <a href="<?= URL_BASE ?>/privacidad" target="_blank" class="text-white fw-bold text-decoration-none border-bottom">política de privacidad</a> de la plataforma.
+                            </label>
+                        </div>
+
                         <div class="d-flex justify-content-between align-items-center mt-4">
                             <a href="<?= URL_BASE ?>/login" class="text-white text-decoration-none opacity-75 small"><i
                                     class="fas fa-arrow-left me-1"></i> Ya Tengo Una Cuenta </a>
@@ -485,14 +492,22 @@
                 }
             });
 
+            // Validar términos y condiciones
+            const checkTerminos = document.getElementById('check-terminos');
+            const aceptoTerminos = checkTerminos.checked;
+
             // El botón solo se activa si la contraseña es fuerte, ambas contraseñas coinciden,
-            // los correos coinciden y son válidos, la cédula y el teléfono están completos, y TODOS los campos están llenos.
-            if (esFuerte && coinciden && esCorreoValido && correosCoinciden && cedulaCompleta && telefonoCompleto && todosLlenos) {
+            // los correos coinciden y son válidos, la cédula y el teléfono están completos, 
+            // TODOS los campos están llenos y los términos están aceptados.
+            if (esFuerte && coinciden && esCorreoValido && correosCoinciden && cedulaCompleta && telefonoCompleto && todosLlenos && aceptoTerminos) {
                 btnSubmit.disabled = false;
             } else {
                 btnSubmit.disabled = true;
             }
         }
+
+        // Listener para el checkbox
+        document.getElementById('check-terminos').addEventListener('change', validarFormulario);
 
         // Escuchamos absolutamente todos los campos para validar en tiempo real
         const formInputs = document.querySelectorAll('#form-registro input[required], #form-registro select[required]');
