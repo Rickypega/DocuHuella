@@ -45,17 +45,24 @@ Este sistema ha sido desarrollado bajo el patrón de diseño **MVC (Modelo-Vista
 
 ---
 
-## 📂 Estructura de Directorios
+## 📁 Estructura de Directorios
 
 ```text
-DocuHuella/
-├── config/      # Configuración de la conexión a la base de datos (PDO)
-├── controllers/ # Lógica intermedia que procesa las solicitudes
-├── models/      # Clases PHP que interactúan con la base de datos
-├── views/       # Archivos de interfaz, formularios y reportes
-├── public/      # Recursos estáticos (CSS, JS, Logo oficial)
-├── setup.php    # Script temporal de inicialización
-└── DocuhuellaDB.sql # Estructura exportada de la base de datos
+DocuHuella/                     # Raíz del Proyecto
+├── config/                     # Configuración de conexión a la base de datos (PDO)
+├── controllers/                # Lógica de negocio (Controladores MVC)
+├── layouts/                    # Plantillas maestras reutilizables (Heads, Footers)
+├── libs/                       # Librerías externas y helpers adicionales 
+├── models/                     # Clases PHP que interactúan con la base de datos (Modelos MVC)
+├── public/                     # Recursos estáticos accesibles directamente (CSS, JS, Imágenes, Logos)
+├── routes/                     # Definición de las rutas amigables y enrutamiento centralizado
+├── views/                      # Archivos de interfaz de usuario y formularios (Vistas MVC)
+│
+├── .gitignore                  # Configuración de archivos a ignorar en Git
+├── .htaccess                   # Configuración de Apache para URLs amigables (Enrutador)
+├── DocuhuellaDB.sql            # Estructura y datos iniciales exportados de la base de datos
+├── index.php                   # Punto de entrada único de la aplicación (Front Controller)
+├── README.md                   # Documentación general del proyecto (este archivo)
 
 ```
 
@@ -68,23 +75,11 @@ Para que el proyecto funcione en tu computadora local, sigue estos pasos al pie 
 ### 1. Base de Datos
 
 1. Abre **XAMPP** y activa los módulos de **Apache** y **MySQL**.
-2. Presiona admin en xampp o ve a tu navegador e ingresa a [http://localhost:8080/phpmyadmin/](https://www.google.com/search?q=http://localhost:8080/phpmyadmin/) *(Ajusta el puerto si usas uno diferente al 8080)*.
+2. Presiona admin en xampp o ve a tu navegador e ingresa a [http://localhost:8080/phpmyadmin/](http://localhost:8080/phpmyadmin/) *(Ajusta el puerto si usas uno diferente al 8080)*.
 3. Crea una base de datos nueva con el nombre exacto: `Docuhuella`.
 4. Ve a la pestaña "Importar" y sube el archivo `DocuhuellaDB.sql` que se encuentra en la raíz de este proyecto.
 
 ### 2. Inicialización de Datos (Roles y Administrador)
-
-Una vez importada la base de datos, debes ejecutar el script de inicialización para que el sistema cree los roles predeterminados (Admin, Veterinario, Cuidador) y la cuenta maestra.
-
-1. Entra a la siguiente ruta en tu navegador:
-`http://localhost:8080/DocuHuella/setup.php`
-`http://localhost/DocuHuella/setup.php`
-3. Si ves los mensajes de confirmación en verde, el sistema ya está configurado.
-4. **Credenciales de acceso iniciales:**
-* **Correo:** `master@docuhuella.com`
-* **Contraseña:** `master123`
-
-
 
 > ⚠️ **Nota importante sobre el puerto:** Si tu panel de XAMPP da un error con Apache en el puerto 80, debes cambiarlo al **8080** en el archivo `httpd.conf` de Apache. Asegúrate de usar `localhost:8080` en todas tus URLs locales.
 
@@ -94,7 +89,6 @@ Una vez importada la base de datos, debes ejecutar el script de inicialización 
 
 * **Ricardo Peña García (Ricky)**
 * **Eddual Rafael Corniel**
-* **Lerinson Samuel Volquez**
 
 ---
 
