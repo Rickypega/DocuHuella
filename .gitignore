@@ -1,6 +1,3 @@
-# Archivos de configuración 
-config/db.php
-
 # Logs y archivos temporales
 php_errors.log
 *.log
