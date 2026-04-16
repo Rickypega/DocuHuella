@@ -63,11 +63,13 @@ class Mascota {
      * Sin joins, usando la estructura actual
      */
     public function obtenerPerfilCompleto() {
-        $query = "SELECT m.*, e.Nombre_Especie AS Especie, r.Nombre_Raza AS Raza, c.Nombre_Color AS Color
+        $query = "SELECT m.*, e.Nombre_Especie AS Especie, r.Nombre_Raza AS Raza, c.Nombre_Color AS Color,
+                         cui.Nombre AS Nombre_Cuidador, cui.Apellido AS App_Cuidador, cui.Cedula, cui.Telefono
                   FROM " . $this->tabla . " m
                   LEFT JOIN especies e ON m.ID_Especie = e.ID_Especie
                   LEFT JOIN razas r ON m.ID_Raza = r.ID_Raza
                   LEFT JOIN colores c ON m.ID_Color = c.ID_Color
+                  JOIN cuidadores cui ON m.ID_Cuidador = cui.ID_Cuidador
                   WHERE m.ID_Mascota = :id
                   LIMIT 1";
                   
@@ -123,7 +125,7 @@ class Mascota {
     }
 
     /**
-     * ACTUALIZAR DATOS MÉTRICOS
+     * ACTUALIZAR DATOS MÉTRICOS (CUIDADOR)
      */
     public function actualizarDatos() {
         $query = "UPDATE " . $this->tabla . " 
@@ -141,6 +143,25 @@ class Mascota {
         $stmt->bindParam(':id', $this->id_mascota);
 
         return $stmt->execute();
+    }
+
+    /**
+     * ACTUALIZAR DATOS POR VETERINARIO
+     */
+    public function actualizarDatosVete($id, $datos) {
+        $query = "UPDATE " . $this->tabla . " 
+                  SET ID_Especie = :id_e, ID_Raza = :id_r, Edad = :edad, Peso = :peso, ID_Color = :id_c, rasgos = :rasgos
+                  WHERE ID_Mascota = :id";
+        $stmt = $this->conexion->prepare($query);
+        return $stmt->execute([
+            ':id_e' => $datos['id_especie'],
+            ':id_r' => $datos['id_raza'],
+            ':id_c' => $datos['id_color'],
+            ':edad' => $datos['edad'],
+            ':peso' => $datos['peso'],
+            ':rasgos' => $datos['rasgos'] ?? '',
+            ':id'   => $id
+        ]);
     }
 
     /**

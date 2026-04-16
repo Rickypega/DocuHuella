@@ -88,7 +88,7 @@ class Cita {
                          cli.Nombre_Sucursal AS Clinica, cli.Direccion
                   FROM " . $this->tabla . " c
                   INNER JOIN mascotas m ON c.ID_Mascota = m.ID_Mascota
-                  INNER JOIN veterinarios v ON c.ID_Veterinario = v.ID_Veterinario
+                  LEFT JOIN veterinarios v ON c.ID_Veterinario = v.ID_Veterinario
                   INNER JOIN clinicas cli ON c.ID_Clinica = cli.ID_Clinica
                   WHERE m.ID_Cuidador = :id_cuidador
                   ORDER BY c.Fecha_Cita DESC";
@@ -116,6 +116,31 @@ class Cita {
         $stmt->bindParam(':estado', $this->estado);
         $stmt->bindParam(':id', $this->id_cita);
         
+        return $stmt->execute();
+    }
+
+    /**
+     * 5. ACTUALIZAR FECHA Y HORA
+     * Solo permite editar el momento de la cita.
+     */
+    public function actualizarFecha($id, $fecha, $hora) {
+        $query = "UPDATE " . $this->tabla . " 
+                  SET Fecha_Cita = :fecha, Hora_Cita = :hora 
+                  WHERE ID_Cita = :id";
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bindParam(':fecha', $fecha);
+        $stmt->bindParam(':hora', $hora);
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
+    }
+
+    /**
+     * 6. ELIMINAR CITA
+     */
+    public function eliminar($id) {
+        $query = "DELETE FROM " . $this->tabla . " WHERE ID_Cita = :id";
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bindParam(':id', $id);
         return $stmt->execute();
     }
 }

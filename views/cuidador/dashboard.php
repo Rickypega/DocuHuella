@@ -61,6 +61,25 @@ if (!empty($citas)) {
             padding: 2px 5px;
             border-radius: 6px;
         }
+
+        /* Ajustes Responsivos para el Calendario */
+        @media (max-width: 768px) {
+            .fc-toolbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .fc-toolbar-title {
+                font-size: 1rem !important;
+                text-align: center;
+            }
+            .fc-button {
+                padding: 0.4rem 0.65rem !important;
+                font-size: 0.85rem !important;
+            }
+            .fc-header-toolbar {
+                margin-bottom: 1.5rem !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -166,14 +185,14 @@ if (!empty($citas)) {
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
+                initialView: (window.innerWidth < 768) ? 'listWeek' : 'dayGridMonth',
                 locale: 'es', // Idioma en español
                 height: 'auto', // Tamaño automático basado en el contenido
                 handleWindowResize: true,
                 headerToolbar: {
-                    left: 'prev,next today',
+                    left: (window.innerWidth < 768) ? 'prev,next today' : 'prev,next today',
                     center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                    right: (window.innerWidth < 768) ? 'dayGridMonth,listWeek' : 'dayGridMonth,timeGridWeek,listWeek'
                 },
                 events: <?php echo json_encode($eventos_calendario); ?>,
                 eventClick: function(info) {

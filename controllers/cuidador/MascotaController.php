@@ -1,5 +1,7 @@
 <?php
 require_once APP_PATH . '/models/Mascota.php';
+require_once APP_PATH . '/models/Vacunacion.php';
+require_once APP_PATH . '/models/Consulta.php';
 
 class MascotaController
 {
@@ -61,9 +63,178 @@ class MascotaController
         }
 
         $historial = $mascotaModel->verHistorialMedico();
+        
+        // Obtener historial de vacunas
+        $vacunaModel = new Vacunacion($this->db);
+        $vacunas = $vacunaModel->obtenerCartillaPorMascota($id_mascota);
+        
         $perfil_info = $mascotaModel->obtenerInfoCuidador($_SESSION['id_perfil']);
 
         include_once APP_PATH . '/views/cuidador/mascota.php';
+    }
+
+    /**
+     * Detalle de Consulta vía AJAX (Seguro para Cuidador)
+     */
+    public function consultaDetalle()
+    {
+        if (!isset($_GET['id']) || !isset($_SESSION['id_perfil'])) {
+            echo json_encode(['status' => 'error', 'message' => 'Acceso no autorizado']);
+            return;
+        }
+
+        $id_consulta = $_GET['id'];
+        $consultaModel = new Consulta($this->db);
+        $detalle = $consultaModel->obtenerDetallesCompletos($id_consulta);
+
+        // Seguridad: Verificar que el dueño de la mascota sea el usuario en sesión
+        if (!$detalle || $detalle['ID_Cuidador'] != $_SESSION['id_perfil']) {
+            echo json_encode(['status' => 'error', 'message' => 'No tienes permiso para ver esta consulta']);
+            return;
+        }
+
+        // Buscar evidencias
+        $evidencias = [];
+        $dir = APP_PATH . '/public/uploads/consultas/';
+        if (is_dir($dir)) {
+            $files = scandir($dir);
+            foreach ($files as $f) {
+                if (strpos($f, $id_consulta . "_") === 0 || strpos($f, $id_consulta . ".") === 0) {
+                    $evidencias[] = URL_BASE . "/public/uploads/consultas/" . $f;
+                }
+            }
+        }
+        $detalle['evidencias'] = $evidencias;
+
+        echo json_encode(['status' => 'success', 'data' => $detalle]);
+    }
+
+    /**
+     * Detalle de Vacuna vía AJAX (Seguro para Cuidador)
+     */
+    public function vacunaDetalle()
+    {
+        if (!isset($_GET['id']) || !isset($_SESSION['id_perfil'])) {
+            echo json_encode(['status' => 'error', 'message' => 'Acceso no autorizado']);
+            return;
+        }
+
+        $id_vacunacion = $_GET['id'];
+        
+        // El veterinario tiene una query similar, la adaptamos para asegurar propiedad
+        $query = "SELECT v.*, vac.Nombre_Vacuna, vac.Descripcion, m.Nombre AS Nombre_Mascota, m.ID_Cuidador,
+                         vet.Nombre AS Nombre_Vet, vet.Apellido AS Apellido_Vet
+                  FROM vacunaciones v 
+                  JOIN vacunas vac ON v.ID_Vacuna = vac.ID_Vacuna 
+                  JOIN mascotas m ON v.ID_Mascota = m.ID_Mascota
+                  JOIN veterinarios vet ON v.ID_Veterinario = vet.ID_Veterinario
+                  WHERE v.ID_Vacunacion = :id LIMIT 1";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([':id' => $id_vacunacion]);
+        $detalle = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$detalle || $detalle['ID_Cuidador'] != $_SESSION['id_perfil']) {
+            echo json_encode(['status' => 'error', 'message' => 'Acceso denegado']);
+            return;
+        }
+
+        echo json_encode(['status' => 'success', 'data' => $detalle]);
+    }
+
+    /**
+     * Exportar Expediente en PDF (Seguro para Cuidador)
+     */
+    public function exportarExpediente()
+    {
+        if (!isset($_GET['id']) || !isset($_SESSION['id_perfil'])) {
+            die("Acceso denegado");
+        }
+
+        $id_mascota = $_GET['id'];
+        $mascotaModel = new Mascota($this->db);
+        $mascotaModel->id_mascota = $id_mascota;
+        $datos = $mascotaModel->obtenerPerfilCompleto();
+
+        // Seguridad
+        if (!$datos || $datos['ID_Cuidador'] != $_SESSION['id_perfil']) {
+            die("No tienes permiso para exportar este archivo.");
+        }
+
+        $consultas = $mascotaModel->verHistorialMedico();
+        
+        $vacunaModel = new Vacunacion($this->db);
+        $vacunas = $vacunaModel->obtenerCartillaPorMascota($id_mascota);
+
+        // Generar PDF
+        while (ob_get_level()) ob_end_clean();
+        ob_start();
+        
+        require_once APP_PATH . '/libs/fpdf.php';
+        $pdf = new FPDF();
+        $pdf->AddPage();
+        
+        // Cabecera
+        $pdf->SetFont('Arial', 'B', 20);
+        $pdf->SetTextColor(26, 45, 64);
+        $pdf->Cell(0, 15, utf8_decode('EXPEDIENTE CLÍNICO DIGITAL'), 0, 1, 'C');
+        $pdf->SetFont('Arial', 'I', 10);
+        $pdf->Cell(0, 5, utf8_decode('DocuHuella - Gestión Médica Veterinaria'), 0, 1, 'C');
+        $pdf->Ln(10);
+
+        // Datos Mascota
+        $pdf->SetFillColor(240, 240, 240);
+        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->Cell(0, 10, utf8_decode('1. IDENTIFICACIÓN DEL PACIENTE'), 0, 1, 'L', true);
+        $pdf->SetFont('Arial', '', 11);
+        $pdf->Ln(2);
+        $pdf->Cell(50, 7, utf8_decode('Nombre: ' . $datos['Nombre']), 0, 0);
+        $pdf->Cell(0, 7, utf8_decode('Especie/Raza: ' . $datos['Especie'] . ' / ' . ($datos['Raza'] ?? 'N/A')), 0, 1);
+        $pdf->Cell(50, 7, utf8_decode('Sexo/Edad: ' . ($datos['Sexo']=='M'?'Macho':'Hembra') . ' / ' . $datos['Edad'] . ' años'), 0, 0);
+        $pdf->Cell(0, 7, utf8_decode('Peso/Color: ' . $datos['Peso'] . ' kg / ' . $datos['Color']), 0, 1);
+        $pdf->MultiCell(0, 7, utf8_decode('Rasgos: ' . ($datos['Rasgos'] ?: 'Ninguno registrado')));
+        $pdf->Ln(5);
+
+        // Consultas
+        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->Cell(0, 10, utf8_decode('2. HISTORIAL DE CONSULTAS'), 0, 1, 'L', true);
+        if (empty($consultas)) {
+            $pdf->SetFont('Arial', 'I', 10);
+            $pdf->Cell(0, 10, utf8_decode('No hay consultas registradas.'), 0, 1);
+        } else {
+            foreach ($consultas as $c) {
+                $pdf->SetFont('Arial', 'B', 10);
+                $pdf->Cell(0, 8, utf8_decode('Fecha: ' . date('d/m/Y', strtotime($c['Fecha_Consulta'])) . ' - Motivo: ' . $c['Motivo']), 'T', 1);
+                $pdf->SetFont('Arial', '', 10);
+                $pdf->MultiCell(0, 5, utf8_decode('Diagnóstico: ' . ($c['Diagnostico'] ?: 'N/A')));
+                $pdf->MultiCell(0, 5, utf8_decode('Tratamiento: ' . ($c['Tratamiento_Recomendado'] ?: 'N/A')));
+                $pdf->Cell(0, 5, utf8_decode('Centro: ' . $c['Clinica'] . ' (Dr. ' . $c['Nombre_Vet'] . ' ' . $c['Apellido_Vet'] . ')'), 0, 1);
+                $pdf->Ln(2);
+            }
+        }
+        $pdf->Ln(5);
+
+        // Vacunas
+        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->Cell(0, 10, utf8_decode('3. REGISTRO DE VACUNACIÓN'), 0, 1, 'L', true);
+        if (empty($vacunas)) {
+            $pdf->SetFont('Arial', 'I', 10);
+            $pdf->Cell(0, 10, utf8_decode('No hay vacunas registradas.'), 0, 1);
+        } else {
+            $pdf->SetFont('Arial', 'B', 10);
+            $pdf->Cell(40, 8, utf8_decode('Fecha'), 1, 0, 'C');
+            $pdf->Cell(80, 8, utf8_decode('Vacuna'), 1, 0, 'C');
+            $pdf->Cell(70, 8, utf8_decode('Próx. Refuerzo'), 1, 1, 'C');
+            $pdf->SetFont('Arial', '', 10);
+            foreach ($vacunas as $v) {
+                $pdf->Cell(40, 8, date('d/m/Y', strtotime($v['Fecha_Aplicacion'])), 1, 0, 'C');
+                $pdf->Cell(80, 8, utf8_decode($v['Nombre_Vacuna']), 1, 0, 'L');
+                $pdf->Cell(70, 8, ($v['Fecha_Refuerzo'] ? date('d/m/Y', strtotime($v['Fecha_Refuerzo'])) : 'N/A'), 1, 1, 'C');
+            }
+        }
+
+        $pdf->Output('I', 'Expediente_' . $datos['Nombre'] . '.pdf');
+        exit();
     }
 
     /**

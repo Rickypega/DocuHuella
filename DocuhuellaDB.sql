@@ -176,7 +176,7 @@ CREATE TABLE Consultas (
 CREATE TABLE Citas (
     ID_Cita INT AUTO_INCREMENT PRIMARY KEY,
     ID_Clinica INT NOT NULL,
-    ID_Veterinario INT NOT NULL,
+    ID_Veterinario INT NULL,
     ID_Mascota INT NOT NULL,
     Fecha_Cita DATE NOT NULL,
     Hora_Cita TIME NOT NULL,

@@ -42,7 +42,7 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     </div>
 
     <!-- Filtros de búsqueda y fecha -->
-    <div class="card border-0 shadow-sm mb-4 p-3" style="border-radius: 14px; background: #f8f9ff;">
+    <div class="card border-0 shadow-sm mb-4 p-3" style="border-radius: 14px; background: #f8f9ff; overflow: hidden;">
         <div class="row g-2 align-items-end">
             <div class="col-12 col-md-4">
                 <label class="form-label text-muted small mb-1">Buscar nota</label>
@@ -92,7 +92,6 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     </div>
 
 </div><!-- /panel-mis-notas -->
-
 
 <!-- ================================================================
      MODAL: NUEVA / EDITAR NOTA
@@ -317,43 +316,85 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
 </script>
 <script>
     // URL base de la API de notas
-    const NOTAS_API_URL = '<?= URL_BASE ?>/notas/api';
+    var NOTAS_API_URL = '<?= URL_BASE ?>/notas/api';
 
     // Referencia al modal de Bootstrap
-    let modalNotaBS = null;
-    let modalEliminarTodasBS = null;
+    var modalNotaBS = modalNotaBS || null;
+    var modalEliminarTodasBS = modalEliminarTodasBS || null;
 
     document.addEventListener('DOMContentLoaded', function () {
-        modalNotaBS = new bootstrap.Modal(document.getElementById('modalNota'));
-        modalEliminarTodasBS = new bootstrap.Modal(document.getElementById('modalEliminarTodas'));
+        const modalNotaEl = document.getElementById('modalNota');
+        const modalEliminarTodasEl = document.getElementById('modalEliminarTodas');
+        
+        // Mover modales al final del body para evitar conflictos de z-index (Pantalla Oscura)
+        if (modalNotaEl) document.body.appendChild(modalNotaEl);
+        if (modalEliminarTodasEl) document.body.appendChild(modalEliminarTodasEl);
+
+        if (modalNotaEl && typeof bootstrap !== 'undefined') {
+            modalNotaBS = new bootstrap.Modal(modalNotaEl);
+        }
+        if (modalEliminarTodasEl && typeof bootstrap !== 'undefined') {
+            modalEliminarTodasBS = new bootstrap.Modal(modalEliminarTodasEl);
+        }
+
+        // Deep linking: Verificar si el panel de notas debe abrirse al entrar
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('view') === 'notas') {
+            mostrarPanelNotas(false); 
+        }
     });
+
+    window.onpopstate = function(event) {
+        if (event.state && event.state.panel === 'notas') {
+            mostrarPanelNotas(false);
+        } else {
+            ocultarPanelNotas(false);
+        }
+    };
 
     // ============================================================
     // MOSTRAR / OCULTAR el panel de Mis Notas
     // ============================================================
-    function mostrarPanelNotas() {
-        // Ocultar contenido principal del dashboard y mostrar el panel de notas
-        const panelPrincipal = document.getElementById('contenido-dashboard');
+    function mostrarPanelNotas(shouldPushState = true) {
         const panelNotas = document.getElementById('panel-mis-notas');
+        if (!panelNotas) return;
 
-        if (panelPrincipal) panelPrincipal.classList.add('d-none');
-        if (panelNotas) panelNotas.classList.remove('d-none');
+        // Ocultar todos los hermanos EXCEPT el panel de notas
+        const siblings = panelNotas.parentNode.children;
+        for (let s of siblings) {
+            if (s !== panelNotas) s.classList.add('d-none');
+        }
+        panelNotas.classList.remove('d-none');
 
         // Marcar el enlace activo en el sidebar
         document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
         const enlaceNotas = document.getElementById('enlace-mis-notas');
         if (enlaceNotas) enlaceNotas.classList.add('active');
 
-        // Cargar notas al abrir
+        if (shouldPushState) {
+            const url = new URL(window.location);
+            url.searchParams.set('view', 'notas');
+            window.history.pushState({panel: 'notas'}, '', url);
+        }
+
         cargarNotas();
     }
 
-    function ocultarPanelNotas() {
-        const panelPrincipal = document.getElementById('contenido-dashboard');
+    function ocultarPanelNotas(shouldPushState = true) {
         const panelNotas = document.getElementById('panel-mis-notas');
+        if (!panelNotas) return;
 
-        if (panelPrincipal) panelPrincipal.classList.remove('d-none');
-        if (panelNotas) panelNotas.classList.add('d-none');
+        const siblings = panelNotas.parentNode.children;
+        for (let s of siblings) {
+            if (s !== panelNotas) s.classList.remove('d-none');
+        }
+        panelNotas.classList.add('d-none');
+
+        if (shouldPushState) {
+            const url = new URL(window.location);
+            url.searchParams.delete('view');
+            window.history.pushState({}, '', url);
+        }
     }
 
     // ============================================================
@@ -490,32 +531,54 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     // MODAL NUEVA NOTA
     // ============================================================
     function abrirModalNuevaNota() {
-        document.getElementById('modalNotaTitulo').innerHTML =
-            '<i class="fas fa-plus me-2"></i>Nueva Nota';
-        document.getElementById('nota_id_editar').value = '';
-        document.getElementById('nota_titulo').value = '';
-        document.getElementById('nota_contenido').value = '';
-        document.getElementById('nota_color').value = '#1A2D40';
-        document.getElementById('btn-nota-eliminar').classList.add('d-none');
+        const modalEl = document.getElementById('modalNota');
+        if (!modalNotaBS && modalEl && typeof bootstrap !== 'undefined') {
+            modalNotaBS = new bootstrap.Modal(modalEl);
+        }
+
+        if (document.getElementById('modalNotaTitulo')) {
+            document.getElementById('modalNotaTitulo').innerHTML = '<i class="fas fa-plus me-2"></i>Nueva Nota';
+        }
+        
+        if (document.getElementById('nota_id_editar')) document.getElementById('nota_id_editar').value = '';
+        if (document.getElementById('nota_titulo')) document.getElementById('nota_titulo').value = '';
+        if (document.getElementById('nota_contenido')) document.getElementById('nota_contenido').value = '';
+        if (document.getElementById('nota_color')) document.getElementById('nota_color').value = '#1A2D40';
+        
+        const btnEliminar = document.getElementById('btn-nota-eliminar');
+        if (btnEliminar) btnEliminar.classList.add('d-none');
+        
         seleccionarColor('#1A2D40');
         validarFormNota();
-        modalNotaBS.show();
+        
+        if (modalNotaBS) modalNotaBS.show();
     }
 
     // ============================================================
     // MODAL EDITAR NOTA
     // ============================================================
     function abrirModalEditar(nota) {
-        document.getElementById('modalNotaTitulo').innerHTML =
-            '<i class="fas fa-edit me-2"></i>Editar Nota';
-        document.getElementById('nota_id_editar').value = nota.ID_Nota;
-        document.getElementById('nota_titulo').value = decodeHTMLEntities(nota.Titulo);
-        document.getElementById('nota_contenido').value = decodeHTMLEntities(nota.Contenido || '');
-        document.getElementById('nota_color').value = nota.Color_Etiqueta || '#1A2D40';
-        document.getElementById('btn-nota-eliminar').classList.remove('d-none');
+        const modalEl = document.getElementById('modalNota');
+        if (!modalNotaBS && modalEl && typeof bootstrap !== 'undefined') {
+            modalNotaBS = new bootstrap.Modal(modalEl);
+        }
+
+        if (document.getElementById('modalNotaTitulo')) {
+            document.getElementById('modalNotaTitulo').innerHTML = '<i class="fas fa-edit me-2"></i>Editar Nota';
+        }
+        
+        if (document.getElementById('nota_id_editar')) document.getElementById('nota_id_editar').value = nota.ID_Nota;
+        if (document.getElementById('nota_titulo')) document.getElementById('nota_titulo').value = decodeHTMLEntities(nota.Titulo);
+        if (document.getElementById('nota_contenido')) document.getElementById('nota_contenido').value = decodeHTMLEntities(nota.Contenido || '');
+        if (document.getElementById('nota_color')) document.getElementById('nota_color').value = nota.Color_Etiqueta || '#1A2D40';
+        
+        const btnEliminar = document.getElementById('btn-nota-eliminar');
+        if (btnEliminar) btnEliminar.classList.remove('d-none');
+        
         seleccionarColor(nota.Color_Etiqueta || '#1A2D40');
         validarFormNota();
-        modalNotaBS.show();
+        
+        if (modalNotaBS) modalNotaBS.show();
     }
 
     // ============================================================
@@ -669,15 +732,25 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     // MODAL ELIMINAR TODAS
     // ============================================================
     function abrirModalEliminarTodas() {
-        document.getElementById('eliminar_todas_pass').value = '';
-        document.getElementById('msg-eliminar-todas').classList.add('d-none');
-        document.getElementById('msg-eliminar-todas').textContent = '';
-        const icoPass = document.getElementById('ico-pass-eliminar');
-        if (icoPass) {
-            icoPass.className = 'fas fa-eye';
-            document.getElementById('eliminar_todas_pass').type = 'password';
+        const modalEl = document.getElementById('modalEliminarTodas');
+        if (!modalEliminarTodasBS && modalEl && typeof bootstrap !== 'undefined') {
+            modalEliminarTodasBS = new bootstrap.Modal(modalEl);
         }
-        modalEliminarTodasBS.show();
+
+        if (document.getElementById('eliminar_todas_pass')) document.getElementById('eliminar_todas_pass').value = '';
+        if (document.getElementById('msg-eliminar-todas')) {
+            document.getElementById('msg-eliminar-todas').classList.add('d-none');
+            document.getElementById('msg-eliminar-todas').textContent = '';
+        }
+        
+        const icoPass = document.getElementById('ico-pass-eliminar');
+        const passInput = document.getElementById('eliminar_todas_pass');
+        if (icoPass && passInput) {
+            icoPass.className = 'fas fa-eye';
+            passInput.type = 'password';
+        }
+        
+        if (modalEliminarTodasBS) modalEliminarTodasBS.show();
     }
 
     function togglePassEliminarTodas() {

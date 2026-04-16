@@ -1,5 +1,6 @@
 <?php
-class Consulta {
+class Consulta
+{
     private $conexion;
     private $tabla = "consultas";
 
@@ -17,21 +18,23 @@ class Consulta {
     public $tratamiento_sugerido;
     public $observaciones_privadas; // notas solo para el staff
 
-    public function __construct($db) {
+    public function __construct($db)
+    {
         $this->conexion = $db;
     }
 
     /**
      * REGISTRAR NUEVA VISITA MÉDICA
      */
-    public function registrarConsulta() {
+    public function registrarConsulta()
+    {
         $query = "INSERT INTO " . $this->tabla . " 
                   (ID_Expediente, ID_Veterinario, Motivo_Consulta, Sintomas, 
                    Peso_KG, Temperatura_C, Frecuencia_Cardiaca, Diagnostico, 
                    Tratamiento_Sugerido, Observaciones_Privadas) 
                   VALUES (:id_exp, :id_vet, :motivo, :sintomas, :peso, :temp, 
                           :frecuencia, :diag, :tratamiento, :obs)";
-        
+
         $stmt = $this->conexion->prepare($query);
 
         // Sanitización de textos libres 
@@ -53,7 +56,7 @@ class Consulta {
         $stmt->bindParam(':obs', $this->observaciones_privadas);
 
         try {
-            if($stmt->execute()) {
+            if ($stmt->execute()) {
                 $this->id_consulta = $this->conexion->lastInsertId();
                 return true;
             }
@@ -68,17 +71,18 @@ class Consulta {
      * Trae todas las visitas médicas asociadas a la carpeta de la mascota, 
      * ordenadas desde la más reciente.
      */
-    public function obtenerPorExpediente($id_expediente) {
+    public function obtenerPorExpediente($id_expediente)
+    {
         $query = "SELECT c.*, v.Nombre AS Nombre_Vet, v.Apellido AS Apellido_Vet 
                   FROM " . $this->tabla . " c
                   INNER JOIN veterinarios v ON c.ID_Veterinario = v.ID_Veterinario
                   WHERE c.ID_Expediente = :id_exp
                   ORDER BY c.Fecha_Consulta DESC";
-                  
+
         $stmt = $this->conexion->prepare($query);
         $stmt->bindParam(':id_exp', $id_expediente);
         $stmt->execute();
-        
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -86,7 +90,8 @@ class Consulta {
      * OBTENER DATOS PARA IMPRIMIR RECETA
      * Une Consulta + Expediente + Mascota + Veterinario + Clínica
      */
-    public function obtenerDatosReceta($id_consulta) {
+    public function obtenerDatosReceta($id_consulta)
+    {
         $query = "SELECT 
                     cons.Fecha_Consulta, 
                     cons.Peso_KG, 
@@ -109,13 +114,42 @@ class Consulta {
                   INNER JOIN veterinarios v ON cons.ID_Veterinario = v.ID_Veterinario
                   INNER JOIN clinicas c ON e.ID_Clinica = c.ID_Clinica
                   WHERE cons.ID_Consulta = :id LIMIT 1";
-        
+
         $stmt = $this->conexion->prepare($query);
         $stmt->bindParam(':id', $id_consulta);
         $stmt->execute();
-        
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+
+    }
+    /**
+     * OBTENER DETALLES COMPLETOS (5 PARTES)
+     * Mascota, Consulta, Veterinario, Cuidador, Clínica
+     */
+    public function obtenerDetallesCompletos($id_consulta)
+    {
+        $query = "SELECT 
+                    cons.*, 
+                    m.Nombre AS Nombre_Mascota, m.Sexo AS Sexo_Mascota, m.Edad AS Edad_Mascota, m.ID_Cuidador,
+                    e.Nombre_Especie AS Especie, r.Nombre_Raza AS Raza,
+                    cui.Nombre AS Nombre_Cuidador, cui.Apellido AS Apellido_Cuidador, cui.Cedula AS Cedula_Cuidador, cui.Telefono AS Telefono_Cuidador,
+                    v.Nombre AS Nombre_Vet, v.Apellido AS Apellido_Vet, v.Exequatur, v.Colegiatura,
+                    cli.Nombre_Sucursal AS Clinica, cli.Direccion AS Direccion_Clinica, cli.Telefono AS Telefono_Clinica, cli.RNC AS RNC_Clinica
+                  FROM " . $this->tabla . " cons
+                  INNER JOIN expedientes exp ON cons.ID_Expediente = exp.ID_Expediente
+                  INNER JOIN mascotas m ON exp.ID_Mascota = m.ID_Mascota
+                  INNER JOIN cuidadores cui ON m.ID_Cuidador = cui.ID_Cuidador
+                  INNER JOIN veterinarios v ON cons.ID_Veterinario = v.ID_Veterinario
+                  INNER JOIN clinicas cli ON v.ID_Clinica = cli.ID_Clinica
+                  LEFT JOIN especies e ON m.ID_Especie = e.ID_Especie
+                  LEFT JOIN razas r ON m.ID_Raza = r.ID_Raza
+                  WHERE cons.ID_Consulta = :id LIMIT 1";
+
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bindParam(':id', $id_consulta);
+        $stmt->execute();
+
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
 ?>
-
