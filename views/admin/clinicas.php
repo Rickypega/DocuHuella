@@ -113,6 +113,9 @@ $sucursales = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <a href="<?= URL_BASE ?>/views/admin/registrar_vet.php"><i class="fas fa-user-md"></i> Veterinarios</a>
             <a href="<?= URL_BASE ?>/views/admin/reportes.php"><i class="fas fa-file-medical-alt"></i> Reportes
                 Clínicos</a>
+            <a href="#" id="enlace-mis-notas" onclick="mostrarPanelNotas(); marcarActivoSidebar(this); return false;">
+                <i class="fas fa-sticky-note"></i> Mis Notas
+            </a>
         </nav>
         <div class="mt-auto">
             <a href="#" class="btn btn-outline-light d-flex align-items-center justify-content-center gap-2 mb-2"
@@ -130,6 +133,9 @@ $sucursales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- Contenido principal -->
     <div class="main-content">
+
+        <!-- Envoltorio para ocultar al mostrar notas -->
+        <div id="contenido-dashboard">
 
         <!-- Bienvenida -->
         <div class="d-flex justify-content-end mb-2">
@@ -195,6 +201,12 @@ $sucursales = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </table>
             </div>
         </div>
+
+        </div><!-- /#contenido-dashboard -->
+
+        <!-- Panel de Notas -->
+        <?php include_once APP_PATH . '/views/includes/mis_notas.php'; ?>
+
     </div>
 
     <!-- ===== MODAL CREAR SUCURSAL ===== -->
@@ -571,6 +583,13 @@ $sucursales = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     btn.disabled = false;
                     btn.innerHTML = 'Guardar Cambios';
                 });
+        }
+    </script>
+
+    <script>
+        function marcarActivoSidebar(el) {
+            document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+            el.classList.add('active');
         }
     </script>
 

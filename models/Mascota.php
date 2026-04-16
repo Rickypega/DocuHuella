@@ -6,11 +6,11 @@ class Mascota {
     // ATRIBUTOS
     public $id_mascota;
     public $id_cuidador;
+    public $id_especie;
+    public $id_raza;
+    public $id_color;
     public $nombre;
-    public $especie;
-    public $raza;
     public $sexo;
-    public $color;
     public $edad;
     public $rasgos;
     public $peso;
@@ -27,30 +27,25 @@ class Mascota {
      */
     public function registrarMascota() {
         $query = "INSERT INTO " . $this->tabla . " 
-                  (Nombre, Especie, Raza, Sexo, Color, Edad, Rasgos, Peso, Estado_Esterilizacion, ID_Cuidador, Imagen) 
-                  VALUES (:nombre, :especie, :raza, :sexo, :color, :edad, :rasgos, :peso, :esteril, :id_cuidador, :imagen)";
+                  (Nombre, ID_Especie, ID_Raza, Sexo, ID_Color, Edad, Rasgos, Peso, Estado_Esterilizacion, ID_Cuidador) 
+                  VALUES (:nombre, :id_especie, :id_raza, :sexo, :id_color, :edad, :rasgos, :peso, :esteril, :id_cuidador)";
         
         $stmt = $this->conexion->prepare($query);
 
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
-        $this->especie = htmlspecialchars(strip_tags($this->especie));
-        $this->raza = htmlspecialchars(strip_tags($this->raza));
         $this->sexo = htmlspecialchars(strip_tags($this->sexo));
-        $this->color = htmlspecialchars(strip_tags($this->color));
         $this->rasgos = htmlspecialchars(strip_tags($this->rasgos));
-        $this->imagen = htmlspecialchars(strip_tags($this->imagen));
 
         $stmt->bindParam(':nombre', $this->nombre);
-        $stmt->bindParam(':especie', $this->especie);
-        $stmt->bindParam(':raza', $this->raza);
+        $stmt->bindParam(':id_especie', $this->id_especie);
+        $stmt->bindParam(':id_raza', $this->id_raza);
         $stmt->bindParam(':sexo', $this->sexo);
-        $stmt->bindParam(':color', $this->color);
+        $stmt->bindParam(':id_color', $this->id_color);
         $stmt->bindParam(':edad', $this->edad);
         $stmt->bindParam(':rasgos', $this->rasgos);
         $stmt->bindParam(':peso', $this->peso);
         $stmt->bindParam(':esteril', $this->estado_esterilizacion);
         $stmt->bindParam(':id_cuidador', $this->id_cuidador);
-        $stmt->bindParam(':imagen', $this->imagen);
 
         try {
             if ($stmt->execute()) {
@@ -68,9 +63,12 @@ class Mascota {
      * Sin joins, usando la estructura actual
      */
     public function obtenerPerfilCompleto() {
-        $query = "SELECT * 
-                  FROM " . $this->tabla . "
-                  WHERE ID_Mascota = :id
+        $query = "SELECT m.*, e.Nombre_Especie AS Especie, r.Nombre_Raza AS Raza, c.Nombre_Color AS Color
+                  FROM " . $this->tabla . " m
+                  LEFT JOIN especies e ON m.ID_Especie = e.ID_Especie
+                  LEFT JOIN razas r ON m.ID_Raza = r.ID_Raza
+                  LEFT JOIN colores c ON m.ID_Color = c.ID_Color
+                  WHERE m.ID_Mascota = :id
                   LIMIT 1";
                   
         $stmt = $this->conexion->prepare($query);
@@ -82,26 +80,45 @@ class Mascota {
 
     /**
      * VER HISTORIAL MÉDICO
-     * Adaptado a tu tabla expedientes real
+     * Incluye nombre de la clínica mediante LEFT JOIN
      */
     public function verHistorialMedico() {
         $query = "SELECT 
-                    e.ID_Expediente,
-                    e.Fecha_Hora,
-                    e.Motivo,
-                    e.Diagnostico_Presuntivo,
-                    e.Tratamiento_Recomendado,
+                    c.ID_Consulta,
+                    c.Fecha_Consulta,
+                    c.Motivo_Consulta AS Motivo,
+                    c.Diagnostico,
+                    c.Tratamiento_Sugerido AS Tratamiento_Recomendado,
                     v.Nombre AS Nombre_Vet,
-                    v.Apellido AS Apellido_Vet
-                  FROM expedientes e
-                  LEFT JOIN veterinarios v ON e.ID_Veterinario = v.ID_Veterinario
+                    v.Apellido AS Apellido_Vet,
+                    cli.Nombre_Sucursal AS Clinica
+                  FROM consultas c
+                  JOIN expedientes e ON c.ID_Expediente = e.ID_Expediente
+                  JOIN veterinarios v ON c.ID_Veterinario = v.ID_Veterinario
+                  JOIN clinicas cli ON v.ID_Clinica = cli.ID_Clinica
                   WHERE e.ID_Mascota = :id
-                  ORDER BY e.Fecha_Hora DESC";
+                  ORDER BY c.Fecha_Consulta DESC";
 
         $stmt = $this->conexion->prepare($query);
         $stmt->bindParam(':id', $this->id_mascota);
         $stmt->execute();
 
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * OBTENER TODAS LAS MASCOTAS DE UN CUIDADOR
+     */
+    public function obtenerMascotasPorCuidador($id_cuidador) {
+        $query = "SELECT m.*, e.Nombre_Especie AS Especie, r.Nombre_Raza AS Raza 
+                  FROM " . $this->tabla . " m
+                  LEFT JOIN especies e ON m.ID_Especie = e.ID_Especie
+                  LEFT JOIN razas r ON m.ID_Raza = r.ID_Raza
+                  WHERE m.ID_Cuidador = :id_c 
+                  ORDER BY m.Nombre ASC";
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bindParam(':id_c', $id_cuidador);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -124,6 +141,37 @@ class Mascota {
         $stmt->bindParam(':id', $this->id_mascota);
 
         return $stmt->execute();
+    }
+
+    /**
+     * CATÁLOGOS
+     */
+    public function obtenerEspecies() {
+        try {
+            $query = "SELECT * FROM especies ORDER BY Nombre_Especie ASC";
+            $stmt = $this->conexion->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (Exception $e) { return []; }
+    }
+
+    public function obtenerColores() {
+        try {
+            $query = "SELECT * FROM colores ORDER BY Nombre_Color ASC";
+            $stmt = $this->conexion->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (Exception $e) { return []; }
+    }
+
+    /**
+     * Obtiene info de contacto del cuidador para pre-llenar perfil
+     */
+    public function obtenerInfoCuidador($id_cuidador) {
+        $query = "SELECT Telefono, Direccion FROM cuidadores WHERE ID_Cuidador = :id";
+        $stmt = $this->conexion->prepare($query);
+        $stmt->execute([':id' => $id_cuidador]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
 ?>

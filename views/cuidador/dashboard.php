@@ -6,6 +6,25 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     header("Location: " . URL_BASE . "/cuidador/dashboard");
     exit();
 }
+
+// Convertir las citas a JSON para el calendario
+$eventos_calendario = [];
+if (!empty($citas)) {
+    foreach ($citas as $cita) {
+        $eventos_calendario[] = [
+            'id'    => $cita['ID_Cita'],
+            'title' => '🐾 ' . $cita['Nombre_Mascota'] . ': ' . $cita['Motivo'],
+            'start' => $cita['Fecha_Cita'] . 'T' . $cita['Hora_Cita'],
+            'extendedProps' => [
+                'veterinario' => $cita['Nombre_Vet'] . ' ' . $cita['Apellido_Vet'],
+                'clinica'     => $cita['Clinica'],
+                'estado'      => $cita['Estado']
+            ],
+            'backgroundColor' => ($cita['Estado'] == 'Pendiente') ? '#f59f00' : '#05ac37',
+            'borderColor'     => ($cita['Estado'] == 'Pendiente') ? '#f59f00' : '#05ac37'
+        ];
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -17,13 +36,39 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="<?= URL_BASE ?>/public/images/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="<?= URL_BASE ?>/public/css/style.css?v=<?= time() ?>">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- FullCalendar CSS -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+    <style>
+        .fc {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .fc-toolbar-title {
+            color: var(--dh-navy);
+            font-weight: 700 !important;
+            font-size: 1.25rem !important;
+        }
+        .fc-button-primary {
+            background-color: var(--dh-navy) !important;
+            border-color: var(--dh-navy) !important;
+        }
+        .fc-event {
+            cursor: pointer;
+            padding: 2px 5px;
+            border-radius: 6px;
+        }
+    </style>
 </head>
 <body>
 
-        <!-- Encabezado Móvil (Solo visible en pantallas pequeñas) -->
+    <!-- Encabezado Móvil -->
     <div class="mobile-header d-md-none p-3 d-flex justify-content-between align-items-center shadow-sm">
         <h4 class="mb-0 fw-bold text-white"><i class="fas fa-paw" style="color: var(--dh-beige);"></i> DocuHuella</h4>
-        <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+        <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
             <i class="fas fa-bars"></i>
         </button>
     </div>
@@ -36,16 +81,21 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
         </div>
 
         <nav class="mt-3">
-            <a href="<?= URL_BASE ?>/cuidador/dashboard" class="active"><i class="fas fa-home"></i> Mi Panel</a>
-            <a href="<?= URL_BASE ?>/views/cuidador/mis_mascotas.php"><i class="fas fa-bone"></i> Mis Mascotas</a>
+            <a href="<?= URL_BASE ?>/cuidador/dashboard" class="active" id="enlace-dashboard-cuidador">
+                <i class="fas fa-home"></i> Mi Panel
+            </a>
+            <a href="<?= URL_BASE ?>/cuidador/mis-mascotas"><i class="fas fa-bone"></i> Mis Mascotas</a>
+            <a href="#" id="enlace-mis-notas" onclick="mostrarPanelNotas(); marcarActivoSidebar(this); return false;">
+                <i class="fas fa-sticky-note"></i> Mis Notas
+            </a>
         </nav>
         
         <div class="mt-auto">
-            <a href="#" class="btn btn-outline-light d-flex align-items-center justify-content-center gap-2 mb-2" style="border-radius: 10px; padding: 12px; margin: 0 15px; border-color: rgba(255,255,255,0.2);" data-bs-toggle="modal" data-bs-target="#modalPerfilGlobal">
+            <a href="#" class="btn btn-outline-light d-flex align-items-center justify-content-center gap-2 mb-2 mx-3" style="border-radius: 10px; padding: 12px;" data-bs-toggle="modal" data-bs-target="#modalPerfilGlobal">
                 <i class="fas fa-user-edit"></i>
                 <span>Mi Perfil</span>
             </a>
-            <a href="<?= URL_BASE ?>/logout" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius: 10px; padding: 12px; margin: 0 15px 20px; width: auto !important;">
+            <a href="<?= URL_BASE ?>/logout" class="btn btn-danger d-flex align-items-center justify-content-center gap-2 mb-4 mx-3" style="border-radius: 10px; padding: 12px;">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Cerrar Sesión</span>
             </a>
@@ -61,27 +111,93 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
             </div>
         </div>
 
-        <div class="mb-4 pb-2 border-bottom">
-            <h2 class="fw-bold mb-0" style="color: var(--dh-navy);">Mi Espacio DocuHuella</h2>
-            <p class="text-muted mt-1">Sigue el estado de tus queridas mascotas</p>
-        </div>
+        <!-- Contenido principal -->
+        <div id="contenido-dashboard">
+            <div class="mb-4 pb-2 border-bottom">
+                <h2 class="fw-bold mb-0" style="color: var(--dh-navy);">Mi Espacio DocuHuella</h2>
+                <p class="text-muted mt-1">Sigue el estado de tus queridas mascotas y tus próximas citas</p>
+            </div>
 
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="stat-card" style="border-left-color: #ffc107;">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="stat-label">Mascotas a mi Cargo</div>
-                            <div class="stat-number"><?php echo number_format($total_mascotas ?? 0); ?></div>
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <div class="stat-card" style="border-left-color: #ffc107;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="stat-label">Mascotas a mi Cargo</div>
+                                <div class="stat-number"><?php echo number_format($total_mascotas ?? 0); ?></div>
+                            </div>
+                            <i class="fas fa-paw stat-icon" style="color: #ffc107;"></i>
                         </div>
-                        <i class="fas fa-paw stat-icon" style="color: #ffc107;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm" style="border-radius: 20px;">
+                        <div class="card-body p-4">
+                            <h4 class="fw-bold mb-4" style="color: var(--dh-navy);">
+                                <i class="fas fa-calendar-alt me-2"></i>Agenda de Citas y Recordatorios
+                            </h4>
+                            <div id="calendar"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Panel Mis Notas (SPA) -->
+        <?php include_once APP_PATH . '/views/includes/mis_notas.php'; ?>
+
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <?php include_once APP_PATH . '/views/includes/modal_perfil.php'; ?>
+    <!-- FullCalendar JS -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.8/locales-all.global.min.js'></script>
+    
+    <script>
+        function marcarActivoSidebar(el) {
+            document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'es', // Idioma en español
+                height: 'auto', // Tamaño automático basado en el contenido
+                handleWindowResize: true,
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                },
+                events: <?php echo json_encode($eventos_calendario); ?>,
+                eventClick: function(info) {
+                    const props = info.event.extendedProps;
+                    
+                    // Usar SweetAlert2 si está disponible (vía mis_notas.php)
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: info.event.title,
+                            html: `
+                                <div class="text-start">
+                                    <p><strong><i class="fas fa-user-md me-2"></i>Veterinario:</strong> ${props.veterinario}</p>
+                                    <p><strong><i class="fas fa-hospital me-2"></i>Clínica:</strong> ${props.clinica}</p>
+                                    <p><strong><i class="fas fa-info-circle me-2"></i>Estado:</strong> <span class="badge ${props.estado === 'Pendiente' ? 'bg-warning' : 'bg-success'}">${props.estado}</span></p>
+                                </div>
+                            `,
+                            confirmButtonColor: '#1A2D40',
+                            confirmButtonText: 'Cerrar'
+                        });
+                    }
+                }
+            });
+            calendar.render();
+        });
+    </script>
 </body>
 </html>

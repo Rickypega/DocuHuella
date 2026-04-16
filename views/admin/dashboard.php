@@ -42,11 +42,19 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
         </div>
 
         <nav class="mt-3">
-            <a href="<?= URL_BASE ?>/admin/dashboard" class="active"><i class="fas fa-chart-pie"></i> Mi Resumen</a>
+            <a href="<?= URL_BASE ?>/admin/dashboard" class="active" id="enlace-dashboard-admin"
+               onclick="ocultarPanelNotas(); marcarActivoSidebar(this); return false;"
+               style="cursor:pointer;">
+               <i class="fas fa-chart-pie"></i> Mi Resumen
+            </a>
             <a href="<?= URL_BASE ?>/views/admin/clinicas.php"><i class="fas fa-hospital"></i> Mis Sucursales</a>
             <a href="<?= URL_BASE ?>/views/admin/registrar_vet.php"><i class="fas fa-user-md"></i> Veterinarios</a>
             <a href="<?= URL_BASE ?>/views/admin/reportes.php"><i class="fas fa-file-medical-alt"></i> Reportes
                 Clinicos</a>
+            <a href="#" id="enlace-mis-notas"
+               onclick="mostrarPanelNotas(); marcarActivoSidebar(this); return false;">
+                <i class="fas fa-sticky-note"></i> Mis Notas
+            </a>
         </nav>
 
         <div class="mt-auto">
@@ -64,8 +72,10 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
             </a>
         </div>
     </div>
-
     <div class="main-content">
+
+        <!-- Contenido principal del dashboard -->
+        <div id="contenido-dashboard">
 
         <?php if (isset($_GET['exito']) && $_GET['exito'] == 'vet_registrado'): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -218,19 +228,28 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
             </div>
         </div>
 
+        </div><!-- /contenido-dashboard -->
+
+        <!-- Panel Mis Notas (oculto por defecto) -->
+        <?php include_once APP_PATH . '/views/includes/mis_notas.php'; ?>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const ctx = document.getElementById('graficoSistema').getContext('2d');
+        function marcarActivoSidebar(el) {
+            document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+            el.classList.add('active');
+        }
 
-            new Chart(ctx, {
+        document.addEventListener("DOMContentLoaded", function () {
+            const ctx = document.getElementById('graficoSistema');
+            if (!ctx) return;
+            new Chart(ctx.getContext('2d'), {
                 type: 'bar',
                 data: {
-                    // Actualizado para reflejar las nuevas métricas del Admin
                     labels: ['Citas', 'Sucursales', 'Veterinarios', 'Clientes', 'Mascotas', 'Expedientes'],
                     datasets: [{
                         label: 'Volumen de Datos',

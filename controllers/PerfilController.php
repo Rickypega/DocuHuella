@@ -25,8 +25,8 @@ class PerfilController {
 
             $telefono        = $_POST['telefono'] ?? null;
             $direccion       = $_POST['direccion'] ?? null;
-            $password_actual = $_POST['password_actual'];
-            $password_nueva  = !empty($_POST['password_nueva']) ? $_POST['password_nueva'] : null;
+            $password_actual = trim($_POST['password_actual']);
+            $password_nueva  = !empty($_POST['password_nueva']) ? trim($_POST['password_nueva']) : null;
 
             try {
                 // 1. Validar la contraseña actual de TODO usuario
@@ -35,9 +35,9 @@ class PerfilController {
                 $stmt->execute();
                 $hash = $stmt->fetchColumn();
 
-                if (!password_verify($password_actual, $hash)) {
+                if (!$hash || !password_verify($password_actual, $hash)) {
                     // Contraseña incorrecta
-                    echo "<script>alert('La contraseña actual es incorrecta. No se han guardado los cambios.'); window.history.back();</script>";
+                    header("Location: " . $_SERVER['HTTP_REFERER'] . (strpos($_SERVER['HTTP_REFERER'], '?') !== false ? '&' : '?') . "status_perfil=error_pass");
                     exit();
                 }
 
@@ -77,11 +77,11 @@ class PerfilController {
                     }
                 }
 
-                echo "<script>alert('¡Perfil actualizado correctamente!'); window.history.back();</script>";
+                header("Location: " . $_SERVER['HTTP_REFERER'] . (strpos($_SERVER['HTTP_REFERER'], '?') !== false ? '&' : '?') . "status_perfil=success");
                 exit();
 
             } catch (PDOException $e) {
-                echo "<script>alert('Error al actualizar el perfil.'); window.history.back();</script>";
+                header("Location: " . $_SERVER['HTTP_REFERER'] . (strpos($_SERVER['HTTP_REFERER'], '?') !== false ? '&' : '?') . "status_perfil=error_db");
                 exit();
             }
         }

@@ -40,12 +40,19 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
         </div>
 
         <nav class="mt-3">
-            <a href="<?= URL_BASE ?>/superadmin/dashboard" class="active"><i class="fas fa-chart-pie"></i>
-                Estadísticas</a>
+            <a href="<?= URL_BASE ?>/superadmin/dashboard" class="active" id="enlace-dashboard-sa"
+               onclick="ocultarPanelNotas(); marcarActivoSidebar(this); return false;"
+               style="cursor:pointer;">
+               <i class="fas fa-chart-pie"></i> Estadísticas
+            </a>
             <a href="<?= URL_BASE ?>/views/superadmin/administrador.php"><i class="fas fa-hospital"></i> Gestión de
                 Clínicas</a>
             <a href="<?= URL_BASE ?>/views/superadmin/reportes.php"><i class="fas fa-file-export"></i> Gestión de
                 Reportes</a>
+            <a href="#" id="enlace-mis-notas"
+               onclick="mostrarPanelNotas(); marcarActivoSidebar(this); return false;">
+                <i class="fas fa-sticky-note"></i> Mis Notas
+            </a>
         </nav>
 
         <div class="mt-auto">
@@ -73,97 +80,103 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
             </div>
         </div>
 
-        <div class="mb-4 pb-2 border-bottom">
-            <h2 class="fw-bold mb-0" style="color: var(--dh-navy);">Visión General</h2>
-            <p class="text-muted mt-1">Estado global de la plataforma DocuHuella</p>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left-color: #0d6efd;">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="stat-label">Administradores</div>
-                            <div class="stat-number"><?php echo number_format($total_admins); ?></div>
-                        </div>
-                        <i class="fas fa-user-tie stat-icon"></i>
-                    </div>
-                </div>
+        <!-- Contenido principal del dashboard -->
+        <div id="contenido-dashboard">
+            <div class="mb-4 pb-2 border-bottom">
+                <h2 class="fw-bold mb-0" style="color: var(--dh-navy);">Visión General</h2>
+                <p class="text-muted mt-1">Estado global de la plataforma DocuHuella</p>
             </div>
 
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="stat-label">Clínicas / Sedes</div>
-                            <div class="stat-number"><?php echo number_format($total_clinicas); ?></div>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="stat-card" style="border-left-color: #0d6efd;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="stat-label">Administradores</div>
+                                <div class="stat-number"><?php echo number_format($total_admins); ?></div>
+                            </div>
+                            <i class="fas fa-user-tie stat-icon"></i>
                         </div>
-                        <i class="fas fa-hospital stat-icon"></i>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left-color: #8a0a2a;">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="stat-label">Veterinarios</div>
-                            <div class="stat-number"><?php echo number_format($total_veterinarios); ?></div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="stat-label">Clínicas / Sedes</div>
+                                <div class="stat-number"><?php echo number_format($total_clinicas); ?></div>
+                            </div>
+                            <i class="fas fa-hospital stat-icon"></i>
                         </div>
-                        <i class="fas fa-user-md stat-icon"></i>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="stat-label">Expedientes</div>
-                            <div class="stat-number"><?php echo number_format($total_expedientes); ?></div>
+                <div class="col-md-3">
+                    <div class="stat-card" style="border-left-color: #8a0a2a;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="stat-label">Veterinarios</div>
+                                <div class="stat-number"><?php echo number_format($total_veterinarios); ?></div>
+                            </div>
+                            <i class="fas fa-user-md stat-icon"></i>
                         </div>
-                        <i class="fas fa-folder-open stat-icon"></i>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-6">
-                <div class="stat-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="stat-label">Cuidadores Registrados</div>
-                            <div class="stat-number"><?php echo number_format($total_cuidadores); ?></div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="stat-label">Expedientes</div>
+                                <div class="stat-number"><?php echo number_format($total_expedientes); ?></div>
+                            </div>
+                            <i class="fas fa-folder-open stat-icon"></i>
                         </div>
-                        <i class="fas fa-users stat-icon"></i>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-6">
-                <div class="stat-card" style="border-left-color: #05ac37;">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="stat-label">Mascotas en Sistema</div>
-                            <div class="stat-number"><?php echo number_format($total_mascotas); ?></div>
+                <div class="col-md-6">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="stat-label">Cuidadores Registrados</div>
+                                <div class="stat-number"><?php echo number_format($total_cuidadores); ?></div>
+                            </div>
+                            <i class="fas fa-users stat-icon"></i>
                         </div>
-                        <i class="fas fa-dog stat-icon"></i>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="row mt-5">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm" style="border-radius: 15px;">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold mb-4" style="color: var(--dh-navy);">Distribución del Sistema</h5>
-                        <div style="height: 350px;">
-                            <canvas id="graficoSistema"></canvas>
+                <div class="col-md-6">
+                    <div class="stat-card" style="border-left-color: #05ac37;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="stat-label">Mascotas en Sistema</div>
+                                <div class="stat-number"><?php echo number_format($total_mascotas); ?></div>
+                            </div>
+                            <i class="fas fa-dog stat-icon"></i>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-4" style="color: var(--dh-navy);">Distribución del Sistema</h5>
+                            <div style="height: 350px;">
+                                <canvas id="graficoSistema"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /contenido-dashboard -->
+
+        <!-- Panel Mis Notas (oculto por defecto) -->
+        <?php include_once APP_PATH . '/views/includes/mis_notas.php'; ?>
 
     </div>
 
@@ -171,10 +184,15 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const ctx = document.getElementById('graficoSistema').getContext('2d');
+        function marcarActivoSidebar(el) {
+            document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+            el.classList.add('active');
+        }
 
-            new Chart(ctx, {
+        document.addEventListener("DOMContentLoaded", function () {
+            const ctx = document.getElementById('graficoSistema');
+            if (!ctx) return;
+            new Chart(ctx.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: ['Admins', 'Clínicas', 'Veterinarios', 'Cuidadores', 'Mascotas', 'Expedientes'],

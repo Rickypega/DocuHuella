@@ -12,12 +12,12 @@
                         <?php if(isset($_SESSION['id_rol']) && $_SESSION['id_rol'] != 4): ?>
                             <div class="col-12">
                                 <label class="form-label">Teléfono</label>
-                                <input type="text" name="telefono" class="form-control mascara-telefono-perfil" maxlength="12" placeholder="809-000-0000" inputmode="numeric">
+                                <input type="text" name="telefono" class="form-control mascara-telefono-perfil" maxlength="12" placeholder="809-000-0000" inputmode="numeric" value="<?= htmlspecialchars($perfil_info['Telefono'] ?? '') ?>">
                             </div>
                             <?php if($_SESSION['id_rol'] == 2 || $_SESSION['id_rol'] == 3): ?>
                                 <div class="col-12">
                                     <label class="form-label">Dirección</label>
-                                    <input type="text" name="direccion" class="form-control" placeholder="Escriba su dirección">
+                                    <input type="text" name="direccion" class="form-control" placeholder="Escriba su dirección" value="<?= htmlspecialchars($perfil_info['Direccion'] ?? '') ?>">
                                 </div>
                             <?php endif; ?>
                         <?php endif; ?>
@@ -184,5 +184,56 @@
             });
         });
 
+        // Manejo de alertas según parámetros de URL (SweetAlert2)
+        const urlParams = new URLSearchParams(window.location.search);
+        const statusPerfil = urlParams.get('status_perfil');
+
+        if (statusPerfil && typeof Swal !== 'undefined') {
+            let config = {
+                confirmButtonColor: '#1A2D40',
+                timer: 4000,
+                timerProgressBar: true
+            };
+
+            if (statusPerfil === 'success') {
+                Swal.fire({
+                    ...config,
+                    icon: 'success',
+                    title: '¡Actualización Exitosa!',
+                    text: 'Los cambios en tu perfil han sido guardados correctamente.'
+                });
+            } else if (statusPerfil === 'error_pass') {
+                Swal.fire({
+                    ...config,
+                    icon: 'error',
+                    title: 'Verificación Fallida',
+                    text: 'La contraseña actual no coincide. Por seguridad, no se aplicaron los cambios.',
+                    timer: 6000
+                });
+            } else if (statusPerfil === 'error_db') {
+                Swal.fire({
+                    ...config,
+                    icon: 'error',
+                    title: 'Error de Servidor',
+                    text: 'Ocurrió un problema técnico al guardar tus datos. Inténtalo de nuevo más tarde.',
+                    timer: 6000
+                });
+            }
+
+            // Limpiar la URL para evitar que la alerta reaparezca al recargar
+            const newUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+
+        // Trigger manual por si falla el data-bs-toggle de Bootstrap
+        document.querySelectorAll('[data-bs-target="#modalPerfilGlobal"]').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const modalEl = document.getElementById('modalPerfilGlobal');
+                if (modalEl && typeof bootstrap !== 'undefined') {
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                }
+            });
+        });
     });
 </script>

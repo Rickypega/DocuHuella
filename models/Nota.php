@@ -106,6 +106,19 @@ class Nota {
         
         return $stmt->execute();
     }
+
+    /**
+     * 5. ELIMINAR TODAS LAS NOTAS DEL USUARIO
+     */
+    public function eliminarTodasPorUsuario() {
+        $query = "DELETE FROM " . $this->tabla . " 
+                  WHERE ID_Usuario = :id_usuario";
+
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bindParam(':id_usuario', $this->id_usuario);
+
+        return $stmt->execute();
+    }
 }
 ?>
 

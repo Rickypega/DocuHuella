@@ -192,6 +192,9 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <a href="<?= URL_BASE ?>/views/admin/reportes.php">
                 <i class="fas fa-file-medical-alt"></i> Reportes Clinicos
             </a>
+            <a href="#" id="enlace-mis-notas" onclick="mostrarPanelNotas(); marcarActivoSidebar(this); return false;">
+                <i class="fas fa-sticky-note"></i> Mis Notas
+            </a>
         </nav>
 
         <div class="mt-auto">
@@ -211,6 +214,10 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <div class="main-content">
+
+        <!-- Contenedor para ocultar al mostrar notas -->
+        <div id="contenido-dashboard">
+
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
             <h2 class="fw-bold" style="color: var(--dh-navy);">Gestión de Veterinarios</h2>
             <button class="btn btn-dark shadow px-4 py-2" data-bs-toggle="modal" data-bs-target="#modalRegistroVet">
@@ -269,6 +276,12 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </table>
             </div>
         </div>
+
+        </div><!-- /#contenido-dashboard -->
+
+        <!-- Panel de Notas -->
+        <?php include_once APP_PATH . '/views/includes/mis_notas.php'; ?>
+
     </div>
 
     <div class="modal fade" id="modalRegistroVet" tabindex="-1" aria-hidden="true">
@@ -919,6 +932,12 @@ $veterinarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </script>
 
     <?php include_once APP_PATH . '/views/includes/modal_perfil.php'; ?>
+    <script>
+        function marcarActivoSidebar(el) {
+            document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+            el.classList.add('active');
+        }
+    </script>
 </body>
 
 </html>

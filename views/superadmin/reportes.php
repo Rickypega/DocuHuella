@@ -93,6 +93,10 @@ try {
             <a href="<?= URL_BASE ?>/superadmin/dashboard"><i class="fas fa-chart-pie"></i> Estadísticas</a>
             <a href="<?= URL_BASE ?>/views/superadmin/administrador.php"><i class="fas fa-hospital"></i> Gestión de Clínicas</a>
             <a href="<?= URL_BASE ?>/views/superadmin/reportes.php" class="active"><i class="fas fa-file-export"></i> Gestión de Reportes</a>
+            <a href="#" id="enlace-mis-notas"
+               onclick="mostrarPanelNotas(); marcarActivoSidebar(this); return false;">
+                <i class="fas fa-sticky-note"></i> Mis Notas
+            </a>
         </nav>
         
         <div class="mt-auto">
@@ -115,6 +119,9 @@ try {
                 <i class="fas fa-user-circle fs-3 ms-2 text-secondary"></i>
             </div>
         </div>
+
+        <!-- Contenido principal -->
+        <div id="contenido-dashboard">
         
         <div class="mb-4 pb-2 border-bottom">
             <h2 class="fw-bold mb-0" style="color: var(--dh-navy);">Centro de Reportes</h2>
@@ -198,6 +205,12 @@ try {
             </div>
 
         </div>
+
+        </div><!-- /contenido-dashboard -->
+
+        <!-- Panel Mis Notas (oculto por defecto) -->
+        <?php include_once APP_PATH . '/views/includes/mis_notas.php'; ?>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -236,5 +249,11 @@ try {
         }
     </script>
     <?php include_once APP_PATH . '/views/includes/modal_perfil.php'; ?>
+    <script>
+    function marcarActivoSidebar(el) {
+        document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+        el.classList.add('active');
+    }
+    </script>
 </body>
 </html>

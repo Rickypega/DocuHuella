@@ -106,6 +106,9 @@ $mis_clinicas = $stmt_cli->fetchAll(PDO::FETCH_ASSOC);
             <a href="<?= URL_BASE ?>/views/admin/registrar_vet.php"><i class="fas fa-user-md"></i> Veterinarios</a>
             <a href="<?= URL_BASE ?>/views/admin/reportes.php" class="active"><i class="fas fa-file-medical-alt"></i>
                 Reportes Clínicos</a>
+            <a href="#" id="enlace-mis-notas" onclick="mostrarPanelNotas(); marcarActivoSidebar(this); return false;">
+                <i class="fas fa-sticky-note"></i> Mis Notas
+            </a>
         </nav>
         <div class="mt-auto">
             <a href="#" class="btn btn-outline-light d-flex align-items-center justify-content-center gap-2 mb-2"
@@ -123,6 +126,9 @@ $mis_clinicas = $stmt_cli->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- Contenido Principal -->
     <div class="main-content">
+
+        <!-- Envoltorio para ocultar al mostrar notas -->
+        <div id="contenido-dashboard">
 
         <!-- Bienvenida -->
         <div class="d-flex justify-content-end mb-2">
@@ -257,6 +263,12 @@ $mis_clinicas = $stmt_cli->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
         </div>
+
+        </div><!-- /#contenido-dashboard -->
+
+        <!-- Panel de Notas -->
+        <?php include_once APP_PATH . '/views/includes/mis_notas.php'; ?>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -293,6 +305,12 @@ $mis_clinicas = $stmt_cli->fetchAll(PDO::FETCH_ASSOC);
         }
     </script>
     <?php include_once APP_PATH . '/views/includes/modal_perfil.php'; ?>
+    <script>
+        function marcarActivoSidebar(el) {
+            document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+            el.classList.add('active');
+        }
+    </script>
 </body>
 
 </html>
