@@ -181,4 +181,8 @@ public function privacidad() {
 public function terminos() {
     include_once 'views/terminos.php';
 }
+
+public function contactos() {
+    include_once 'views/contactos.php';
+}
 }

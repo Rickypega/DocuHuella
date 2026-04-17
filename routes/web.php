@@ -9,6 +9,7 @@ return [
     'logout'        => ['controller' => 'UsuariosController', 'method' => 'logout'],     // Cerrar sesión
     'privacidad'    => ['controller' => 'UsuariosController', 'method' => 'privacidad'], // Privacidad
     'terminos'      => ['controller' => 'UsuariosController', 'method' => 'terminos'],   // Terminos
+    'contactos'     => ['controller' => 'UsuariosController', 'method' => 'contactos'],  // Contactos
 
     'superadmin/dashboard' => ['controller' => 'superadmin/DashboardController', 'method' => 'index'], // Dashboard SuperAdmin
     'superadmin/catalogos' => ['controller' => 'superadmin/CatalogosController', 'method' => 'index'], // Gestión de Catálogos

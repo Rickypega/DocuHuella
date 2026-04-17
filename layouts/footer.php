@@ -6,6 +6,8 @@
                     <a href="<?= URL_BASE ?>/privacidad" class="text-white text-decoration-none mx-2">Política de Privacidad</a>
                     <span class="opacity-50">|</span>
                     <a href="<?= URL_BASE ?>/terminos" class="text-white text-decoration-none mx-2">Términos de Uso</a>
+                    <span class="opacity-50">|</span>
+                    <a href="<?= URL_BASE ?>/contactos" class="text-white text-decoration-none mx-2">Contactos</a>
                 </div>
             </div>
             
